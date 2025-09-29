@@ -12,7 +12,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // قم بتشغيل الـ Seeders بالترتيب الذي يضمن توفر البيانات الأساسية للعلاقات الخارجية.
         $this->call([
             UserSeeder::class,               // Users (owners, renters, admins) must exist first
             EquipmentCategorySeeder::class,  // Categories must exist before equipment

@@ -21,8 +21,6 @@ class InvoiceFactory extends Factory
      */
     public function definition(): array
     {
-        // كحل افتراضي، سننشئ Booking جديداً. هذا سيتم تجاوزه (override) بواسطة Seeder
-        // عندما يحدد Booking_id صراحةً. هذا يضمن أن Factory يمكنه العمل بشكل مستقل.
         $booking = Booking::factory()->createQuietly(); // createQuietly لتجنب تشغيل الـ afterCreating callbacks فوراً
 
         $subtotal = $booking->total_cost;
@@ -82,7 +80,6 @@ class InvoiceFactory extends Factory
         ]);
     }
 
-    // دوال States الأخرى (issued, paid, overdue, cancelled) تبقى كما هي
     public function issued(): static
     {
         return $this->state(fn (array $attributes) => ['status' => 'issued']);

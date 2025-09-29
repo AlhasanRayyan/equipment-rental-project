@@ -35,17 +35,17 @@
     <!-- شعار لوحة التحكم -->
     <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ route('admin.dashboard') }}"> {{-- تم التعديل --}}
         <div class="sidebar-brand-icon rotate-n-15">
-            <i class="fas fa-tools"></i> {{-- تم تغيير الأيقونة --}}
+            <i class="fas fa-tools"></i> 
         </div>
-        <div class="sidebar-brand-text mx-3">إدارة المعدات</div> {{-- تم تغيير الاسم --}}
+        <div class="sidebar-brand-text mx-3">إدارة المعدات</div> 
     </a>
 
     <!-- فاصل -->
     <hr class="sidebar-divider my-0">
 
     <!-- عنصر لوحة التحكم الرئيسية (Admin Dashboard) -->
-    <li class="nav-item {{ Request::routeIs('admin.dashboard') ? 'active' : '' }}"> {{-- تم التعديل --}}
-        <a class="nav-link" href="{{ route('admin.dashboard') }}"> {{-- تم التعديل --}}
+    <li class="nav-item {{ Request::routeIs('admin.dashboard') ? 'active' : '' }}"> 
+        <a class="nav-link" href="{{ route('admin.dashboard') }}"> 
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>لوحة التحكم</span></a>
     </li>
@@ -77,13 +77,12 @@
             <span>الشكاوى والاستفسارات</span></a>
     </li>
 
-    <!-- فاصل وإعدادات النظام (إذا لزم الأمر، يمكن تبسيطها) -->
+    <!-- فاصل وإعدادات النظام  -->
     <hr class="sidebar-divider">
     <div class="sidebar-heading">
         الإعدادات العامة
     </div>
 
-    {{-- هنا يمكنك إضافة روابط لإدارة فئات المعدات، إعدادات الدفع، أو أي شيء آخر يخص النظام. --}}
     <li class="nav-item {{ Request::is('admin/settings*') ? 'active' : '' }}">
         <a class="nav-link" href=""> 
             <i class="fas fa-fw fa-cogs"></i>
@@ -96,4 +95,3 @@
         <button class="rounded-circle border-0" id="sidebarToggle"></button>
     </div>
 </ul>
-<!-- نهاية القائمة الجانبية للتحكم -->

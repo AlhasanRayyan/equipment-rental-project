@@ -52,12 +52,9 @@ class EquipmentImageFactory extends Factory
     public function configure(): static
     {
         return $this->afterCreating(function (EquipmentImage $image) {
-            // If this is the first image created for an equipment, make it the main one.
-            // Or if explicitly marked as main, ensure others are not.
             if ($image->is_main) {
                 $image->equipment->images()->where('id', '!=', $image->id)->update(['is_main' => false]);
             } else {
-                // If no main image exists, make the first one created for this equipment the main.
                 if (!$image->equipment->images()->where('is_main', true)->exists()) {
                     $image->update(['is_main' => true]);
                 }

@@ -20,6 +20,7 @@ class DashboardController extends Controller
         $totalUsers = User::count();
         $totalEquipment = Equipment::count();
         $totalBookings = Booking::count();
+
         // إجمالي الأرباح: مجموع المدفوعات المكتملة ذات النوع 'initial_payment' أو 'final_payment'
         $totalRevenue = Payment::where('status', 'completed')
             ->whereIn('payment_type', ['initial_payment', 'final_payment'])
@@ -40,19 +41,15 @@ class DashboardController extends Controller
 
         // 3. آخر الشكاوى والاستفسارات
         // هنا نفترض أن الشكاوى والاستفسارات تُسجل في جدول الرسائل (Messages)
-        // أو لديك نموذج مخصص لها (Complaint model)
         $latestComplaints = Message::where('message_type', 'notification') // أو نوع مخصص للشكاوى
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
-        // ملاحظة: إذا كان لديك نموذج خاص للشكاوى، استبدل Message::class به.
-        // وإذا لم يكن لديك Message::message_type='notification' لتمييز الشكاوى،
-        // ستحتاج إلى إضافة حقل أو منطق لتمييزها.
-
+   
         // 4. بيانات الرسم البياني لتوزيع المعدات حسب الفئة
         $equipmentCategoriesCount = EquipmentCategory::withCount('equipment')
             ->orderBy('equipment_count', 'desc')
-            ->take(7) // عرض أعلى 7 فئات
+            ->take(7)
             ->get();
 
         // 5. بيانات الرسم البياني للحجوزات الشهرية

@@ -33,7 +33,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'phone_number' => $this->faker->unique()->phoneNumber(),
             'password' => Hash::make('password'), // كلمة مرور افتراضية
-            'role' => $this->faker->randomElement(['user', 'admin']), // بناءً على تعديل الـ enum المقترح
+            'role' => $this->faker->randomElement(['user', 'admin']), 
             'profile_picture_url' => $this->faker->imageUrl(640, 480, 'people', true),
             'description' => $this->faker->paragraph(),
             'location_text' => $this->faker->address(),

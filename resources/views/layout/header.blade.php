@@ -43,7 +43,6 @@
             </div>
         </li>
 
-        {{-- تم حذف "Nav Item - Alerts" و "Nav Item - Messages" بناءً على طلبك --}}
 
         <div class="topbar-divider d-none d-sm-block"></div>
 
@@ -79,7 +78,7 @@
     </ul>
 </nav>
 
-<!-- نافذة تأكيد تسجيل الخروج (لا تحتاج لتعديل، فقط للتأكد من وجودها) -->
+<!-- نافذة تأكيد تسجيل الخروج -->
 <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

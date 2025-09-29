@@ -27,7 +27,6 @@ class BookingFactory extends Factory
      */
     public function definition(): array
     {
-        // Ensure we have at least one equipment and a regular user to act as renter
         $equipment = Equipment::inRandomOrder()->first() ?? Equipment::factory()->create();
         $renter = User::where('role', 'user')->inRandomOrder()->first() ?? User::factory()->regularUser()->create();
         $startDate = Carbon::parse($this->faker->dateTimeBetween('-3 months', '+3 months'));

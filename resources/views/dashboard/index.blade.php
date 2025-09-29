@@ -6,33 +6,32 @@
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h1 class="h3 mb-0 text-gray-800">لوحة تحكم المشرف</h1> {{-- تم التعديل --}}
-            {{-- يمكن إضافة زر لتوليد تقارير هنا إذا لزم الأمر لمشروع تأجير المعدات --}}
-            {{-- <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
                 <i class="fas fa-download fa-sm text-white-50"></i> توليد تقرير
-            </a> --}}
+            </a>
         </div>
 
-        <!-- ✅ صف الإحصائيات (مُعاد تصميمه لمشروع تأجير المعدات) -->
+        <!--  صف الإحصائيات  -->
         <div class="row">
             <div class="col-xl-3 col-md-6 mb-4">
-                {{-- إحصائية: إجمالي المستخدمين (رقم 1 في طلبك) --}}
+                {{-- إحصائية: إجمالي المستخدمين --}}
                 <x-stats-card icon="fas fa-users" title="إجمالي المستخدمين" :value="$stats['total_users']" color="primary" />
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
-                {{-- إحصائية: إجمالي المعدات (رقم 1 في طلبك) --}}
+                {{-- إحصائية: إجمالي المعدات  --}}
                 <x-stats-card icon="fas fa-hard-hat" title="إجمالي المعدات" :value="$stats['total_equipment']" color="success" />
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
-                {{-- إحصائية: إجمالي الحجوزات (رقم 1 في طلبك) --}}
+                {{-- إحصائية: إجمالي الحجوزات --}}
                 <x-stats-card icon="fas fa-calendar-check" title="إجمالي الحجوزات" :value="$stats['total_bookings']" color="info" />
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
-                {{-- إحصائية: إجمالي الأرباح (رقم 1 في طلبك) --}}
-                <x-stats-card icon="fas fa-dollar-sign" title="إجمالي الأرباح" :value="$stats['total_revenue']" color="warning" prefix="$" /> {{-- يمكن إضافة رمز العملة --}}
+                {{-- إحصائية: إجمالي الأرباح  --}}
+                <x-stats-card icon="fas fa-dollar-sign" title="إجمالي الأرباح" :value="$stats['total_revenue']" color="warning" prefix="$" />
             </div>
         </div>
 
-        <!-- صف الرسوم البيانية (مُعاد تصميمه) -->
+        <!-- صف الرسوم البيانية  -->
         <div class="row">
             <!-- الرسم البياني الدائري (توزيع المعدات حسب الفئة) -->
             <div class="col-xl-4 col-lg-5">
@@ -43,18 +42,18 @@
                     <div class="card-body"><canvas id="equipmentCategoryChart"></canvas></div>
                 </div>
             </div>
-            <!-- الرسم البياني الخطي (يمكن استخدامه لعرض الحجوزات شهريًا أو الأرباح) -->
+            <!-- الرسم البياني الخطي  -->
             <div class="col-xl-8 col-lg-7">
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <h6 class="m-0 fw-bold text-primary">الحجوزات الشهرية</h6> {{-- أو الأرباح الشهرية --}}
+                        <h6 class="m-0 fw-bold text-primary">الحجوزات الشهرية</h6> 
                     </div>
                     <div class="card-body"><canvas id="monthlyBookingsChart"></canvas></div>
                 </div>
             </div>
         </div>
 
-        <!-- صف الجداول (مُعاد تصميمه) -->
+        <!-- صف الجداول  -->
         <div class="row">
             <!-- جدول آخر المعدات المضافة (لمراجعة الإعلانات) -->
             <div class="col-lg-6 mb-4">
@@ -193,7 +192,7 @@
             // الرسم البياني للحجوزات الشهرية
             const monthlyBookingsCtx = document.getElementById('monthlyBookingsChart').getContext('2d');
             new Chart(monthlyBookingsCtx, {
-                type: 'bar', // يمكن تغييرها إلى 'line' إذا أردت رسماً بيانياً خطياً
+                type: 'bar',
                 data: {
                     labels: {!! json_encode($monthlyBookings->pluck('month_name')) !!}, // أسماء الأشهر
                     datasets: [{
