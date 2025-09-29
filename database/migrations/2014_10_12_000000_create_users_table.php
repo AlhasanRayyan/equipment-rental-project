@@ -24,7 +24,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->string('location_text')->nullable();
             $table->boolean('is_active')->default(true);
-             $table->timestamp('last_login')->nullable();
+            $table->timestamp('last_login')->nullable();
             $table->decimal('average_owner_rating', 3, 2)->default(0.00);
             $table->decimal('average_renter_rating', 3, 2)->default(0.00);
             $table->rememberToken();
