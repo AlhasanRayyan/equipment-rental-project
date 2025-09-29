@@ -58,7 +58,7 @@
 
     <!-- إدارة المستخدمين (تفعيل / حظر) -->
     <li class="nav-item {{ Request::is('admin/users*') ? 'active' : '' }}">
-        <a class="nav-link" href="">
+        <a class="nav-link" href="{{ route('admin.users.index') }}">
             <i class="fas fa-fw fa-users"></i>
             <span>إدارة المستخدمين</span></a>
     </li>

@@ -1,4 +1,4 @@
-@extends('layout.app') {{-- أو admin.layout إذا كان لديك ملف layout خاص بالأدمن --}}
+@extends('layouts.app') {{-- أو admin.layout إذا كان لديك ملف layout خاص بالأدمن --}}
 
 @section('content')
     <div class="container-fluid">

@@ -135,7 +135,7 @@
 </head>
 <body id="page-top">
     <div id="wrapper">
-        @include('layout.sidebar')
+        @include('layouts.sidebar')
         <div id="content-wrapper" class="d-flex flex-column">
             <div id="content">
                 <nav class="navbar navbar-expand navbar-light topbar mb-4 static-top">
@@ -149,11 +149,11 @@
                                 <img class="img-profile rounded-circle" src="https://placehold.co/60x60/4e73df/ffffff?text={{ substr(Auth::user()->name ?? 'Z', 0, 1) }}">
                             </a>
                             <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in text-end" aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw ms-2 text-gray-400"></i>
                                     تسجيل الخروج
                                 </a>
-                                <form id="logout-form" action="" method="POST" class="d-none">@csrf</form>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                             </div>
                         </li>
                     </ul>
