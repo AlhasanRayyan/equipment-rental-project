@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ComplaintController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EquipmentController;
 use App\Http\Controllers\Admin\UserController;
@@ -45,6 +46,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/{equipment}/approve', [EquipmentController::class, 'approve'])->name('approve');
         Route::post('/{equipment}/reject', [EquipmentController::class, 'reject'])->name('reject'); // خيار لرفض المعدة
         Route::delete('/{equipment}', [EquipmentController::class, 'destroy'])->name('destroy'); // حذف المعدة
+    });
+
+    // مسارات إدارة الشكاوى والاستفسارات
+    Route::prefix('complaints')->name('complaints.')->group(function () {
+        Route::get('/', [ComplaintController::class, 'index'])->name('index');
+        Route::get('/{message}', [ComplaintController::class, 'show'])->name('show'); // لعرض تفاصيل شكوى
+        Route::post('/{message}/mark-as-read', [ComplaintController::class, 'markAsRead'])->name('markAsRead'); // لتمييز الشكوى كمقروءة
+        Route::post('/{message}/resolve', [ComplaintController::class, 'resolve'])->name('resolve'); // لحل الشكوى
+        Route::delete('/{message}', [ComplaintController::class, 'destroy'])->name('destroy'); // لحذف شكوى
     });
 });
 

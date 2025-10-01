@@ -72,7 +72,7 @@
 
     <!-- إدارة الشكاوى والاستفسارات -->
     <li class="nav-item {{ Request::is('admin/complaints*') ? 'active' : '' }}">
-        <a class="nav-link" href=""> 
+        <a class="nav-link" href="{{ route('admin.complaints.index') }}"> 
             <i class="fas fa-fw fa-headset"></i> {{-- أيقونة مقترحة للشكاوى --}}
             <span>الشكاوى والاستفسارات</span></a>
     </li>
