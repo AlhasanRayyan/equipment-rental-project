@@ -65,8 +65,8 @@
 
     <!-- إدارة المعدات (مراجعة الإعلانات) -->
     <li class="nav-item {{ Request::is('admin/equipment*') ? 'active' : '' }}">
-        <a class="nav-link" href=""> 
-            <i class="fas fa-fw fa-hard-hat"></i> {{-- أيقونة مقترحة للمعدات --}}
+        <a class="nav-link" href="{{ route('admin.equipment.index') }}"> 
+            <i class="fas fa-fw fa-hard-hat"></i> 
             <span>إدارة المعدات</span></a>
     </li>
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EquipmentController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -36,7 +37,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/{user}/deactivate', [UserController::class, 'deactivate'])->name('deactivate');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
     });
+
+
+    // مسارات إدارة المعدات (مراجعة الإعلانات والموافقة)
+    Route::prefix('equipment')->name('equipment.')->group(function () {
+        Route::get('/', [EquipmentController::class, 'index'])->name('index');
+        Route::post('/{equipment}/approve', [EquipmentController::class, 'approve'])->name('approve');
+        Route::post('/{equipment}/reject', [EquipmentController::class, 'reject'])->name('reject'); // خيار لرفض المعدة
+        Route::delete('/{equipment}', [EquipmentController::class, 'destroy'])->name('destroy'); // حذف المعدة
+    });
 });
 
 
-require __DIR__.'/auth.php'; // تأكد من وجود هذا السطر
+require __DIR__ . '/auth.php'; // تأكد من وجود هذا السطر
