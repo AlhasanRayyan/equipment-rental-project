@@ -90,7 +90,7 @@ class EquipmentController extends Controller
         // يمكنك تحميل العلاقات اللازمة هنا إذا كنت تريد عرضها في صفحة التفاصيل
         $equipment->load(['owner', 'category', 'images', 'trackingRecords']); // مثال لتحميل العلاقات
 
-        return view('admin.equipment.show', compact('equipment'));
+        return view('dashboard.equipment.show', compact('equipment'));
     }
 
 }

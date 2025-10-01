@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\ComplaintController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EquipmentCategoryController;
 use App\Http\Controllers\Admin\EquipmentController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
@@ -64,6 +65,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::prefix('settings')->name('settings.')->group(function () {
         Route::get('/', [AdminSettingController::class, 'index'])->name('index');
         Route::put('/{adminSetting}', [AdminSettingController::class, 'update'])->name('update'); // لتعديل إعداد معين
+    });
+
+    // مسارات إدارة فئات المعدات
+    Route::prefix('categories')->name('categories.')->group(function () {
+        Route::get('/', [EquipmentCategoryController::class, 'index'])->name('index');
+        Route::post('/', [EquipmentCategoryController::class, 'store'])->name('store');
+        Route::put('/{equipmentCategory}', [EquipmentCategoryController::class, 'update'])->name('update');
+        Route::delete('/{equipmentCategory}', [EquipmentCategoryController::class, 'destroy'])->name('destroy');
+        Route::get('/{equipmentCategory}/equipment', [EquipmentCategoryController::class, 'showEquipment'])->name('showEquipment'); // **جديد: عرض المعدات المرتبطة بفئة**
     });
 });
 
