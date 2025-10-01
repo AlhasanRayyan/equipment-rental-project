@@ -27,7 +27,8 @@
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
                 {{-- إحصائية: إجمالي الأرباح  --}}
-                <x-stats-card icon="fas fa-dollar-sign" title="إجمالي الأرباح" :value="$stats['total_revenue']" color="warning" prefix="$" />
+                <x-stats-card icon="fas fa-dollar-sign" title="إجمالي الأرباح" :value="$stats['total_revenue']" color="warning"
+                    prefix="$" />
             </div>
         </div>
 
@@ -46,7 +47,7 @@
             <div class="col-xl-8 col-lg-7">
                 <div class="card shadow mb-4">
                     <div class="card-header py-3">
-                        <h6 class="m-0 fw-bold text-primary">الحجوزات الشهرية</h6> 
+                        <h6 class="m-0 fw-bold text-primary">الحجوزات الشهرية</h6>
                     </div>
                     <div class="card-body"><canvas id="monthlyBookingsChart"></canvas></div>
                 </div>
@@ -65,7 +66,8 @@
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">
                                 <tbody>
-                                    @forelse($pendingEquipment as $equipment) {{-- متغير جديد --}}
+                                    @forelse($pendingEquipment as $equipment)
+                                        {{-- متغير جديد --}}
                                         <tr>
                                             <td class="text-center">
                                                 {{-- عرض صورة المعدة إذا وجدت --}}
@@ -74,13 +76,16 @@
                                             </td>
                                             <td>
                                                 <div class="fw-bold">{{ Str::limit($equipment->name, 25) }}</div>
-                                                <small class="text-muted">{{ $equipment->owner->first_name ?? 'N/A' }}</small>
+                                                <small
+                                                    class="text-muted">{{ $equipment->owner->first_name ?? 'N/A' }}</small>
                                             </td>
                                             <td class="text-end">
                                                 @if ($equipment->is_approved_by_admin)
                                                     <span class="badge bg-success text-white">معتمد</span>
                                                 @else
-                                                    <a href="" class="btn btn-sm btn-warning">مراجعة</a> {{-- زر مراجعة --}}
+                                                    <a href="{{ route('admin.equipment.index', ['status' => 'pending', 'query' => $equipment->name]) }}"
+                                                        class="btn btn-sm btn-warning">مراجعة</a> {{-- توجيه لصفحة إدارة المعدات مع فلتر --}}
+                                                    {{-- أو إذا أردت صفحة تفاصيل مباشرة: <a href="{{ route('admin.equipment.show', $equipment) }}" class="btn btn-sm btn-warning">مراجعة</a> --}}
                                                 @endif
                                             </td>
                                             <td class="text-end text-muted small">
@@ -113,7 +118,8 @@
                         <div class="table-responsive">
                             <table class="table table-hover align-middle mb-0">
                                 <tbody>
-                                    @forelse($latestComplaints as $complaint) {{-- متغير جديد (سأفترض وجود نموذج Complaint/Message للشكاوى) --}}
+                                    @forelse($latestComplaints as $complaint)
+                                        {{-- متغير جديد (سأفترض وجود نموذج Complaint/Message للشكاوى) --}}
                                         <tr>
                                             <td>
                                                 <div class="d-flex align-items-center">
@@ -121,13 +127,16 @@
                                                         <span>{{ mb_substr($complaint->sender->first_name ?? 'U', 0, 1) }}</span>
                                                     </div>
                                                     <div>
-                                                        <div class="fw-bold">{{ $complaint->sender->first_name ?? 'مستخدم' }}</div>
-                                                        <small class="text-muted">{{ Str::limit($complaint->content, 30) }}</small>
+                                                        <div class="fw-bold">
+                                                            {{ $complaint->sender->first_name ?? 'مستخدم' }}</div>
+                                                        <small
+                                                            class="text-muted">{{ Str::limit($complaint->content, 30) }}</small>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="text-end">
-                                                <a href="" class="btn btn-sm btn-info">عرض</a> {{-- زر عرض --}}
+                                                <a href="{{ route('admin.complaints.show', $complaint) }}"
+                                                    class="btn btn-sm btn-info">عرض</a> {{-- زر عرض --}}
                                             </td>
                                             <td class="text-end text-muted small">
                                                 @if ($complaint->created_at)
@@ -139,7 +148,8 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td class="text-center p-4" colspan="3">لا توجد شكاوى أو استفسارات حديثة.</td>
+                                            <td class="text-center p-4" colspan="3">لا توجد شكاوى أو استفسارات حديثة.
+                                            </td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -164,8 +174,12 @@
                     labels: {!! json_encode($equipmentCategoriesCount->pluck('category_name')) !!},
                     datasets: [{
                         data: {!! json_encode($equipmentCategoriesCount->pluck('equipment_count')) !!},
-                        backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b', '#6f42c1', '#fd7e14'],
-                        hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#f4b200', '#d43f30', '#5a2d9b', '#e26b0a'],
+                        backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b',
+                            '#6f42c1', '#fd7e14'
+                        ],
+                        hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#f4b200',
+                            '#d43f30', '#5a2d9b', '#e26b0a'
+                        ],
                         hoverBorderColor: "rgba(234, 236, 244, 1)",
                     }]
                 },

@@ -41,11 +41,13 @@ class DashboardController extends Controller
 
         // 3. آخر الشكاوى والاستفسارات
         // هنا نفترض أن الشكاوى والاستفسارات تُسجل في جدول الرسائل (Messages)
-        $latestComplaints = Message::where('message_type', 'notification') // أو نوع مخصص للشكاوى
+        $latestComplaints = Message::with('sender') 
+            ->where('is_resolved', false) 
+            ->orderBy('is_read', 'asc') 
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
-   
+
         // 4. بيانات الرسم البياني لتوزيع المعدات حسب الفئة
         $equipmentCategoriesCount = EquipmentCategory::withCount('equipment')
             ->orderBy('equipment_count', 'desc')

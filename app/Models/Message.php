@@ -33,6 +33,8 @@ class Message extends Model
         'attachment_url',
         // 'timestamp' is covered by created_at
         'is_read',
+        'is_resolved', // **تأكد أن هذا موجود هنا**
+
     ];
 
     /**
@@ -43,7 +45,7 @@ class Message extends Model
     protected $casts = [
         'is_read' => 'boolean',
         'message_type' => 'string', // Enum in DB, treated as string
-        // 'timestamp' is implicitly covered by 'created_at'
+        'is_resolved' => 'boolean', // **تأكد أن هذا موجود هنا**
     ];
 
     // Accessors and Methods (من الـ classDiagram)
@@ -98,10 +100,10 @@ class Message extends Model
         $query->where(function ($q) use ($user1Id, $user2Id) {
             $q->where(function ($q1) use ($user1Id, $user2Id) {
                 $q1->where('sender_id', $user1Id)
-                   ->where('receiver_id', $user2Id);
+                    ->where('receiver_id', $user2Id);
             })->orWhere(function ($q2) use ($user1Id, $user2Id) {
                 $q2->where('sender_id', $user2Id)
-                   ->where('receiver_id', $user1Id);
+                    ->where('receiver_id', $user1Id);
             });
         })->orderBy('created_at'); // Order by timestamp to show conversation chronologically
     }

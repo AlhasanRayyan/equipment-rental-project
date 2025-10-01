@@ -46,7 +46,8 @@
                                 action="{{ route('admin.complaints.markAsRead', $message) }}" method="POST" class="d-none">
                                 @csrf</form>
                         @endif
-                        @if (!($message->is_resolved ?? false))
+                        @if (!$message->is_resolved)
+                            {{-- تم التعديل --}}
                             <li><a class="dropdown-item" href="#"
                                     onclick="event.preventDefault(); document.getElementById('resolve-form-{{ $message->id }}').submit();"><i
                                         class="fas fa-check-circle text-success"></i> وضع علامة تم الحل</a></li>
@@ -85,7 +86,8 @@
                         <div class="mb-4">
                             <h6>نوع الرسالة: <span class="badge bg-info">{{ ucfirst($message->message_type) }}</span></h6>
                             <h6>الحالة:
-                                @if ($message->is_resolved ?? false)
+                                @if ($message->is_resolved)
+                                    {{-- تم التعديل --}}
                                     <span class="badge bg-success">تم الحل</span>
                                 @elseif ($message->is_read)
                                     <span class="badge bg-primary">مقروءة</span>
@@ -94,13 +96,10 @@
                                 @endif
                             </h6>
                             @if ($message->booking)
-                                <h6>مرتبطة بالحجز رقم: <a href=""
-                                {{-- نفترض وجود مسار لعرض تفاصيل الحجز --}}
-                                {{-- <h6>مرتبطة بالحجز رقم: <a href="{{ route('admin.bookings.show', $message->booking_id) }}"
+                                <h6>مرتبطة بالحجز رقم: <a href="" {{-- نفترض وجود مسار لعرض تفاصيل الحجز --}} {{-- <h6>مرتبطة بالحجز رقم: <a href="{{ route('admin.bookings.show', $message->booking_id) }}"
                                         class="text-primary fw-bold">#{{ $message->booking_id }}</a></h6> --}}
-                                {{-- نفترض وجود مسار لعرض تفاصيل الحجز --}}
-
-                                <p class="text-muted small">المعدة: {{ $message->booking->equipment->name ?? 'N/A' }}</p>
+                                        {{-- نفترض وجود مسار لعرض تفاصيل الحجز --}} <p class="text-muted small">المعدة:
+                                        {{ $message->booking->equipment->name ?? 'N/A' }}</p>
                             @endif
                         </div>
 
@@ -139,7 +138,8 @@
                     </div>
                     <div class="modal-body">
                         <p>هل أنت متأكد من حذف هذه الشكوى/الاستفسار من
-                            <strong>{{ $message->sender->first_name ?? 'مستخدم' }}</strong>؟</p>
+                            <strong>{{ $message->sender->first_name ?? 'مستخدم' }}</strong>؟
+                        </p>
                         <div class="alert alert-danger" role="alert">
                             سيتم حذف هذه الشكوى بشكل دائم ولن يمكن استرجاعها.
                         </div>

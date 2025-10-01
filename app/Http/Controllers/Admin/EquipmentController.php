@@ -84,4 +84,13 @@ class EquipmentController extends Controller
 
         return redirect()->route('admin.equipment.index')->with('success', 'تم حذف المعدة بنجاح.');
     }
+
+      public function show(Equipment $equipment)
+    {
+        // يمكنك تحميل العلاقات اللازمة هنا إذا كنت تريد عرضها في صفحة التفاصيل
+        $equipment->load(['owner', 'category', 'images', 'trackingRecords']); // مثال لتحميل العلاقات
+
+        return view('admin.equipment.show', compact('equipment'));
+    }
+
 }

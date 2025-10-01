@@ -44,6 +44,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // مسارات إدارة المعدات (مراجعة الإعلانات والموافقة)
     Route::prefix('equipment')->name('equipment.')->group(function () {
         Route::get('/', [EquipmentController::class, 'index'])->name('index');
+        Route::get('/{equipment}', [EquipmentController::class, 'show'])->name('show');
+
         Route::post('/{equipment}/approve', [EquipmentController::class, 'approve'])->name('approve');
         Route::post('/{equipment}/reject', [EquipmentController::class, 'reject'])->name('reject'); // خيار لرفض المعدة
         Route::delete('/{equipment}', [EquipmentController::class, 'destroy'])->name('destroy'); // حذف المعدة
