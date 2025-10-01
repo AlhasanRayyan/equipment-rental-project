@@ -84,7 +84,7 @@
     </div>
 
     <li class="nav-item {{ Request::is('admin/settings*') ? 'active' : '' }}">
-        <a class="nav-link" href=""> 
+        <a class="nav-link" href="{{ route('admin.settings.index') }}"> 
             <i class="fas fa-fw fa-cogs"></i>
             <span>إعدادات النظام</span></a>
     </li>

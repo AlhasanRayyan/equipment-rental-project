@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\ComplaintController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EquipmentController;
@@ -55,6 +56,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/{message}/mark-as-read', [ComplaintController::class, 'markAsRead'])->name('markAsRead'); // لتمييز الشكوى كمقروءة
         Route::post('/{message}/resolve', [ComplaintController::class, 'resolve'])->name('resolve'); // لحل الشكوى
         Route::delete('/{message}', [ComplaintController::class, 'destroy'])->name('destroy'); // لحذف شكوى
+    });
+
+    // مسارات إدارة إعدادات النظام
+    Route::prefix('settings')->name('settings.')->group(function () {
+        Route::get('/', [AdminSettingController::class, 'index'])->name('index');
+        Route::put('/{adminSetting}', [AdminSettingController::class, 'update'])->name('update'); // لتعديل إعداد معين
     });
 });
 
