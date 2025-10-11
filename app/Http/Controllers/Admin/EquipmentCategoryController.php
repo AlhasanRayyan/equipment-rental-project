@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\EquipmentCategory; // تأكد من استيراد الـ Model
-use App\Models\Equipment; // قد تحتاجها لعرض المعدات
+use App\Models\EquipmentCategory; 
+use App\Models\Equipment; 
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
@@ -27,12 +27,12 @@ class EquipmentCategoryController extends Controller
                     ->orWhere('description', 'like', "%{$query}%");
             })
             ->withCount('equipment')
-            ->with('parent') // **جديد: تحميل علاقة الوالد**
-            ->orderBy('parent_id', 'asc') // **جديد: ترتيب حسب الوالد**
+            ->with('parent') 
+            ->orderBy('parent_id', 'asc') 
             ->orderBy('category_name', 'asc')
             ->paginate(10);
 
-        $parentCategories = EquipmentCategory::parents()->active()->get(); // **جديد: لجلب الفئات الرئيسية لاختيارها كوالد**
+        $parentCategories = EquipmentCategory::parents()->active()->get(); 
 
         return view('dashboard.categories.index', compact('categories', 'query', 'parentCategories'));
     }
@@ -49,7 +49,7 @@ class EquipmentCategoryController extends Controller
             'category_name' => ['required', 'string', 'max:255', 'unique:equipment_categories'],
             'description' => ['nullable', 'string'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'],
-            'parent_id' => ['nullable', 'exists:equipment_categories,id'], // **جديد: التحقق من وجود parent_id**
+            'parent_id' => ['nullable', 'exists:equipment_categories,id'], 
             'is_active' => ['boolean'],
         ]);
 
@@ -101,7 +101,7 @@ class EquipmentCategoryController extends Controller
             'category_name' => $request->category_name,
             'description' => $request->description,
             'image_url' => $imageUrl,
-            'parent_id' => $request->parent_id, // **جديد: تحديث parent_id**
+            'parent_id' => $request->parent_id,
             'is_active' => $request->has('is_active'),
         ]);
 
@@ -116,11 +116,10 @@ class EquipmentCategoryController extends Controller
      */
     public function destroy(EquipmentCategory $equipmentCategory)
     {
-        // تحقق: لا تسمح بحذف فئة إذا كانت مرتبطة بمعدات أو بفئات فرعية
         if ($equipmentCategory->equipment()->exists()) {
             return redirect()->route('admin.categories.index')->with('error', 'لا يمكن حذف الفئة لأنها مرتبطة بمعدات موجودة.');
         }
-        if ($equipmentCategory->children()->exists()) { // **جديد: منع حذف الفئة إذا كان لها أبناء**
+        if ($equipmentCategory->children()->exists()) { 
             return redirect()->route('admin.categories.index')->with('error', 'لا يمكن حذف الفئة لأنها تحتوي على فئات فرعية.');
         }
 

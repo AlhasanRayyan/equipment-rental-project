@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <title>الصفحة الرئيسية - تأجير المعدات</title> {{-- تم التعديل --}}
+  <title>الصفحة الرئيسية - تأجير المعدات</title> 
   <meta content="Templines" name="author">
   <meta content="SPCER" name="description">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,10 +38,10 @@
             <div class="nav-overlay uk-visible@l  List">
               <ul class="uk-navbar-nav">
                 <li class="uk-active"><a href="{{ route('home') }}">الصفحة الرئيسية</a></li>
-                <li><a href="{{ route('categories') }}">الفئات</a></li> {{-- تم التعديل --}}
-                <li><a href="{{ route('equipments') }}">المعدات</a></li> {{-- تم التعديل --}}
-                <li><a href="{{ route('about') }}">عن الموقع</a></li> {{-- تم التعديل --}}
-                <li><a href="{{ route('contact') }}">تواصل معنا</a></li> {{-- تم التعديل --}}
+                <li><a href="{{ route('categories') }}">الفئات</a></li> 
+                <li><a href="{{ route('equipments') }}">المعدات</a></li> 
+                <li><a href="{{ route('about') }}">عن الموقع</a></li> 
+                <li><a href="{{ route('contact') }}">تواصل معنا</a></li> 
               </ul>
             </div>
             <div class="login-link">
@@ -99,7 +99,7 @@
           <div class="find-box">
             <div class="find-box__title"> <span>اعثر على المعدات المناسبة</span></div>
             <div class="find-box__form">
-              <form action="{{ route('equipments') }}" method="GET"> {{-- تم التعديل --}}
+              <form action="{{ route('equipments') }}" method="GET">
                 <div class="uk-grid uk-grid-medium uk-flex-middle uk-child-width-1-3@m uk-child-width-1-2@s" data-uk-grid>
                   <div>
                     <div class="uk-inline uk-width-1-1">
@@ -144,9 +144,9 @@
               @forelse ($featuredCategories as $category)
                 <div>
                   <div class="category-item">
-                    <a class="category-item__link uk-inline-clip uk-transition-toggle" href="{{ route('equipments', ['category' => $category->id]) }}" tabindex="0"> {{-- تم التعديل --}}
+                    <a class="category-item__link uk-inline-clip uk-transition-toggle" href="{{ route('equipments', ['category' => $category->id]) }}" tabindex="0"> 
                       <div class="category-item__media">
-                        <img src="{{ $category->image_url ? asset('storage/' . $category->image_url) : asset('assets/home/img/category-default.jpg') }}" alt="{{ $category->category_name }}" /> {{-- تم التعديل --}}
+                        <img src="{{ $category->image_url ? asset('storage/' . $category->image_url) : asset('assets/home/img/category-default.jpg') }}" alt="{{ $category->category_name }}" /> 
                         <div class="uk-transition-fade">
                           <div class="uk-overlay-primary uk-position-cover"></div>
                           <div class="uk-position-center"><span data-uk-icon="icon: plus; ratio: 2"></span></div>
@@ -176,7 +176,7 @@
                   <div class="uk-text-meta">منصة تأجير معدات البناء</div>
                   <div class="uk-h2">نحن نقدم خدمات عديدة <br> جميع اشكال و احجام<br> معدات البناء</div>
                 </div>
-                <p>{{ $siteDescription }}</p> {{-- تم التعديل --}}
+                <p>{{ $siteDescription }}</p>
                 <ul class="about-list">
                   <li> <strong>معدات<br> أقل تكلفة</strong><span>وفر على نفسك ، تأجر بدل ما تشتري وبأقل الأسعار </span></li>
                   <li> <strong>خدمة عملاء<br>متاحة</strong><span>لدينا العديد من الموظفين لمتابعة خدماتكم</span></li>
@@ -196,7 +196,7 @@
           <div class="uk-grid uk-child-width-1-4@l uk-child-width-1-2@s" data-uk-grid>
             <div class="uk-flex-first@l">
               <div class="title">عن المنصة</div>
-              <p>{{ $siteDescription }}</p> {{-- تم التعديل --}}
+              <p>{{ $siteDescription }}</p> 
               <ul class="social-list">
                 <li class="social-list__item"><a class="social-list__link" href="#!"><i class="fab fa-facebook-f"></i></a></li>
                 <li class="social-list__item"><a class="social-list__link" href="#!"><i class="fab fa-twitter"></i></a></li>
@@ -219,7 +219,7 @@
                   <div class="contacts-list-item__icon"><img src="{{ asset('assets/home/img/icons/ico-timer.svg') }}" data-uk-svg alt="The Office Hours"></div>
                   <div class="contacts-list-item__desc">
                     <div class="contacts-list-item__label">ساعات العمل</div>
-                    <div class="contacts-list-item__content">{{ $officeHours }}</div> {{-- تم التعديل --}}
+                    <div class="contacts-list-item__content">{{ $officeHours }}</div> 
                   </div>
                 </li>
                 <li class="contacts-list-item">
@@ -276,7 +276,7 @@
       </div>
       <div class="uk-flex-top" id="callback" data-uk-modal="">
         <div class="uk-modal-dialog uk-modal-body uk-margin-auto-vertical"><button class="uk-modal-close-default" type="button" data-uk-close=""></button>
-          <p>هذا نموذج لخدمة الاتصال السريع، يمكن ربط محتواه بخدمة تواصل معينة.</p> {{-- تم التعديل --}}
+          <p>هذا نموذج لخدمة الاتصال السريع، يمكن ربط محتواه بخدمة تواصل معينة.</p> 
         </div>
       </div>
     </footer>

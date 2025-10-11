@@ -15,8 +15,7 @@ class EquipmentCategorySeeder extends Seeder
      */
     public function run(): void
     {
-        // تهيئة Faker للاستخدام داخل Seeder
-        $faker = Faker::create(); // تأكد من استيراد Faker في الأعلى
+        $faker = Faker::create(); 
 
         // 1. إنشاء الفئات الرئيسية المحددة (بدون والد)
         $heavyMachinery = EquipmentCategory::firstOrCreate(

@@ -22,7 +22,6 @@ class HomeController extends Controller
         $locations = ['غزة', 'خان يونس', 'الوسطى', 'الشمال', 'رفح'];
 
         // 2. بيانات قسم فئات الآلات (Category Section)
-        // يمكن إعادة استخدام $equipmentCategories هنا، أو جلبها مرة أخرى إذا كانت هناك متطلبات مختلفة.
         $featuredCategories = EquipmentCategory::parents()->active()->inRandomOrder()->take(6)->get();
 
         // 3. بيانات تذييل الصفحة (Footer) من إعدادات النظام
@@ -42,7 +41,6 @@ class HomeController extends Controller
         ));
     }
 
-    // دوال لصفحات الواجهة الأمامية الأخرى (يمكن أن تكون فارغة حالياً أو تحتوي على منطق بسيط)
     public function categories()
     {
         $parentCategories = EquipmentCategory::parents()->active()->with('children')->paginate(12);
