@@ -26,12 +26,11 @@ class EquipmentCategoryFactory extends Factory
     public function definition(): array
     {
         return [
-            // تم التعديل هنا: حذفنا كلا استدعاءي ->unique()
-            // لأن Laravel factory سيعالج فرادة الاسم بالكامل ضد قاعدة البيانات.
-            'category_name' => $this->faker->words(2, true) . ' ' . $this->faker->randomElement(['Tools', 'Machinery', 'Vehicles', 'Devices', 'Equipment']),
+            'category_name' => $this->faker->words(2, true) . ' ' . $this->faker->randomElement(['Tools', 'Machinery', 'Vehicles', 'Devices', 'Equipment', 'Electronics', 'Supplies', 'Instruments']), // أضفت بعض الكلمات لتنوع أكبر
             'description' => $this->faker->paragraph(),
             'image_url' => $this->faker->imageUrl(640, 480, 'categories', true),
-            'is_active' => $this->faker->boolean(95), // 95% chance of being active
+            'parent_id' => null, // افتراضياً، لا يوجد والد (فئة رئيسية)
+            'is_active' => $this->faker->boolean(95),
         ];
     }
 
@@ -42,6 +41,26 @@ class EquipmentCategoryFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_active' => false,
+        ]);
+    }
+
+    /**
+     * Indicate that the category is a parent category (explicitly set parent_id to null).
+     */
+    public function parentCategory(): static // **جديد: state لإنشاء فئة رئيسية**
+    {
+        return $this->state(fn (array $attributes) => [
+            'parent_id' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the category is a subcategory of a given parent.
+     */
+    public function subcategoryOf(EquipmentCategory $parent): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'parent_id' => $parent->id,
         ]);
     }
 }

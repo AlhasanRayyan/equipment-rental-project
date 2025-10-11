@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EquipmentCategoryController;
 use App\Http\Controllers\Admin\EquipmentController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -24,6 +25,13 @@ Route::get('/', function () {
 });
 
 
+// 1. Frontend / Public Website Routes
+// ========================================================================
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/categories', [HomeController::class, 'categories'])->name('categories');
+Route::get('/equipments', [HomeController::class, 'equipments'])->name('equipments');
+Route::get('/about', [HomeController::class, 'about'])->name('about');
+Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {

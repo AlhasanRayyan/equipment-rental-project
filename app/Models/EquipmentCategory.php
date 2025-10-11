@@ -5,61 +5,81 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo; 
 use Illuminate\Database\Eloquent\Builder;
 
 class EquipmentCategory extends Model
 {
     use HasFactory;
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'equipment_categories'; 
+    protected $table = 'equipment_categories';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'category_name',
         'description',
         'image_url',
+        'parent_id', 
         'is_active',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'is_active' => 'boolean',
     ];
 
+    // Relationships
+
+    
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(EquipmentCategory::class, 'parent_id');
+    }
+
+    public function children(): HasMany
+    {
+        return $this->hasMany(EquipmentCategory::class, 'parent_id');
+    }
+
+    /**
+     * Get the equipment for the category.
+     * EquipmentCategory "1" --> "0..*" Equipment : categorizes
+     */
+    public function equipment(): HasMany
+    {
+        return $this->hasMany(Equipment::class, 'category_id');
+    }
+
     // Accessors (Methods from classDiagram)
 
- 
+    /**
+     * Get the total number of equipment associated with this category and its children.
+     * +getTotalEquipmentAttribute() int
+     */
     public function getTotalEquipmentAttribute(): int
     {
-        return $this->equipment()->count();
+        // يحسب المعدات في هذه الفئة والفئات الفرعية لها
+        $total = $this->equipment()->count();
+        foreach ($this->children as $child) {
+            $total += $child->getTotalEquipmentAttribute(); // استدعاء تكراري (recursive)
+        }
+        return $total;
     }
 
     // Scopes
 
-  
+    /**
+     * Scope a query to only include active categories.
+     * +scopeActive() QueryBuilder
+     */
     public function scopeActive(Builder $query): void
     {
         $query->where('is_active', true);
     }
 
-    // Relationships
-
-  
-    public function equipment(): HasMany
+    /**
+     * Scope a query to only include parent categories (those without a parent).
+     */
+    public function scopeParents(Builder $query): void
     {
-        return $this->hasMany(Equipment::class, 'category_id');
+        $query->whereNull('parent_id');
     }
 }
