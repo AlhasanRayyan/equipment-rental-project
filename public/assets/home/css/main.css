@@ -5732,7 +5732,11 @@ body.page-categories-2 .page-footer:before {
 }
 
 
+<<<<<<< HEAD
 /* start stars css */
+=======
+/* start stars css */ 
+>>>>>>> 6e6d9167c2067f79efc1ea9ba5a4a934791b08c0
 .rating:not(:checked) > input {
   position: absolute;
   appearance: none;
@@ -5765,4 +5769,8 @@ body.page-categories-2 .page-footer:before {
 
 .section-find1 {
     padding-bottom: 0 !important;
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 6e6d9167c2067f79efc1ea9ba5a4a934791b08c0

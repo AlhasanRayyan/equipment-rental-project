@@ -41,6 +41,7 @@ class HomeController extends Controller
         ));
     }
 
+<<<<<<< HEAD
     // public function categories()
     // {
     //     $parentCategories = EquipmentCategory::parents()->active()->with('children')->paginate(12);
@@ -67,6 +68,34 @@ class HomeController extends Controller
 
     //     return view('equipments', compact('equipments', 'equipmentCategories', 'locations', 'query', 'category', 'location'));
     // }
+=======
+    public function categories()
+    {
+        $parentCategories = EquipmentCategory::parents()->active()->with('children')->paginate(12);
+        return view('categories', compact('parentCategories'));
+    }
+
+    public function equipments(Request $request)
+    {
+        $query = $request->input('query');
+        $category = $request->input('category');
+        $location = $request->input('location');
+
+        $equipments = Equipment::query()
+            ->when($query, fn($q) => $q->where('name', 'like', "%{$query}%"))
+            ->when($category, fn($q) => $q->where('category_id', $category))
+            ->when($location, fn($q) => $q->where('location_address', 'like', "%{$location}%")) // أو باستخدام Lat/Lng
+            ->where('is_approved_by_admin', true) // عرض المعدات المعتمدة فقط
+            ->where('status', 'available') // عرض المعدات المتاحة فقط
+            ->with('category', 'images')
+            ->paginate(12);
+
+        $equipmentCategories = EquipmentCategory::where('is_active', true)->get();
+        $locations = ['غزة', 'خان يونس', 'الوسطى', 'الشمال', 'رفح']; // نفس القائمة من index
+
+        return view('equipments', compact('equipments', 'equipmentCategories', 'locations', 'query', 'category', 'location'));
+    }
+>>>>>>> 6e6d9167c2067f79efc1ea9ba5a4a934791b08c0
 
     public function about()
     {
