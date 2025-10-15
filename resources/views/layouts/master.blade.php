@@ -20,7 +20,9 @@
     <meta name="theme-color" content="#222222">
     <link rel="stylesheet" href="{{ asset('assets/home/css/libs.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/home/css/main.css') }}">
-</head>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+ </head>
 
 <body class="page-home">
 
@@ -93,7 +95,7 @@
                     <div class="uk-grid uk-child-width-1-4@l uk-child-width-1-2@s" data-uk-grid>
                         <div class="uk-flex-first@l">
                             <div class="title">عن المنصة</div>
-                            <p>{{ $siteDescription }}</p>
+                            {{-- <p>{{ $siteDescription }}</p> --}}
                             <ul class="social-list">
                                 <li class="social-list__item"><a class="social-list__link" href="#!"><i
                                             class="fab fa-facebook-f"></i></a></li>
@@ -116,10 +118,8 @@
                                             alt="For Rental Support"></div>
                                     <div class="contacts-list-item__desc">
                                         <div class="contacts-list-item__label">الدعم الفني</div>
-                                        <div class="contacts-list-item__content"> <a
-                                                href="tel:{{ $contactPhone }}">{{ $contactPhone }}</a></div>
-                                        {{-- تم التعديل --}}
-                                    </div>
+                                        <div class="contacts-list-item__content"> <a {{-- href="tel:{{ $contactPhone }}">{{ $contactPhone }}</a></div> --}}
+                                                {{-- تم التعديل --}} </div>
                                 </li>
                                 <li class="contacts-list-item">
                                     <div class="contacts-list-item__icon"><img
@@ -127,7 +127,7 @@
                                             alt="The Office Hours"></div>
                                     <div class="contacts-list-item__desc">
                                         <div class="contacts-list-item__label">ساعات العمل</div>
-                                        <div class="contacts-list-item__content">{{ $officeHours }}</div>
+                                        {{-- <div class="contacts-list-item__content">{{ $officeHours }}</div> --}}
                                     </div>
                                 </li>
                                 <li class="contacts-list-item">
@@ -136,8 +136,9 @@
                                             alt="Send Us Email"></div>
                                     <div class="contacts-list-item__desc">
                                         <div class="contacts-list-item__label">راسلنا على الإيميل</div>
-                                        <div class="contacts-list-item__content"> <a
-                                                href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a></div>
+                                        <div class="contacts-list-item__content">
+                                            {{-- <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a> --}}
+                                        </div>
                                         {{-- تم التعديل --}}
                                     </div>
                                 </li>
@@ -184,11 +185,16 @@
                     <div class="uk-margin">
                         <ul class="uk-nav-default uk-nav-parent-icon" data-uk-nav>
                             {{-- ارجعيلها --}}
-                            <li class="{{ request()->url() == route('home') ? 'uk-active' :'' }}"><a href="{{ route('home') }}" >الصفحة الرئيسية</a></li>
-                            <li class="{{ request()->url() == route('categories') ? 'uk-active' :'' }}"><a href="{{ route('categories') }}">الفئات</a></li>
-                            <li class="{{ request()->url() == route('equipments') ? 'uk-active' :'' }}"><a href="{{ route('equipments') }}">المعدات</a></li>
-                            <li class="{{ request()->url() == route('about') ? 'uk-active' :'' }}"><a href="{{ route('about') }}">عن الموقع</a></li>
-                            <li class="{{ request()->url() == route('contact') ? 'uk-active' :'' }}"><a href="{{ route('contact') }}">تواصل معنا</a></li>
+                            <li class="{{ request()->url() == route('home') ? 'uk-active' : '' }}"><a
+                                    href="{{ route('home') }}">الصفحة الرئيسية</a></li>
+                            <li class="{{ request()->url() == route('categories') ? 'uk-active' : '' }}"><a
+                                    href="{{ route('categories') }}">الفئات</a></li>
+                            <li class="{{ request()->url() == route('equipments') ? 'uk-active' : '' }}"><a
+                                    href="{{ route('equipments') }}">المعدات</a></li>
+                            <li class="{{ request()->url() == route('about') ? 'uk-active' : '' }}"><a
+                                    href="{{ route('about') }}">عن الموقع</a></li>
+                            <li class="{{ request()->url() == route('contact') ? 'uk-active' : '' }}"><a
+                                    href="{{ route('contact') }}">تواصل معنا</a></li>
                         </ul>
                     </div>
                 </div>

@@ -11,4 +11,11 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+       resolve: {
+        alias: {
+            'uikit-scss': 'uikit/src/scss/uikit-theme.scss',
+            'uikit-js': 'uikit/dist/js/uikit.min.js',
+            'uikit-icons-js': 'uikit/dist/js/uikit-icons.min.js',
+        },
+    },
 });

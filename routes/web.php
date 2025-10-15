@@ -1,6 +1,6 @@
 <?php
 
-<<<<<<< HEAD
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Admin\UserController;
@@ -11,16 +11,16 @@ use App\Http\Controllers\Admin\EquipmentController;
 use App\Http\Controllers\Category\CategoryController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\EquipmentCategoryController;
-=======
-use App\Http\Controllers\Admin\AdminSettingController;
-use App\Http\Controllers\Admin\ComplaintController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\EquipmentCategoryController;
-use App\Http\Controllers\Admin\EquipmentController;
-use App\Http\Controllers\Admin\UserController;
-use App\Http\Controllers\HomeController;
-use Illuminate\Support\Facades\Route;
->>>>>>> 6e6d9167c2067f79efc1ea9ba5a4a934791b08c0
+
+
+
+
+
+
+
+
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -33,27 +33,28 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-<<<<<<< HEAD
+
 // Route::get('/', function () {
 //     return view('welcome');
 // });
-=======
-Route::get('/', function () {
-    return view('welcome');
-});
->>>>>>> 6e6d9167c2067f79efc1ea9ba5a4a934791b08c0
+
+
+
+
+
 
 
 // 1. Frontend / Public Website Routes
 // ========================================================================
 Route::get('/', [HomeController::class, 'index'])->name('home');
-<<<<<<< HEAD
+
 Route::get('/categories', [CategoryController::class, 'index'])->name('categories');
-Route::get('/equipments', [EquipmentsController::class, 'index'])->name('equipments');
-=======
-Route::get('/categories', [HomeController::class, 'categories'])->name('categories');
-Route::get('/equipments', [HomeController::class, 'equipments'])->name('equipments');
->>>>>>> 6e6d9167c2067f79efc1ea9ba5a4a934791b08c0
+Route::get('/equipments', [HomeController::class, 'equipments'])->name('equipments'); // صفحة نتائج البحث
+Route::get('/equipments/{equipment}', [EquipmentController::class, 'show'])->name('equipments.show');
+Route::get('/equipments/{equipment}', [HomeController::class, 'showEquipment'])->name('equipments.show');
+
+
+
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 

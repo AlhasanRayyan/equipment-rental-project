@@ -10,25 +10,17 @@ use App\Models\Equipment;
 
 class HomeController extends Controller
 {
-    /**
-     * عرض الصفحة الرئيسية الديناميكية.
-     *
-     * @return \Illuminate\View\View
-     */
     public function index()
     {
-        // 1. بيانات قسم البحث (Find Section)
-        $equipmentCategories = EquipmentCategory::where('is_active', true)->get();
+        $equipmentCategories = EquipmentCategory::where('is_active', true)->with('children')->get(); // تحميل children هنا
         $locations = ['غزة', 'خان يونس', 'الوسطى', 'الشمال', 'رفح'];
 
-        // 2. بيانات قسم فئات الآلات (Category Section)
         $featuredCategories = EquipmentCategory::parents()->active()->inRandomOrder()->take(6)->get();
 
-        // 3. بيانات تذييل الصفحة (Footer) من إعدادات النظام
-        $contactPhone = AdminSetting::where('setting_key', 'contact_phone')->first()->setting_value ?? '+970 59 723 4892'; // افتراض رقم هاتف جديد
-        $officeHours = AdminSetting::where('setting_key', 'office_hours')->first()->setting_value ?? 'السبت - الخميس ( 8ص - 6م)'; // افتراض ساعات عمل جديدة
+        $contactPhone = AdminSetting::where('setting_key', 'contact_phone')->first()->setting_value ?? '+970 59 723 4892';
+        $officeHours = AdminSetting::where('setting_key', 'office_hours')->first()->setting_value ?? 'السبت - الخميس ( 8ص - 6م)';
         $contactEmail = AdminSetting::where('setting_key', 'contact_email')->first()->setting_value ?? 'rentals@my-domain.net';
-        $siteDescription = AdminSetting::where('setting_key', 'site_description')->first()->setting_value ?? 'منصة تتيح للمستخدمين خدمات من تأجير واستئجار معدات البناء بجميع أنواعها وبأسعار مناسبة'; // افتراض وصف للموقع
+        $siteDescription = AdminSetting::where('setting_key', 'site_description')->first()->setting_value ?? 'منصة تتيح للمستخدمين خدمات من تأجير واستئجار معدات بجميع أنواعها وبأسعار مناسبة';
 
         return view('home', compact(
             'equipmentCategories',
@@ -41,72 +33,75 @@ class HomeController extends Controller
         ));
     }
 
-<<<<<<< HEAD
-    // public function categories()
-    // {
-    //     $parentCategories = EquipmentCategory::parents()->active()->with('children')->paginate(12);
-    //     return view('categories', compact('parentCategories'));
-    // }
-
-    // public function equipments(Request $request)
-    // {
-    //     $query = $request->input('query');
-    //     $category = $request->input('category');
-    //     $location = $request->input('location');
-
-    //     $equipments = Equipment::query()
-    //         ->when($query, fn($q) => $q->where('name', 'like', "%{$query}%"))
-    //         ->when($category, fn($q) => $q->where('category_id', $category))
-    //         ->when($location, fn($q) => $q->where('location_address', 'like', "%{$location}%")) // أو باستخدام Lat/Lng
-    //         ->where('is_approved_by_admin', true) // عرض المعدات المعتمدة فقط
-    //         ->where('status', 'available') // عرض المعدات المتاحة فقط
-    //         ->with('category', 'images')
-    //         ->paginate(12);
-
-    //     $equipmentCategories = EquipmentCategory::where('is_active', true)->get();
-    //     $locations = ['غزة', 'خان يونس', 'الوسطى', 'الشمال', 'رفح']; // نفس القائمة من index
-
-    //     return view('equipments', compact('equipments', 'equipmentCategories', 'locations', 'query', 'category', 'location'));
-    // }
-=======
-    public function categories()
+    public function categories(Request $request)
     {
-        $parentCategories = EquipmentCategory::parents()->active()->with('children')->paginate(12);
-        return view('categories', compact('parentCategories'));
+        $parentId = $request->input('parent_id');
+
+        if ($parentId) {
+            $parentCategory = EquipmentCategory::find($parentId);
+            if (!$parentCategory) {
+                abort(404);
+            }
+            $categories = $parentCategory->children()->active()->with('children')->paginate(12);
+            $currentParent = $parentCategory;
+        } else {
+            $categories = EquipmentCategory::parents()->active()->with('children')->paginate(12);
+            $currentParent = null;
+        }
+
+        return view('categories', compact('categories', 'currentParent'));
     }
 
     public function equipments(Request $request)
     {
         $query = $request->input('query');
-        $category = $request->input('category');
+        $categoryId = $request->input('category');
         $location = $request->input('location');
+        $minDailyRate = $request->input('min_daily_rate');
+        $maxDailyRate = $request->input('max_daily_rate');
 
         $equipments = Equipment::query()
             ->when($query, fn($q) => $q->where('name', 'like', "%{$query}%"))
-            ->when($category, fn($q) => $q->where('category_id', $category))
-            ->when($location, fn($q) => $q->where('location_address', 'like', "%{$location}%")) // أو باستخدام Lat/Lng
-            ->where('is_approved_by_admin', true) // عرض المعدات المعتمدة فقط
-            ->where('status', 'available') // عرض المعدات المتاحة فقط
-            ->with('category', 'images')
+            ->when($categoryId, function ($q) use ($categoryId) {
+                $selectedCategory = EquipmentCategory::find($categoryId);
+                if ($selectedCategory) {
+                    $categoryIds = [$selectedCategory->id];
+                    $this->getAllChildrenIds($selectedCategory, $categoryIds);
+                    $q->whereIn('category_id', array_unique($categoryIds)); // array_unique لتحسين الأداء وتجنب التكرار
+                }
+            })
+            ->when($location, fn($q) => $q->where('location_address', 'like', "%{$location}%"))
+            ->when($minDailyRate, fn($q) => $q->where('daily_rate', '>=', $minDailyRate))
+            ->when($maxDailyRate, fn($q) => $q->where('daily_rate', '<=', $maxDailyRate)) // **تصحيح الخطأ الإملائي هنا**
+            ->where('is_approved_by_admin', true)
+            ->where('status', 'available')
+            ->with('owner', 'category', 'images')
             ->paginate(12);
 
-        $equipmentCategories = EquipmentCategory::where('is_active', true)->get();
-        $locations = ['غزة', 'خان يونس', 'الوسطى', 'الشمال', 'رفح']; // نفس القائمة من index
+        // هذه المتغيرات ضرورية لفلتر البحث في صفحة المعدات
+        $equipmentCategories = EquipmentCategory::where('is_active', true)->with('children')->get();
+        $locations = ['غزة', 'خان يونس', 'الوسطى', 'الشمال', 'رفح'];
 
-        return view('equipments', compact('equipments', 'equipmentCategories', 'locations', 'query', 'category', 'location'));
+        // **تصحيح الـ View الراجع**: الآن يشير إلى 'equipments' بدلاً من 'home'
+        // ويمرر جميع المتغيرات اللازمة لتعبئة الفلاتر وعرض النتائج
+        return view('frontend.equipments', compact(
+            'equipments',
+            'equipmentCategories', // تم تغيير اسم المتغير ليتوافق مع الـ View
+            'locations',
+            'query',
+            'categoryId',
+            'location',
+            'minDailyRate',
+            'maxDailyRate'
+        ));
     }
->>>>>>> 6e6d9167c2067f79efc1ea9ba5a4a934791b08c0
 
-    public function about()
-    {
-        $siteDescription = AdminSetting::where('setting_key', 'site_description')->first()->setting_value ?? 'منصة تأجير معدات البناء ...';
-        return view('about', compact('siteDescription'));
-    }
 
-    public function contact()
+    private function getAllChildrenIds(EquipmentCategory $category, array &$ids): void
     {
-        $contactEmail = AdminSetting::where('setting_key', 'contact_email')->first()->setting_value ?? 'support@equipmentrental.com';
-        $contactPhone = AdminSetting::where('setting_key', 'contact_phone')->first()->setting_value ?? '+970 59 723 4892';
-        return view('contact', compact('contactEmail', 'contactPhone'));
+        foreach ($category->children as $child) {
+            $ids[] = $child->id;
+            $this->getAllChildrenIds($child, $ids);
+        }
     }
 }
