@@ -33,24 +33,26 @@ class HomeController extends Controller
         ));
     }
 
-    public function categories(Request $request)
-    {
-        $parentId = $request->input('parent_id');
+   public function categories(Request $request)
+{
+    $parentId = $request->input('parent_id');
 
-        if ($parentId) {
-            $parentCategory = EquipmentCategory::find($parentId);
-            if (!$parentCategory) {
-                abort(404);
-            }
-            $categories = $parentCategory->children()->active()->with('children')->paginate(12);
-            $currentParent = $parentCategory;
-        } else {
-            $categories = EquipmentCategory::parents()->active()->with('children')->paginate(12);
-            $currentParent = null;
+    $currentParent = null; // ضمان وجود المتغيّر دائمًا
+
+    if ($parentId) {
+        $parentCategory = EquipmentCategory::find($parentId);
+        if (!$parentCategory) {
+            abort(404);
         }
-
-        return view('categories', compact('categories', 'currentParent'));
+        $categories = $parentCategory->children()->active()->with('children')->paginate(12);
+        $currentParent = $parentCategory;
+    } else {
+        $categories = EquipmentCategory::parents()->active()->with('children')->paginate(12);
     }
+
+    return view('frontend.categories', compact('categories', 'currentParent'));
+}
+
 
     public function equipments(Request $request)
     {

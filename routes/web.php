@@ -48,7 +48,7 @@ use App\Http\Controllers\Admin\EquipmentCategoryController;
 // ========================================================================
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/categories', [CategoryController::class, 'index'])->name('categories');
+Route::get('/categories', [HomeController::class, 'categories'])->name('categories');
 Route::get('/equipments', [HomeController::class, 'equipments'])->name('equipments'); // صفحة نتائج البحث
 Route::get('/equipments/{equipment}', [EquipmentController::class, 'show'])->name('equipments.show');
 Route::get('/equipments/{equipment}', [HomeController::class, 'showEquipment'])->name('equipments.show');
