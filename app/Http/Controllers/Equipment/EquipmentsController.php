@@ -32,4 +32,39 @@ class EquipmentsController extends Controller
         return view('frontend.equipments', compact('equipments', 'categories', 'contactPhone', 'officeHours', 'contactEmail', 'siteDescription'));
     }
 
+
+    public function create()
+{
+    $categories = EquipmentCategory::active()->get(); // أو جميع الفئات
+    return view('frontend.equipments.create', compact('categories'));
+}
+
+public function store(Request $request)
+{
+    $data = $request->validate([
+        'name' => 'required|string|max:255',
+        'category_id' => 'required|exists:equipment_categories,id',
+        'description' => 'nullable|string',
+        'daily_rate' => 'nullable|numeric',
+        'weekly_rate' => 'nullable|numeric',
+        'monthly_rate' => 'nullable|numeric',
+        'deposit_amount' => 'nullable|numeric',
+        'location_address' => 'required|string|max:255',
+        'has_gps_tracker' => 'boolean',
+        'images.*' => 'image|mimes:jpg,jpeg,png|max:2048',
+    ]);
+
+    $equipment = Equipment::create($data + ['owner_id' => auth()->id(), 'status' => 'available']);
+
+    // حفظ الصور
+    if ($request->hasFile('images')) {
+        foreach ($request->file('images') as $image) {
+            $path = $image->store('equipment', 'public');
+            $equipment->images()->create(['image_url' => $path]);
+        }
+    }
+
+    return redirect()->route('equipments.create')->with('success', 'تمت إضافة المعدة بنجاح');
+}
+
 }

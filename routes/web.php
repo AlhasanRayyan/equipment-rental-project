@@ -18,41 +18,16 @@ use App\Http\Controllers\Admin\EquipmentCategoryController;
 
 
 
-
-
-
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-
-
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
-
-
-
-
-
-
 // 1. Frontend / Public Website Routes
 // ========================================================================
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/categories', [HomeController::class, 'categories'])->name('categories');
 Route::get('/equipments', [HomeController::class, 'equipments'])->name('equipments'); // صفحة نتائج البحث
+Route::get('/equipments/create', [EquipmentsController::class , 'create'])->name('equipments.create');
+Route::post('/equipments/store', [EquipmentsController::class, 'store'])->name('equipments.store');
 Route::get('/equipments/{equipment}', [EquipmentController::class, 'show'])->name('equipments.show');
-Route::get('/equipments/{equipment}', [HomeController::class, 'showEquipment'])->name('equipments.show');
-
+// Route::get('/equipments/{equipment}', [HomeController::class, 'showEquipment'])->name('equipments.show');
 
 
 Route::get('/about', [HomeController::class, 'about'])->name('about');
@@ -109,6 +84,5 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/{equipmentCategory}/equipment', [EquipmentCategoryController::class, 'showEquipment'])->name('showEquipment'); // **جديد: عرض المعدات المرتبطة بفئة**
     });
 });
-
 
 require __DIR__ . '/auth.php'; // تأكد من وجود هذا السطر
