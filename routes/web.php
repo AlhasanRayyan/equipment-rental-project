@@ -26,6 +26,12 @@ Route::get('/categories', [HomeController::class, 'categories'])->name('categori
 Route::get('/equipments', [HomeController::class, 'equipments'])->name('equipments'); // صفحة نتائج البحث
 Route::get('/equipments/create', [EquipmentsController::class , 'create'])->name('equipments.create');
 Route::post('/equipments/store', [EquipmentsController::class, 'store'])->name('equipments.store');
+// ✅ صفحة تعديل معدة موجودة
+Route::get('/equipments/{id}/edit', [EquipmentsController::class, 'edit'])->name('equipments.edit');
+
+// ✅ تحديث بيانات المعدة
+Route::put('/equipments/{id}', [EquipmentsController::class, 'update'])->name('equipments.update');
+
 Route::get('/equipments/{equipment}', [EquipmentController::class, 'show'])->name('equipments.show');
 // Route::get('/equipments/{equipment}', [HomeController::class, 'showEquipment'])->name('equipments.show');
 
