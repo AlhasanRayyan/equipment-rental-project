@@ -131,7 +131,7 @@
                                 <a href="{{ route('equipments.show', $equipment->id) }}"> {{-- رابط لعرض تفاصيل المعدة --}}
                                     {{-- تأكد أن $equipment->images موجودة وأنها ترجع مجموعة صور --}}
                                     @if($equipment->images->count() > 0)
-                                        <img src="{{ asset('storage/' . $equipment->images->first()->image_path) }}"
+                                        <img src="{{ asset('storage/' . $equipment->images->first()->image_url) }}"
                                              alt="{{ $equipment->name }}"
                                              data-uk-img> {{-- data-uk-img لتحسين تحميل الصور --}}
                                     @else

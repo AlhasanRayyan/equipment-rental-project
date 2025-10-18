@@ -49,7 +49,7 @@
                                href="{{ $category->children->count() ? route('categories', ['parent_id' => $category->id]) : route('equipments', ['category' => $category->id]) }}"
                                tabindex="0">
                                 <div class="category-item__media">
-                                    <img src="{{ asset('assets/home/img/' . $category->image_url) }}"
+                                    <img src="{{ asset('storage/' . $category->image_url) }}"
                                          alt="{{ $category->category_name }}" />
 
                                     <div class="uk-transition-fade">
