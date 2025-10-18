@@ -32,8 +32,9 @@ Route::get('/equipments/{id}/edit', [EquipmentsController::class, 'edit'])->name
 // ✅ تحديث بيانات المعدة
 Route::put('/equipments/{id}', [EquipmentsController::class, 'update'])->name('equipments.update');
 
-Route::get('/equipments/{equipment}', [EquipmentController::class, 'show'])->name('equipments.show');
-// Route::get('/equipments/{equipment}', [HomeController::class, 'showEquipment'])->name('equipments.show');
+
+
+Route::get('/equipments/{id}', [EquipmentsController::class, 'show'])->name('equipments.show');
 
 
 Route::get('/about', [HomeController::class, 'about'])->name('about');

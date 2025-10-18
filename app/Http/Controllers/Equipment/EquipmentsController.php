@@ -104,4 +104,11 @@ class EquipmentsController extends Controller
 
         return redirect()->route('home')->with('success', 'تم تحديث بيانات المعدة بنجاح!');
     }
+
+    public function show($id)
+    {
+        $equipment = Equipment::with(['images', 'owner', 'category'])->findOrFail($id);
+
+        return view('frontend.equipments.show', compact('equipment'));
+    }
 }
