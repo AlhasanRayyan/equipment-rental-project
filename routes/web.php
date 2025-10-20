@@ -11,12 +11,7 @@ use App\Http\Controllers\Admin\EquipmentController;
 use App\Http\Controllers\Category\CategoryController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\EquipmentCategoryController;
-
-
-
-
-
-
+use App\Http\Controllers\OwnerEquipmentController;
 
 // 1. Frontend / Public Website Routes
 // ========================================================================
@@ -24,18 +19,17 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/categories', [HomeController::class, 'categories'])->name('categories');
 Route::get('/equipments', [HomeController::class, 'equipments'])->name('equipments'); // صفحة نتائج البحث
-Route::get('/equipments/create', [EquipmentsController::class , 'create'])->name('equipments.create');
+Route::get('/equipments/create', [EquipmentsController::class, 'create'])->name('equipments.create');
 Route::post('/equipments/store', [EquipmentsController::class, 'store'])->name('equipments.store');
 // ✅ صفحة تعديل معدة موجودة
 Route::get('/equipments/{id}/edit', [EquipmentsController::class, 'edit'])->name('equipments.edit');
-
 // ✅ تحديث بيانات المعدة
 Route::put('/equipments/{id}', [EquipmentsController::class, 'update'])->name('equipments.update');
-
-
-
 Route::get('/equipments/{id}', [EquipmentsController::class, 'show'])->name('equipments.show');
 
+Route::get('/owner/equipments', [OwnerEquipmentController::class, 'index'])->name('owner.equipments');
+Route::get('/owner/equipments/search', [OwnerEquipmentController::class, 'search'])->name('owner.equipments.search');
+Route::get('/owner/equipments/{id}/edit', [OwnerEquipmentController::class, 'edit'])->name('owner.equipments.edit');
 
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');

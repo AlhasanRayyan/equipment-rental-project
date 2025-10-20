@@ -102,7 +102,7 @@ class EquipmentsController extends Controller
             }
         }
 
-        return redirect()->route('home')->with('success', 'تم تحديث بيانات المعدة بنجاح!');
+        return redirect()->route('owner.equipments')->with('success', 'تم تحديث بيانات المعدة بنجاح!');
     }
 
     public function show($id)

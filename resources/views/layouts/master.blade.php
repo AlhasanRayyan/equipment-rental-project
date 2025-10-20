@@ -41,22 +41,39 @@
 
                 </div>
                 <div class="page-header-bottom__right">
-                    <nav class="uk-navbar-container  uk-navbar-transparent" data-uk-navbar>
-                        <div class="nav-overlay uk-visible@l  List">
+                    <nav class="uk-navbar-container uk-navbar-transparent" data-uk-navbar>
+                        <div class="nav-overlay uk-visible@l List">
                             <ul class="uk-navbar-nav">
-                                <li class="uk-active"><a href="{{ route('home') }}">الصفحة الرئيسية</a></li>
-                                <li><a href="{{ route('categories') }}">الفئات</a></li>
-                                <li><a href="{{ route('equipments') }}">المعدات</a></li>
-                                <li><a href="{{ route('about') }}">عن الموقع</a></li>
-                                <li><a href="{{ route('contact') }}">تواصل معنا</a></li>
+                                <li class="{{ request()->routeIs('home') ? 'uk-active' : '' }}">
+                                    <a href="{{ route('home') }}">الصفحة الرئيسية</a>
+                                </li>
+
+                                <li class="{{ request()->routeIs('categories') ? 'uk-active' : '' }}">
+                                    <a href="{{ route('categories') }}">الفئات</a>
+                                </li>
+
+                                <li
+                                    class="{{ request()->routeIs('equipments') || request()->routeIs('equipments.*') ? 'uk-active' : '' }}">
+                                    <a href="{{ route('equipments') }}">المعدات</a>
+                                </li>
+
+                                <li class="{{ request()->routeIs('about') ? 'uk-active' : '' }}">
+                                    <a href="{{ route('about') }}">عن الموقع</a>
+                                </li>
+
+                                <li class="{{ request()->routeIs('contact') ? 'uk-active' : '' }}">
+                                    <a href="{{ route('contact') }}">تواصل معنا</a>
+                                </li>
                             </ul>
                         </div>
+
                         <div class="login-link">
                             <i class="fas fa-sign-in-alt"></i>
                             @auth
                                 <a href="{{ route('logout') }}"
-                                    onclick="event.preventDefault(); document.getElementById('logout-form-home').submit();">تسجيل
-                                    الخروج</a>
+                                    onclick="event.preventDefault(); document.getElementById('logout-form-home').submit();">
+                                    تسجيل الخروج
+                                </a>
                                 <form id="logout-form-home" action="{{ route('logout') }}" method="POST"
                                     class="uk-hidden">@csrf</form>
                             @else
@@ -64,18 +81,24 @@
                             @endauth
                         </div>
 
-                        <div class="nav-overlay search-btn"><a class="uk-navbar-toggle" data-uk-search-icon
+                        <div class="nav-overlay search-btn">
+                            <a class="uk-navbar-toggle" data-uk-search-icon
                                 data-uk-toggle="target: .nav-overlay; animation: uk-animation-fade" href="#"></a>
                         </div>
+
                         <div class="nav-overlay uk-navbar-left uk-flex-1" hidden>
                             <div class="uk-navbar-item uk-width-expand">
                                 <form class="uk-search uk-search-navbar uk-width-1-1"
-                                    action="{{ route('equipments') }}" method="GET"><input class="uk-search-input"
-                                        type="search" name="query" placeholder="ابحث عن المعدات..." autofocus></form>
-                            </div><a class="uk-navbar-toggle" data-uk-close
+                                    action="{{ route('equipments') }}" method="GET">
+                                    <input class="uk-search-input" type="search" name="query"
+                                        placeholder="ابحث عن المعدات..." autofocus>
+                                </form>
+                            </div>
+                            <a class="uk-navbar-toggle" data-uk-close
                                 data-uk-toggle="target: .nav-overlay; animation: uk-animation-fade" href="#"></a>
                         </div>
                     </nav>
+
                     <a class="uk-navbar-toggle uk-hidden@l" href="#offcanvas" data-uk-toggle><span
                             data-uk-icon="menu"></span></a>
 
@@ -185,19 +208,24 @@
                     </div>
                     <div class="uk-margin">
                         <ul class="uk-nav-default uk-nav-parent-icon" data-uk-nav>
-                            {{-- ارجعيلها --}}
-                            <li class="{{ request()->url() == route('home') ? 'uk-active' : '' }}"><a
-                                    href="{{ route('home') }}">الصفحة الرئيسية</a></li>
-                            <li class="{{ request()->url() == route('categories') ? 'uk-active' : '' }}"><a
-                                    href="{{ route('categories') }}">الفئات</a></li>
-                            <li class="{{ request()->url() == route('equipments') ? 'uk-active' : '' }}"><a
-                                    href="{{ route('equipments') }}">المعدات</a></li>
-                            <li class="{{ request()->url() == route('about') ? 'uk-active' : '' }}"><a
-                                    href="{{ route('about') }}">عن الموقع</a></li>
-                            <li class="{{ request()->url() == route('contact') ? 'uk-active' : '' }}"><a
-                                    href="{{ route('contact') }}">تواصل معنا</a></li>
+                            <li class="{{ request()->routeIs('home') ? 'uk-active' : '' }}">
+                                <a href="{{ route('home') }}">الصفحة الرئيسية</a>
+                            </li>
+                            <li class="{{ request()->routeIs('categories') ? 'uk-active' : '' }}">
+                                <a href="{{ route('categories') }}">الفئات</a>
+                            </li>
+                            <li class="{{ request()->routeIs('equipments*') ? 'uk-active' : '' }}">
+                                <a href="{{ route('equipments') }}">المعدات</a>
+                            </li>
+                            <li class="{{ request()->routeIs('about') ? 'uk-active' : '' }}">
+                                <a href="{{ route('about') }}">عن الموقع</a>
+                            </li>
+                            <li class="{{ request()->routeIs('contact') ? 'uk-active' : '' }}">
+                                <a href="{{ route('contact') }}">تواصل معنا</a>
+                            </li>
                         </ul>
                     </div>
+
                 </div>
             </div>
             <div class="uk-flex-top" id="callback" data-uk-modal="">

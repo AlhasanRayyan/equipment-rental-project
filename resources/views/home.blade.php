@@ -43,113 +43,109 @@
                     data-uk-slideshow-item="next"></a></div>
         </div>
     </div>
-    <div class="py-5 bg-light"> {{-- section-find uk-section-large uk-background-muted --}}
-        <div class="container"> {{-- uk-container --}}
-            <div class="card shadow-lg border-0 rounded-3"> {{-- uk-card uk-card-default uk-card-body uk-box-shadow-large uk-border-rounded --}}
-                <div class="card-body p-4"> {{-- find-box (body part), uk-card-body --}}
-                    <div class="find-box"> {{-- يمكنك حذف هذا الـ div إذا لم يكن له تنسيقات CSS خاصة بك --}}
-                        <div class="text-center mb-4"> {{-- find-box__title uk-text-center uk-h2 uk-margin-medium-bottom --}}
-                            <h2 class="h2"> <span>اعثر على المعدات المناسبة</span></h2>
-                        </div>
-                        <div class="find-box__form"> {{-- يمكنك حذف هذا الـ div أيضاً إذا لم يكن له تنسيقات CSS خاصة --}}
-                            <form action="{{ route('equipments') }}" method="GET">
-                                {{-- الصف الأول للفلاتر الأساسية (الصنف، الموقع، اسم المعدة) --}}
-                                <div class="row g-3"> {{-- uk-grid uk-grid-medium uk-child-width-1-1 uk-child-width-1-3@m data-uk-grid --}}
-                                    {{-- فلتر الفئات الرئيسية والفرعية المحسن --}}
-                                    <div class="col-md-4 col-12"> {{-- uk-child-width-1-1 uk-child-width-1-3@m --}}
-                                        <label class="form-label" for="filter-category">الصنف</label>
-                                        <div class="input-group"> {{-- uk-form-controls - input-group لدمج الأيقونة --}}
-                                            <select class="form-select form-select-lg" id="filter-category" name="category">
-                                                {{-- uk-select uk-form-large --}}
-                                                <option value="">إختر الصنف</option>
-                                                @foreach ($equipmentCategories->whereNull('parent_id') as $parentCategory)
-                                                    <option value="{{ $parentCategory->id }}"
-                                                        {{ isset($categoryId) && $categoryId == $parentCategory->id ? 'selected' : '' }}>
-                                                        {{ $parentCategory->category_name }}
-                                                    </option>
-                                                    @foreach ($parentCategory->children->where('is_active', true) as $subCategory)
-                                                        <option value="{{ $subCategory->id }}"
-                                                            {{ isset($categoryId) && $categoryId == $subCategory->id ? 'selected' : '' }}>
-                                                            &nbsp;&nbsp;&nbsp;&nbsp;— {{ $subCategory->category_name }}
-                                                        </option>
-                                                    @endforeach
-                                                @endforeach
-                                            </select>
-                                            {{-- أيقونة Bootstrap (تتطلب تضمين Bootstrap Icons أو Font Awesome) --}}
-                                            <label class="input-group-text" for="filter-category"><i
-                                                    class="bi bi-chevron-down"></i></label>
-                                            {{-- إذا كنت تستخدم Font Awesome: <label class="input-group-text" for="filter-category"><i class="fas fa-chevron-down"></i></label> --}}
-                                        </div>
-                                    </div>
-
-                                    {{-- فلتر الموقع --}}
-                                    <div class="col-md-4 col-12"> {{-- uk-child-width-1-1 uk-child-width-1-3@m --}}
-                                        <label class="form-label" for="filter-location">الموقع</label>
-                                        <div class="input-group"> {{-- uk-form-controls --}}
-                                            <select class="form-select form-select-lg" id="filter-location" name="location">
-                                                {{-- uk-select uk-form-large --}}
-                                                <option value="">إختر موقعك الحالي</option>
-                                                @foreach ($locations as $loc)
-                                                    <option value="{{ $loc }}"
-                                                        {{ isset($location) && $location == $loc ? 'selected' : '' }}>
-                                                        {{ $loc }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            <label class="input-group-text" for="filter-location"><i
-                                                    class="bi bi-chevron-down"></i></label>
-                                        </div>
-                                    </div>
-
-                                    {{-- فلتر اسم المعدة مع أيقونة البحث المدمجة --}}
-                                    <div class="col-md-4 col-12"> {{-- uk-child-width-1-1 uk-child-width-1-3@m --}}
-                                        <label class="form-label" for="filter-query">اسم المعدة</label>
-                                        <div class="input-group"> {{-- uk-form-controls uk-inline uk-width-1-1 --}}
-                                            <input class="form-control form-control-lg" id="filter-query" type="text"
-                                                name="query" placeholder="بحث باسم المعدة..."
-                                                value="{{ $query ?? '' }}"> {{-- uk-input uk-form-large --}}
-                                            {{-- أيقونة Bootstrap (تتطلب تضمين Bootstrap Icons أو Font Awesome) --}}
-                                            <label class="input-group-text" for="filter-query"><i
-                                                    class="bi bi-search"></i></label>
-                                            {{-- إذا كنت تستخدم Font Awesome: <label class="input-group-text" for="filter-query"><i class="fas fa-search"></i></label> --}}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- الصف الثاني للفلاتر الإضافية للأسعار --}}
-                                <div class="row g-3 mt-4"> {{-- uk-grid uk-grid-medium uk-child-width-1-1 uk-child-width-1-2@m uk-margin-top data-uk-grid --}}
-                                    <div class="col-md-6 col-12"> {{-- uk-child-width-1-2@m --}}
-                                        <label class="form-label" for="filter-min-rate">الحد الأدنى للسعر اليومي</label>
-                                        <div class="input-group"> {{-- uk-form-controls --}}
-                                            <input class="form-control form-control-lg" id="filter-min-rate" type="number"
-                                                step="0.01" name="min_daily_rate" placeholder="أقل سعر"
-                                                value="{{ $minDailyRate ?? '' }}"> {{-- uk-input uk-form-large --}}
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 col-12"> {{-- uk-child-width-1-2@m --}}
-                                        <label class="form-label" for="filter-max-rate">الحد الأقصى للسعر اليومي</label>
-                                        <div class="input-group"> {{-- uk-form-controls --}}
-                                            <input class="form-control form-control-lg" id="filter-max-rate"
-                                                type="number" step="0.01" name="max_daily_rate"
-                                                placeholder="أقصى سعر" value="{{ $maxDailyRate ?? '' }}">
-                                            {{-- uk-input uk-form-large --}}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="text-center mt-5"> {{-- uk-margin-large-top uk-text-center --}}
-                                    <button type="submit" class="btn btn-primary btn-lg me-2"><span>البحث عن
-                                            المعدات</span></button> {{-- uk-button uk-button-primary uk-button-large uk-margin-small-right --}}
-                                    {{-- زر لإعادة تعيين الفلاتر --}}
-                                    <a href="{{ route('equipments') }}" class="btn btn-secondary btn-lg"><span>إعادة
-                                            تعيين الفلاتر</span></a> {{-- uk-button uk-button-default uk-button-large --}}
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+   <section class="section-find uk-section-large uk-background-muted">
+    <div class="uk-container">
+        <div class="uk-card uk-card-default uk-card-body uk-box-shadow-large uk-border-rounded">
+            <div class="find-box">
+                <div class="find-box__title uk-text-center uk-h2 uk-margin-medium-bottom">
+                    <h2><span>اعثر على المعدات المناسبة</span></h2>
                 </div>
+
+                <div class="find-box__form">
+                    <form action="{{ route('equipments') }}" method="GET">
+
+                        {{-- الصف الأول: الصنف / الموقع / اسم المعدة --}}
+                        <div class="uk-grid uk-grid-medium uk-child-width-1-1 uk-child-width-1-3@m" data-uk-grid>
+
+                            {{-- الفئة --}}
+                            <div>
+                                <label class="uk-form-label" for="filter-category">الصنف</label>
+                                <div class="uk-form-controls uk-inline uk-width-1-1">
+                                    <select class="uk-select uk-form-large" id="filter-category" name="category">
+                                        <option value="">إختر الصنف</option>
+                                        @foreach ($equipmentCategories->whereNull('parent_id') as $parentCategory)
+                                            <option value="{{ $parentCategory->id }}"
+                                                {{ isset($categoryId) && $categoryId == $parentCategory->id ? 'selected' : '' }}>
+                                                {{ $parentCategory->category_name }}
+                                            </option>
+                                            @foreach ($parentCategory->children->where('is_active', true) as $subCategory)
+                                                <option value="{{ $subCategory->id }}"
+                                                    {{ isset($categoryId) && $categoryId == $subCategory->id ? 'selected' : '' }}>
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;— {{ $subCategory->category_name }}
+                                                </option>
+                                            @endforeach
+                                        @endforeach
+                                    </select>
+                                    <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: chevron-down"></span>
+                                </div>
+                            </div>
+
+                            {{-- الموقع --}}
+                            <div>
+                                <label class="uk-form-label" for="filter-location">الموقع</label>
+                                <div class="uk-form-controls uk-inline uk-width-1-1">
+                                    <select class="uk-select uk-form-large" id="filter-location" name="location">
+                                        <option value="">إختر موقعك الحالي</option>
+                                        @foreach ($locations as $loc)
+                                            <option value="{{ $loc }}"
+                                                {{ isset($location) && $location == $loc ? 'selected' : '' }}>
+                                                {{ $loc }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: location"></span>
+                                </div>
+                            </div>
+
+                            {{-- اسم المعدة --}}
+                            <div>
+                                <label class="uk-form-label" for="filter-query">اسم المعدة</label>
+                                <div class="uk-form-controls uk-inline uk-width-1-1">
+                                    <input class="uk-input uk-form-large" id="filter-query" type="text"
+                                        name="query" placeholder="بحث باسم المعدة..." value="{{ $query ?? '' }}">
+                                    <span class="uk-form-icon uk-form-icon-flip" data-uk-icon="icon: search"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- الصف الثاني: السعر --}}
+                        <div class="uk-grid uk-grid-medium uk-child-width-1-1 uk-child-width-1-2@m uk-margin-top" data-uk-grid>
+                            <div>
+                                <label class="uk-form-label" for="filter-min-rate">الحد الأدنى للسعر اليومي</label>
+                                <div class="uk-form-controls">
+                                    <input class="uk-input uk-form-large" id="filter-min-rate" type="number" step="0.01"
+                                        name="min_daily_rate" placeholder="أقل سعر"
+                                        value="{{ $minDailyRate ?? '' }}">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="uk-form-label" for="filter-max-rate">الحد الأقصى للسعر اليومي</label>
+                                <div class="uk-form-controls">
+                                    <input class="uk-input uk-form-large" id="filter-max-rate" type="number" step="0.01"
+                                        name="max_daily_rate" placeholder="أقصى سعر"
+                                        value="{{ $maxDailyRate ?? '' }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- الأزرار --}}
+                        <div class="uk-margin-large-top uk-text-center">
+                            <button type="submit" class="uk-button uk-button-primary uk-button-large uk-margin-small-right">
+                                <span>البحث عن المعدات</span>
+                            </button>
+                            <a href="{{ route('equipments') }}" class="uk-button uk-button-default uk-button-large">
+                                <span>إعادة تعيين الفلاتر</span>
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
             </div>
         </div>
+    </div>
+</section>
+
         <div class="section-category uk-section-large">
             <div class="uk-container">
                 <div class="section-title uk-text-center">
