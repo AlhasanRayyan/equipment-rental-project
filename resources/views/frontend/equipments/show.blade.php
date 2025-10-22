@@ -86,6 +86,73 @@
                                     <div class="uk-h2">معلومات</div>
                                 </div>
                                 <table class="uk-table uk-table-striped">
+                                    {{-- ✅ مشاركة المعدة و QR Code --}}
+                                    <div class="uk-card uk-card-default uk-card-body uk-margin-medium-top uk-text-center">
+                                        <h4 class="uk-heading-line"><span>مشاركة المعدة</span></h4>
+
+                                        {{-- 🔗 رابط المشاركة --}}
+                                        <div class="uk-margin">
+                                            <p class="uk-text-small uk-text-muted">يمكنك مشاركة هذه المعدة عبر الرابط
+                                                التالي:</p>
+                                            <div class="uk-inline uk-width-expand">
+                                                <input class="uk-input uk-text-center" type="text"
+                                                    value="{{ route('equipments.show', $equipment->id) }}" readonly
+                                                    id="equipmentLink">
+                                                <button class="uk-button uk-button-primary uk-margin-small-top"
+                                                    onclick="copyEquipmentLink()">نسخ الرابط</button>
+                                            </div>
+                                        </div>
+
+                                        {{-- 📱 QR Code --}}
+                                        <div class="uk-margin">
+                                            <p class="uk-text-small uk-text-muted">أو امسح رمز QR لفتح الصفحة مباشرة:</p>
+                                            <div class="uk-flex uk-flex-center uk-margin-small-bottom">
+                                                {!! QrCode::size(200)->generate(route('equipments.show', $equipment->id)) !!}
+                                            </div>
+
+                                            {{-- زر تحميل QR --}}
+                                            <a class="uk-button uk-button-default uk-margin-small-top"
+                                                href="data:image/png;base64,{{ base64_encode(QrCode::format('png')->size(300)->generate(route('equipments.show', $equipment->id))) }}"
+                                                download="equipment-{{ $equipment->id }}.png">
+                                                تحميل رمز QR
+                                            </a>
+                                        </div>
+                                        {{-- 🔗 أزرار المشاركة --}}
+                                        <div class="uk-margin">
+                                            <p class="uk-text-small uk-text-muted">شارك عبر:</p>
+
+                                            <div class="uk-flex uk-flex-center uk-grid-small" data-uk-grid>
+                                                @php
+                                                    $shareUrl = urlencode(route('equipments.show', $equipment->id));
+                                                    $shareText = urlencode(
+                                                        'شاهد هذه المعدة على منصة تأجير المعدات: ' . $equipment->name,
+                                                    );
+                                                @endphp
+
+                                                <a href="https://wa.me/?text={{ $shareText }}%20{{ $shareUrl }}"
+                                                    class="share-btn whatsapp" target="_blank" title="واتساب">
+                                                    <i class="fab fa-whatsapp"></i>
+                                                </a>
+
+                                                <a href="https://t.me/share/url?url={{ $shareUrl }}&text={{ $shareText }}"
+                                                    class="share-btn telegram" target="_blank" title="تليجرام">
+                                                    <i class="fab fa-telegram-plane"></i>
+                                                </a>
+
+                                                <a href="https://www.facebook.com/sharer/sharer.php?u={{ $shareUrl }}"
+                                                    class="share-btn facebook" target="_blank" title="فيسبوك">
+                                                    <i class="fab fa-facebook-f"></i>
+                                                </a>
+
+                                                <a href="https://twitter.com/intent/tweet?url={{ $shareUrl }}&text={{ $shareText }}"
+                                                    class="share-btn twitter" target="_blank" title="تويتر">
+                                                    <i class="fab fa-x-twitter"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
                                     <tr>
                                         <td>سعر الإيجار اليومي:</td>
                                         <td>{{ $equipment->daily_rate ?? '-' }} $</td>
@@ -141,8 +208,8 @@
                                             </select>
                                             <span class="uk-form-icon">
                                                 <img class="timer"
-                                                    src="{{ asset('assets/home/img/icons/ico-timer.svg') }}" alt="timer"
-                                                    data-uk-svg>
+                                                    src="{{ asset('assets/home/img/icons/ico-timer.svg') }}"
+                                                    alt="timer" data-uk-svg>
                                             </span>
                                         </div>
                                     </div>
@@ -193,6 +260,19 @@
         </div>
     </main>
     @push('scripts')
+        <script>
+            function copyEquipmentLink() {
+                const input = document.getElementById('equipmentLink');
+                input.select();
+                input.setSelectionRange(0, 99999);
+                navigator.clipboard.writeText(input.value);
+                UIkit.notification({
+                    message: '✅ تم نسخ الرابط بنجاح!',
+                    status: 'success'
+                });
+            }
+        </script>
+
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const startInput = document.querySelector('[name="start_date"]');
