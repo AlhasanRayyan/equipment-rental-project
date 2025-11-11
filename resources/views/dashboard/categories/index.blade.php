@@ -80,7 +80,8 @@
                                             <span class="text-muted small">فئة رئيسية</span>
                                         @endif
                                     </td>
-                                    <td>{{ Str::limit($category->description, 50) ?? 'لا يوجد وصف.' }}</td>
+                                    {{-- <td>{{ Str::limit($category->description, 50) ?? 'لا يوجد وصف.' }}</td> --}}
+                                    <td>{{ Str::words($category->description, 5, '...')?? 'لا يوجد وصف.' }}</td>
                                     <td class="text-center">
                                         <a href="{{ route('admin.categories.showEquipment', $category) }}" class="btn btn-sm btn-info">{{ $category->equipment_count }} معدة</a>
                                     </td>
