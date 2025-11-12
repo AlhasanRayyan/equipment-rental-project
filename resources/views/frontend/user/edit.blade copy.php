@@ -34,11 +34,6 @@
             align-items: center;
         }
 
-        form {
-            display: contents;
-        }
-
-
         .update-container {
             background-color: rgba(255, 255, 255, 0.97);
             border-radius: 25px;
@@ -225,16 +220,17 @@
 </head>
 
 <body>
-    <div class="update-container">
-        <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
 
+    <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        @method('PUT')
+
+        <div class="update-container">
             {{-- صورة المستخدم --}}
             <div class="photo-section">
                 <img src="{{ $user && $user->profile_picture_url
                     ? asset('storage/' . $user->profile_picture_url)
-                    : asset('assets/home/img/guest.png') }}"
+                    : asset('assets/home/img/default-user.png') }}"
                     id="userPhoto" alt="صورة المستخدم">
 
                 <label class="custom-file-btn" for="fileInput">اختر صورة</label>
@@ -284,8 +280,28 @@
 
                 <button class="update-btn" type="submit">تحديث البيانات</button>
             </div>
-        </form>
-    </div>
+        </div>
+    </form>
+
+    {{-- سكريبت لمعاينة الصورة قبل الرفع --}}
+    {{-- مش شغال كنه --}}
+    {{-- <script>
+        function previewFile(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            if (file) {
+                reader.onload = function(e) {
+                    document.getElementById('userPhoto').src = e.target.result;
+                    document.getElementById('fileName').textContent = file.name;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('fileName').textContent = "لم يتم اختيار أي ملف";
+            }
+        }
+    </script> --}}
+
 
     <script>
         function previewFile(event) {

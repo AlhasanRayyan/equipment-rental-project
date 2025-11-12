@@ -153,7 +153,9 @@ class User extends Authenticatable
         return $this->hasMany(Notification::class, 'user_id');
     }
 
- 
+  /**
+     * العناصر المفضلة الخاصة بالمستخدم
+     */
     public function favorites()
     {
         return $this->hasMany(UserFavorite::class, 'user_id');
@@ -164,4 +166,43 @@ class User extends Authenticatable
     {
         return $this->hasMany(AdminSetting::class, 'updated_by');
     }
+    public function equipments()
+{
+    return $this->hasMany(Equipment::class, 'owner_id');
+}
+   /**
+     * الفواتير الخاصة بالمستخدم
+     */
+    // public function invoices()
+    // {
+    //     return $this->hasMany(Invoice::class, 'user_id');
+    // }
+    public function invoices()
+{
+    return $this->hasManyThrough(
+        Invoice::class,   // المودل النهائي
+        Booking::class,   // المودل الوسيط
+        'renter_id',      // المفتاح في جدول الحجوزات اللي يربط المستخدم (مثلاً renter_id أو user_id)
+        'booking_id',     // المفتاح في جدول الفواتير اللي يربط الحجز
+        'id',             // المفتاح الأساسي في جدول المستخدمين
+        'id'              // المفتاح الأساسي في جدول الحجوزات
+    );
+}
+
+      /**
+     * جميع الحجوزات التي تخص المستخدم (كمالك أو كمستأجر)
+     */
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class, 'renter_id');
+    }
+
+    //  /**
+    //  * المعدات المستأجرة من هذا المستخدم (اختياري)
+    //  */
+    // public function rentedEquipments()
+    // {
+    //     // لو عندك عمود renter_id بجدول المعدات
+    //     return $this->hasMany(Equipment::class, 'renter_id');
+    // }
 }

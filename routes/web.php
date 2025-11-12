@@ -20,9 +20,9 @@ Route::get('/categories', [HomeController::class, 'categories'])->name('categori
 Route::get('/equipments', [HomeController::class, 'equipments'])->name('equipments'); // صفحة نتائج البحث
 Route::get('/equipments/create', [EquipmentsController::class, 'create'])->name('equipments.create');
 Route::post('/equipments/store', [EquipmentsController::class, 'store'])->name('equipments.store');
-// ✅ صفحة تعديل معدة موجودة
+// صفحة تعديل معدة موجودة
 Route::get('/equipments/{id}/edit', [EquipmentsController::class, 'edit'])->name('equipments.edit');
-// ✅ تحديث بيانات المعدة
+// تحديث بيانات المعدة
 Route::put('/equipments/{id}', [EquipmentsController::class, 'update'])->name('equipments.update');
 Route::get('/equipments/{id}', [EquipmentsController::class, 'show'])->name('equipments.show');
 
@@ -87,8 +87,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 // Route::middleware(['auth'])->group(function () {
 // Route::resource('profile', UserProfileController::class);
 Route::get('/profile', [UserProfileController::class, 'show'])->name('profile.show');
+Route::get('/profile/section/{type}', [UserProfileController::class, 'loadSection'])->name('profile.section');
+Route::view('/faq', 'frontend.faq')->name('faq');
+
 Route::get('/profile/edit', [UserProfileController::class, 'edit'])->name('profile.edit');
-Route::post('/profile/update', [UserProfileController::class, 'update'])->name('profile.update');
+Route::put('/profile/update', [UserProfileController::class, 'update'])->name('profile.update');
 // });
 
 require __DIR__ . '/auth.php'; // تأكد من وجود هذا السطر

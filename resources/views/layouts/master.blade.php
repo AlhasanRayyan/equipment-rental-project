@@ -18,7 +18,6 @@
     <link rel="manifest" href="{{ asset('assets/home/img/favicon/site.html') }}">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#222222">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/home/css/libs.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/home/css/main.css') }}">

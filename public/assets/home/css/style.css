@@ -9,6 +9,10 @@
       --container-width: 1200px;
     }
 
+    input:focus{
+    outline: none !important;        /* يشيل الهوفر الافتراضي تاع الانبوتات */
+    }
+
 .hero {
   display: flex;
   align-items: center;
