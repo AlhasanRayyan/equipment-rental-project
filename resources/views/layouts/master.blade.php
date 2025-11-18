@@ -57,7 +57,7 @@
                                 </li>
 
                                 <li class="{{ request()->routeIs('about') ? 'uk-active' : '' }}">
-                                    <a href="{{ route('about') }}">عن الموقع</a>
+                                    <a href="{{ route('about') }}">عن المنصة</a>
                                 </li>
 
                                 <li class="{{ request()->routeIs('contact') ? 'uk-active' : '' }}">
@@ -118,7 +118,7 @@
                     <div class="uk-grid uk-child-width-1-4@l uk-child-width-1-2@s" data-uk-grid>
                         <div class="uk-flex-first@l">
                             <div class="title">عن المنصة</div>
-                            {{-- <p>{{ $siteDescription }}</p> --}}
+                            <p>{{ $siteDescription }}</p>
                             <ul class="social-list">
                                 <li class="social-list__item"><a class="social-list__link" href="#!"><i
                                             class="fab fa-facebook-f"></i></a></li>
@@ -141,7 +141,7 @@
                                             alt="For Rental Support"></div>
                                     <div class="contacts-list-item__desc">
                                         <div class="contacts-list-item__label">الدعم الفني</div>
-                                        <div class="contacts-list-item__content"> <a {{-- href="tel:{{ $contactPhone }}">{{ $contactPhone }}</a></div> --}}
+                                        <div class="contacts-list-item__content"> <a href="tel:{{ $contactPhone }}">{{ $contactPhone }}</a></div>
                                                 {{-- تم التعديل --}} </div>
                                 </li>
                                 <li class="contacts-list-item">
@@ -150,7 +150,7 @@
                                             alt="The Office Hours"></div>
                                     <div class="contacts-list-item__desc">
                                         <div class="contacts-list-item__label">ساعات العمل</div>
-                                        {{-- <div class="contacts-list-item__content">{{ $officeHours }}</div> --}}
+                                        <div class="contacts-list-item__content">{{ $officeHours }}</div>
                                     </div>
                                 </li>
                                 <li class="contacts-list-item">
@@ -160,7 +160,7 @@
                                     <div class="contacts-list-item__desc">
                                         <div class="contacts-list-item__label">راسلنا على الإيميل</div>
                                         <div class="contacts-list-item__content">
-                                            {{-- <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a> --}}
+                                            <a href="mailto:{{ $contactEmail }}">{{ $contactEmail }}</a>
                                         </div>
                                         {{-- تم التعديل --}}
                                     </div>
@@ -217,7 +217,7 @@
                                 <a href="{{ route('equipments') }}">المعدات</a>
                             </li>
                             <li class="{{ request()->routeIs('about') ? 'uk-active' : '' }}">
-                                <a href="{{ route('about') }}">عن الموقع</a>
+                                <a href="{{ route('about') }}">عن المنصة</a>
                             </li>
                             <li class="{{ request()->routeIs('contact') ? 'uk-active' : '' }}">
                                 <a href="{{ route('contact') }}">تواصل معنا</a>

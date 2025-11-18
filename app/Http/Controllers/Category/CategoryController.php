@@ -16,12 +16,15 @@ class CategoryController extends Controller
         $categories = EquipmentCategory::where('is_active', true)->orderBy('category_name', 'asc')->get();
 
         // بيانات الفوتر من إعدادات النظام
-        $contactPhone = AdminSetting::where('setting_key', 'contact_phone')->first()->setting_value ?? '+970 59 723 4892';
-        $officeHours = AdminSetting::where('setting_key', 'office_hours')->first()->setting_value ?? 'السبت - الخميس ( 8ص - 6م)';
-        $contactEmail = AdminSetting::where('setting_key', 'contact_email')->first()->setting_value ?? 'rentals@my-domain.net';
-        $siteDescription = AdminSetting::where('setting_key', 'site_description')->first()->setting_value ?? 'منصة تتيح للمستخدمين خدمات من تأجير واستئجار معدات البناء.';
+        // $contactPhone = AdminSetting::where('setting_key', 'contact_phone')->first()->setting_value ?? '+970 59 723 4892';
+        // $officeHours = AdminSetting::where('setting_key', 'office_hours')->first()->setting_value ?? 'السبت - الخميس ( 8ص - 6م)';
+        // $contactEmail = AdminSetting::where('setting_key', 'contact_email')->first()->setting_value ?? 'rentals@my-domain.net';
+        // $siteDescription = AdminSetting::where('setting_key', 'site_description')->first()->setting_value ?? 'منصة تتيح للمستخدمين خدمات من تأجير واستئجار معدات البناء.';
 
-        return view('frontend.categories', compact('categories', 'contactPhone', 'officeHours', 'contactEmail', 'siteDescription'));
+        return view('frontend.categories', compact('categories',
+        // 'contactPhone',
+        // 'officeHours', 'contactEmail', 'siteDescription'
+    ));
     }
 
 }

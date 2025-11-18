@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -23,12 +22,31 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
+    // public function store(LoginRequest $request): RedirectResponse
+    // {
+    //     $request->authenticate();
+
+    //     $request->session()->regenerate();
+
+    //     return redirect()->intended(RouteServiceProvider::HOME);
+    // }
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
+        $user = Auth::user();
 
+        //  لو جاي من رابط فيه redirect (زي login?redirect=equipments.create)
+        if ($request->has('redirect')) {
+            return redirect()->route($request->redirect);
+        }
+
+        //  لو المستخدم أدمن → وديه على dashboard
+        if ($user && $user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+
+        //  غير هيك → نرجعه لصفحة intended (لو كان يزور صفحة محمية)
         return redirect()->intended(RouteServiceProvider::HOME);
     }
 

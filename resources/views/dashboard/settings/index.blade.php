@@ -6,9 +6,25 @@
             font-size: 0.85rem;
             color: #6c757d;
         }
-        .action-dropdown .dropdown-menu { min-width: 150px; border-radius: 0.5rem; box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15); }
-        .action-dropdown .dropdown-item { display: flex; align-items: center; gap: 10px; padding: 0.5rem 1rem; }
-        .action-dropdown .dropdown-item i { width: 18px; text-align: center; opacity: 0.7; }
+
+        .action-dropdown .dropdown-menu {
+            min-width: 150px;
+            border-radius: 0.5rem;
+            box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+        }
+
+        .action-dropdown .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.5rem 1rem;
+        }
+
+        .action-dropdown .dropdown-item i {
+            width: 18px;
+            text-align: center;
+            opacity: 0.7;
+        }
     </style>
 @endsection
 
@@ -48,14 +64,19 @@
                                 <tr>
                                     <td><span class="fw-bold">{{ $setting->setting_key }}</span></td>
                                     <td>{{ Str::limit($setting->setting_value, 50) }}</td>
-                                    <td><p class="setting-description mb-0">{{ Str::limit($setting->description, 70) }}</p></td>
+                                    <td>
+                                        <p class="setting-description mb-0">{{ Str::limit($setting->description, 70) }}</p>
+                                    </td>
                                     <td>{{ $setting->updatedBy->first_name ?? 'N/A' }}</td> {{-- عرض اسم المستخدم الذي قام بالتحديث --}}
                                     <td>{{ $setting->updated_at->format('Y-m-d H:i') }}</td>
                                     <td class="text-center">
                                         <div class="dropdown action-dropdown">
-                                            <button class="btn btn-light btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">إجراءات</button>
+                                            <button class="btn btn-light btn-sm dropdown-toggle" type="button"
+                                                data-bs-toggle="dropdown">إجراءات</button>
                                             <ul class="dropdown-menu dropdown-menu-end">
-                                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#editSettingModal{{ $setting->id }}"><i class="fas fa-edit text-warning"></i> تعديل الإعداد</a></li>
+                                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#editSettingModal{{ $setting->id }}"><i
+                                                            class="fas fa-edit text-warning"></i> تعديل الإعداد</a></li>
                                                 {{-- يمكن إضافة خيار الحذف هنا إذا تم تفعيل دالة destroy في Controller --}}
                                                 {{-- <li><hr class="dropdown-divider"></li>
                                                 <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteSettingModal{{ $setting->id }}"><i class="fas fa-trash"></i> حذف الإعداد</a></li> --}}
@@ -80,31 +101,78 @@
         <div class="modal fade" id="editSettingModal{{ $setting->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form action="{{ route('admin.settings.update', $setting) }}" method="POST">
+                    <form action="{{ route('admin.settings.update', $setting) }}" method="POST"
+                        enctype="multipart/form-data">
                         @csrf @method('PUT')
                         <div class="modal-header">
                             <h5 class="modal-title">تعديل: {{ $setting->setting_key }}</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
                         <div class="modal-body">
-                            <div class="mb-3">
+                            {{-- <div class="mb-3">
                                 <label for="setting_value_{{ $setting->id }}" class="form-label">القيمة</label>
-                                @if (
-                                    $setting->setting_key == 'maintenance_mode'
-                                ) {{-- مثال على حقل خاص للتبديل --}}
+                                @if ($setting->setting_key == 'maintenance_mode') {{-- مثال على حقل خاص للتبديل --}
                                     <select name="setting_value" id="setting_value_{{ $setting->id }}" class="form-select" required>
                                         <option value="true" {{ $setting->setting_value == 'true' ? 'selected' : '' }}>مفعل</option>
                                         <option value="false" {{ $setting->setting_value == 'false' ? 'selected' : '' }}>غير مفعل</option>
                                     </select>
                                 @elseif (
                                     $setting->setting_key == 'tax_rate_percent'
-                                ) {{-- مثال على حقل رقمي --}}
+                                ) {{-- مثال على حقل رقمي --}
                                     <input type="number" step="0.01" name="setting_value" id="setting_value_{{ $setting->id }}" class="form-control" value="{{ $setting->setting_value }}" required>
-                                @else {{-- حقل نصي عام --}}
+                                @else {{-- حقل نصي عام --}
                                     <input type="text" name="setting_value" id="setting_value_{{ $setting->id }}" class="form-control" value="{{ $setting->setting_value }}" required>
                                 @endif
                                 <div class="form-text setting-description">{{ $setting->description }}</div>
+                            </div> --}}
+                            <div class="mb-3">
+                                <label for="setting_value_{{ $setting->id }}" class="form-label">القيمة</label>
+
+                                @php
+                                    $iconKeys = [
+                                        'homepage_step1_icon',
+                                        'homepage_step2_icon',
+                                        'homepage_step3_icon',
+                                        'homepage_step4_icon',
+                                        'homepage_why_box1_icon',
+                                        'homepage_why_box2_icon',
+                                        'homepage_why_box3_icon',
+                                        'homepage_why_box4_icon',
+                                    ];
+                                @endphp
+
+                                @if (in_array($setting->setting_key, $iconKeys))
+                                    {{-- 👇 إعداد من نوع "صورة" – نعرض صورة حالية + حقل رفع --}}
+                                    @if ($setting->setting_value)
+                                        <div class="mb-2">
+                                            <span class="setting-description d-block mb-1">الصورة الحالية:</span>
+                                            <img src="{{ asset($setting->setting_value) }}" alt="icon"
+                                                style="max-width: 80px; max-height: 80px;">
+                                        </div>
+                                    @endif
+
+                                    <input type="file" name="setting_file" id="setting_file_{{ $setting->id }}"
+                                        class="form-control" accept="image/*">
+                                @elseif ($setting->setting_key == 'maintenance_mode')
+                                    <select name="setting_value" id="setting_value_{{ $setting->id }}" class="form-select"
+                                        required>
+                                        <option value="true" {{ $setting->setting_value == 'true' ? 'selected' : '' }}>
+                                            مفعل</option>
+                                        <option value="false" {{ $setting->setting_value == 'false' ? 'selected' : '' }}>
+                                            غير مفعل</option>
+                                    </select>
+                                @elseif ($setting->setting_key == 'tax_rate_percent')
+                                    <input type="number" step="0.01" name="setting_value"
+                                        id="setting_value_{{ $setting->id }}" class="form-control"
+                                        value="{{ $setting->setting_value }}" required>
+                                @else
+                                    <input type="text" name="setting_value" id="setting_value_{{ $setting->id }}"
+                                        class="form-control" value="{{ $setting->setting_value }}" required>
+                                @endif
+
+                                <div class="form-text setting-description">{{ $setting->description }}</div>
                             </div>
+
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
@@ -144,10 +212,12 @@
 
 @push('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             // تهيئة Tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) { return new bootstrap.Tooltip(tooltipTriggerEl) });
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
         });
     </script>
 @endpush

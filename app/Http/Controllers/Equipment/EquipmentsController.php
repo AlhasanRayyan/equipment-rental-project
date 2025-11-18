@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Equipment;
 
 use App\Http\Controllers\Controller;
@@ -25,14 +24,19 @@ class EquipmentsController extends Controller
 
         $categories = EquipmentCategory::where('is_active', true)->get();
 
-        $contactPhone    = AdminSetting::where('setting_key', 'contact_phone')->first()->setting_value ?? '+970 59 723 4892';
-        $officeHours     = AdminSetting::where('setting_key', 'office_hours')->first()->setting_value ?? 'السبت - الخميس ( 8ص - 6م)';
-        $contactEmail    = AdminSetting::where('setting_key', 'contact_email')->first()->setting_value ?? 'rentals@my-domain.net';
-        $siteDescription = AdminSetting::where('setting_key', 'site_description')->first()->setting_value ?? 'منصة تتيح للمستخدمين خدمات من تأجير واستئجار معدات البناء.';
+        // $contactPhone    = AdminSetting::where('setting_key', 'contact_phone')->first()->setting_value ?? '+970 59 723 4892';
+        // $officeHours     = AdminSetting::where('setting_key', 'office_hours')->first()->setting_value ?? 'السبت - الخميس ( 8ص - 6م)';
+        // $contactEmail    = AdminSetting::where('setting_key', 'contact_email')->first()->setting_value ?? 'rentals@my-domain.net';
+        // $siteDescription = AdminSetting::where('setting_key', 'site_description')->first()->setting_value ?? 'منصة تتيح للمستخدمين خدمات من تأجير واستئجار معدات البناء.';
 
-        return view('frontend.equipments', compact('equipments', 'categories', 'contactPhone', 'officeHours', 'contactEmail', 'siteDescription'));
+        return view('frontend.equipments', compact('equipments',
+        'categories',
+        // 'contactPhone',
+        // 'officeHours',
+        // 'contactEmail',
+        // 'siteDescription'
+    ));
     }
-
 
     public function create()
     {
@@ -43,16 +47,16 @@ class EquipmentsController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:equipment_categories,id',
-            'description' => 'nullable|string',
-            'daily_rate' => 'nullable|numeric',
-            'weekly_rate' => 'nullable|numeric',
-            'monthly_rate' => 'nullable|numeric',
-            'deposit_amount' => 'nullable|numeric',
+            'name'             => 'required|string|max:255',
+            'category_id'      => 'required|exists:equipment_categories,id',
+            'description'      => 'nullable|string',
+            'daily_rate'       => 'nullable|numeric',
+            'weekly_rate'      => 'nullable|numeric',
+            'monthly_rate'     => 'nullable|numeric',
+            'deposit_amount'   => 'nullable|numeric',
             'location_address' => 'required|string|max:255',
-            'has_gps_tracker' => 'boolean',
-            'images.*' => 'image|mimes:jpg,jpeg,png|max:2048',
+            'has_gps_tracker'  => 'boolean',
+            'images.*'         => 'image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $equipment = Equipment::create($data + ['owner_id' => auth()->id(), 'status' => 'available']);
@@ -70,7 +74,7 @@ class EquipmentsController extends Controller
 
     public function edit($id)
     {
-        $equipment = Equipment::with('images')->findOrFail($id);
+        $equipment  = Equipment::with('images')->findOrFail($id);
         $categories = EquipmentCategory::all();
         return view('frontend.equipments.edit', compact('equipment', 'categories'));
     }
@@ -80,16 +84,16 @@ class EquipmentsController extends Controller
         $equipment = Equipment::findOrFail($id);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'category_id' => 'required|exists:equipment_categories,id',
+            'name'             => 'required|string|max:255',
+            'category_id'      => 'required|exists:equipment_categories,id',
             'location_address' => 'required|string|max:255',
-            'daily_rate' => 'nullable|numeric',
-            'weekly_rate' => 'nullable|numeric',
-            'monthly_rate' => 'nullable|numeric',
-            'deposit_amount' => 'nullable|numeric',
-            'description' => 'nullable|string',
-            'has_gps_tracker' => 'boolean',
-            'images.*' => 'image|max:2048',
+            'daily_rate'       => 'nullable|numeric',
+            'weekly_rate'      => 'nullable|numeric',
+            'monthly_rate'     => 'nullable|numeric',
+            'deposit_amount'   => 'nullable|numeric',
+            'description'      => 'nullable|string',
+            'has_gps_tracker'  => 'boolean',
+            'images.*'         => 'image|max:2048',
         ]);
 
         $equipment->update($validated);

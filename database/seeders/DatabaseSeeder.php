@@ -25,7 +25,7 @@ class DatabaseSeeder extends Seeder
             NotificationSeeder::class,       // Notifications depend on Users (and optionally Bookings, Equipment)
             EquipmentTrackingSeeder::class,  // Equipment Tracking depends on Equipment
             UserFavoriteSeeder::class,       // User Favorites depend on Users and Equipment
-            AdminSettingSeeder::class, 
+            AdminSettingSeeder::class,
         ]);
     }
 }

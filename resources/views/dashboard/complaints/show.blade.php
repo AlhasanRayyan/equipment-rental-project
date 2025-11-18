@@ -105,7 +105,7 @@
 
                         <div class="mb-4 p-3 bg-light rounded">
                             <h5 class="text-primary mb-3">محتوى الشكوى/الاستفسار:</h5>
-                            <p class="lead">{{ $message->content }}</p>
+                            <p class="lead">{!! nl2br(e($message->content)) !!}</p>
                         </div>
 
                         {{-- يمكن إضافة قسم للرد على الشكوى هنا --}}
