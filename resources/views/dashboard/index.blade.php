@@ -4,9 +4,18 @@
     @php
         // ألوان ثابتة للفئات الرئيسية (بنفس ترتيب $allParentCategories)
         $baseColors = [
-            '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e',
-            '#e74a3b', '#20c997', '#6610f2', '#fd7e14',
-            '#17a2b8', '#6f42c1', '#d63384', '#858796',
+            '#4e73df',
+            '#1cc88a',
+            '#36b9cc',
+            '#f6c23e',
+            '#e74a3b',
+            '#20c997',
+            '#6610f2',
+            '#fd7e14',
+            '#17a2b8',
+            '#6f42c1',
+            '#d63384',
+            '#858796',
         ];
 
         // خريطة: اسم الفئة => لون
@@ -35,10 +44,14 @@
                 <x-stats-card icon="fas fa-hard-hat" title="إجمالي المعدات" :value="$stats['total_equipment']" color="success" />
             </div>
             <div class="col-xl-3 col-md-6 mb-4">
-                <x-stats-card icon="fas fa-calendar-check" title="إجمالي الحجوزات" :value="$stats['total_bookings']" color="info" />
+                <x-stats-card icon="fas fa-calendar-check" title="إجمالي الحجوزات" :value="$stats['total_bookings']" color="info"
+                    :badge="'ملغاة: ' . $stats['canceled_bookings']" />
             </div>
+
+
             <div class="col-xl-3 col-md-6 mb-4">
-                <x-stats-card icon="fas fa-dollar-sign" title="إجمالي الأرباح" :value="$stats['total_revenue']" color="warning" prefix="$" />
+                <x-stats-card icon="fas fa-dollar-sign" title="إجمالي الأرباح" :value="$stats['total_revenue']" color="warning"
+                    prefix="$" />
             </div>
         </div>
 
@@ -62,13 +75,11 @@
                                             optional(
                                                 $equipmentCategoriesCount->firstWhere(
                                                     'category_name',
-                                                    $category->category_name
-                                                )
+                                                    $category->category_name,
+                                                ),
                                             )['equipment_count'] ?? 0;
                                     @endphp
-                                    <span
-                                        class="badge text-white mb-2 me-1"
-                                        style="background-color: {{ $color }};">
+                                    <span class="badge text-white mb-2 me-1" style="background-color: {{ $color }};">
                                         {{ $category->category_name }}
                                         ({{ $count }})
                                     </span>
@@ -98,6 +109,24 @@
                 </div>
             </div>
         </div>
+        {{-- أرباح آخر 6 شهور --}}
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card shadow mb-4">
+                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="m-0 fw-bold text-primary">الأرباح خلال آخر 6 شهور</h6>
+                        <span class="text-muted small">
+                            أرباح هذا الشهر: <strong>${{ $stats['current_month_revenue'] }}</strong>
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div style="height:260px">
+                            <canvas id="monthlyRevenueChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- صف الجداول -->
         <div class="row">
@@ -105,7 +134,12 @@
             <div class="col-lg-6 mb-4">
                 <div class="card shadow">
                     <div class="card-header py-3">
-                        <h6 class="m-0 fw-bold text-primary">آخر 5 معدات بانتظار الموافقة</h6>
+                        <h6 class="m-0 fw-bold text-primary">آخر 5 معدات بانتظار الموافقة
+                            @if ($pendingCount > 0)
+                                <span class="badge bg-danger ms-2">{{ $pendingCount }}</span>
+                            @endif
+
+                        </h6>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -119,7 +153,8 @@
                                             </td>
                                             <td>
                                                 <div class="fw-bold">{{ Str::limit($equipment->name, 25) }}</div>
-                                                <small class="text-muted">{{ $equipment->owner->first_name ?? 'N/A' }}</small>
+                                                <small
+                                                    class="text-muted">{{ $equipment->owner->first_name ?? 'N/A' }}</small>
                                             </td>
                                             <td class="text-end">
                                                 @if ($equipment->is_approved_by_admin)
@@ -149,7 +184,11 @@
             <div class="col-lg-6 mb-4">
                 <div class="card shadow">
                     <div class="card-header py-3">
-                        <h6 class="m-0 fw-bold text-primary">آخر 5 شكاوى / استفسارات</h6>
+                        <h6 class="m-0 fw-bold text-primary">آخر 5 شكاوى / استفسارات
+                            @if ($newComplaintsCount > 0)
+                                <span class="badge bg-danger ms-2">جديد: {{ $newComplaintsCount }}</span>
+                            @endif
+                        </h6>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -163,8 +202,10 @@
                                                         <span>{{ mb_substr($complaint->sender->first_name ?? 'U', 0, 1) }}</span>
                                                     </div>
                                                     <div>
-                                                        <div class="fw-bold">{{ $complaint->sender->first_name ?? 'مستخدم' }}</div>
-                                                        <small class="text-muted">{{ Str::limit($complaint->content, 30) }}</small>
+                                                        <div class="fw-bold">
+                                                            {{ $complaint->sender->first_name ?? 'مستخدم' }}</div>
+                                                        <small
+                                                            class="text-muted">{{ Str::limit($complaint->content, 30) }}</small>
                                                     </div>
                                                 </div>
                                             </td>
@@ -178,7 +219,8 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td class="text-center p-4" colspan="3">لا توجد شكاوى أو استفسارات حديثة.</td>
+                                            <td class="text-center p-4" colspan="3">لا توجد شكاوى أو استفسارات حديثة.
+                                            </td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -192,124 +234,183 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // خريطة الألوان من السيرفر: { 'اسم الفئة': '#color' }
-    const categoryColorMap = @json($categoryColorMap);
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // خريطة الألوان من السيرفر: { 'اسم الفئة': '#color' }
+        const categoryColorMap = @json($categoryColorMap);
 
-    // ================================
-    //  توزيع المعدات حسب الفئة (دائرة)
-    // ================================
-    const ctxCategory = document.getElementById('equipmentCategoryChart').getContext('2d');
-    const categoryData = @json($equipmentCategoriesCount);
+        // ================================
+        //  توزيع المعدات حسب الفئة (دائرة)
+        // ================================
+        const ctxCategory = document.getElementById('equipmentCategoryChart').getContext('2d');
+        const categoryData = @json($equipmentCategoriesCount);
 
-    const categoryLabels = categoryData.map(item => item.category_name);
-    const categoryCounts = categoryData.map(item => item.equipment_count);
+        const categoryLabels = categoryData.map(item => item.category_name);
+        const categoryCounts = categoryData.map(item => item.equipment_count);
 
-    // نأخذ اللون حسب اسم الفئة (نفس ألوان الشيبس فوق)
-    const categoryColors = categoryLabels.map(name => categoryColorMap[name] ?? '#cccccc');
+        // نأخذ اللون حسب اسم الفئة (نفس ألوان الشيبس فوق)
+        const categoryColors = categoryLabels.map(name => categoryColorMap[name] ?? '#cccccc');
 
-    new Chart(ctxCategory, {
-        type: 'doughnut',
-        data: {
-            labels: categoryLabels,
-            datasets: [{
-                data: categoryCounts,
-                backgroundColor: categoryColors,
-                borderWidth: 2,
-                borderColor: '#fff',
-                hoverOffset: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false, // لأننا نعرض الفئات كشيبس فوق
+        new Chart(ctxCategory, {
+            type: 'doughnut',
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryCounts,
+                    backgroundColor: categoryColors,
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                    hoverOffset: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false, // لأننا نعرض الفئات كشيبس فوق
+                    },
+                    tooltip: {
+                        enabled: true,
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.raw + ' معدة';
+                            }
+                        }
+                    }
                 },
-                tooltip: {
-                    enabled: true,
-                    callbacks: {
-                        label: function(context) {
-                            return context.label + ': ' + context.raw + ' معدة';
+                animation: {
+                    animateScale: false,
+                    animateRotate: true
+                }
+            }
+        });
+
+        // ================================
+        //  الحجوزات الشهرية (أعمدة ملوّنة)
+        // ================================
+        const ctxBookings = document.getElementById('monthlyBookingsChart').getContext('2d');
+        const monthlyBookings = @json($monthlyBookings);
+
+        const bookingLabels = monthlyBookings.map(item => item.month_name);
+        const bookingCounts = monthlyBookings.map(item => item.count);
+
+        const baseColors = [
+            '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e',
+            '#e74a3b', '#20c997', '#6610f2', '#fd7e14',
+            '#17a2b8', '#6f42c1', '#d63384', '#858796',
+        ];
+        const bookingColors = bookingLabels.map((_, idx) => baseColors[idx % baseColors.length]);
+
+        new Chart(ctxBookings, {
+            type: 'bar',
+            data: {
+                labels: bookingLabels,
+                datasets: [{
+                    label: 'عدد الحجوزات',
+                    data: bookingCounts,
+                    backgroundColor: bookingColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
                         }
                     }
-                }
-            },
-            animation: {
-                animateScale: false,
-                animateRotate: true
-            }
-        }
-    });
-
-    // ================================
-    //  الحجوزات الشهرية (أعمدة ملوّنة)
-    // ================================
-    const ctxBookings = document.getElementById('monthlyBookingsChart').getContext('2d');
-    const monthlyBookings = @json($monthlyBookings);
-
-    const bookingLabels = monthlyBookings.map(item => item.month_name);
-    const bookingCounts = monthlyBookings.map(item => item.count);
-
-    const baseColors = [
-        '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e',
-        '#e74a3b', '#20c997', '#6610f2', '#fd7e14',
-        '#17a2b8', '#6f42c1', '#d63384', '#858796',
-    ];
-    const bookingColors = bookingLabels.map((_, idx) => baseColors[idx % baseColors.length]);
-
-    new Chart(ctxBookings, {
-        type: 'bar',
-        data: {
-            labels: bookingLabels,
-            datasets: [{
-                label: 'عدد الحجوزات',
-                data: bookingCounts,
-                backgroundColor: bookingColors,
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { precision: 0 }
-                }
-            },
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    enabled: true,
-                    callbacks: {
-                        label: function(context) {
-                            return context.raw + ' حجز';
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: true,
+                        callbacks: {
+                            label: function(context) {
+                                return context.raw + ' حجز';
+                            }
                         }
                     }
+                },
+                animation: {
+                    duration: 800,
+                    easing: 'easeOutQuart'
                 }
-            },
-            animation: {
-                duration: 800,
-                easing: 'easeOutQuart'
             }
-        }
-    });
-</script>
+        });
+        // ================================
+        //  الأرباح الشهرية آخر 6 شهور (Line Chart)
+        // ================================
+        const ctxRevenue = document.getElementById('monthlyRevenueChart').getContext('2d');
+        const monthlyRevenue = @json($monthlyRevenue);
 
-<style>
-    .avatar-placeholder {
-        width: 40px;
-        height: 40px;
-        background-color: #4e73df;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 1.1rem;
-    }
-</style>
+        const revenueLabels = monthlyRevenue.map(item => item.month_name);
+        const revenueValues = monthlyRevenue.map(item => item.total);
+
+        new Chart(ctxRevenue, {
+            type: 'line',
+            data: {
+                labels: revenueLabels,
+                datasets: [{
+                    label: 'الأرباح (دولار)',
+                    data: revenueValues,
+                    borderColor: '#4e73df',
+                    backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointHoverRadius: 5,
+                    pointBorderWidth: 2,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value;
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return ' $' + context.raw.toFixed(2);
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 800,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+    </script>
+
+    <style>
+        .avatar-placeholder {
+            width: 40px;
+            height: 40px;
+            background-color: #4e73df;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+    </style>
 @endpush

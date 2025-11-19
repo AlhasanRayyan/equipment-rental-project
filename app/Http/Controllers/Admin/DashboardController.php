@@ -24,18 +24,27 @@ class DashboardController extends Controller
             ->whereIn('payment_type', ['initial_payment', 'final_payment'])
             ->sum('amount');
 
-        $stats = [
-            'total_users'     => $totalUsers,
-            'total_equipment' => $totalEquipment,
-            'total_bookings'  => $totalBookings,
-            'total_revenue'   => number_format($totalRevenue, 2), // تنسيق الأرباح لكسرين عشريين
-        ];
+        // أرباح هذا الشهر (دفعات مكتملة فقط)
+        $currentMonthRevenue = Payment::where('status', 'completed')
+            ->whereIn('payment_type', ['initial_payment', 'final_payment'])
+            ->whereMonth('created_at', now()->month)
+            ->whereYear('created_at', now()->year)
+            ->sum('amount');
+
+        // $stats = [
+        //     'total_users'           => $totalUsers,
+        //     'total_equipment'       => $totalEquipment,
+        //     'total_bookings'        => $totalBookings,
+        //     'total_revenue'         => number_format($totalRevenue, 2),        // إجمالي كل الأرباح
+        //     'current_month_revenue' => number_format($currentMonthRevenue, 2), // أرباح هذا الشهر
+        // ];
 
         // 2. المعدات بانتظار الموافقة (لمراجعة الإعلانات)
         $pendingEquipment = Equipment::where('is_approved_by_admin', false)
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
+        $pendingCount = Equipment::where('is_approved_by_admin', false)->count();
 
         // 3. آخر الشكاوى والاستفسارات
         // هنا نفترض أن الشكاوى والاستفسارات تُسجل في جدول الرسائل (Messages)
@@ -45,6 +54,7 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
+        $newComplaintsCount = Message::where('is_read', false)->count();
 
         // 4. بيانات الرسم البياني لتوزيع المعدات حسب الفئة
         // $equipmentCategoriesCount = EquipmentCategory::withCount('equipment')
@@ -100,6 +110,35 @@ class DashboardController extends Controller
             $item->month_name = $date->translatedFormat('F Y'); // 'يناير 2023'
             return $item;
         });
+
+        // 6. بيانات الرسم البياني للأرباح خلال آخر 6 شهور
+        $monthlyRevenue = Payment::where('status', 'completed')
+            ->whereIn('payment_type', ['initial_payment', 'final_payment'])
+            ->whereBetween('created_at', [
+                now()->subMonths(5)->startOfMonth(), // من بداية الشهر قبل 5 شهور
+                now()->endOfMonth(),                 // لغاية نهاية الشهر الحالي
+            ])
+            ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, SUM(amount) as total')
+            ->groupBy('month')
+            ->orderBy('month', 'asc')
+            ->get();
+
+// تحويل الشهر لاسم عربي
+        $monthlyRevenue->map(function ($item) {
+            $date             = Carbon::parse($item->month . '-01');
+            $item->month_name = $date->translatedFormat('F Y'); // مثال: "يناير 2025"
+            return $item;
+        });
+        $canceledBookings = Booking::where('booking_status', 'canceled')->count();
+
+        $stats = [
+            'total_users'           => $totalUsers,
+            'total_equipment'       => $totalEquipment,
+            'total_bookings'        => $totalBookings,
+            'total_revenue'         => number_format($totalRevenue, 2),
+            'current_month_revenue' => $currentMonthRevenue,
+            'canceled_bookings'     => $canceledBookings, // 👈 مهم
+        ];
 // dd($equipmentCategoriesCount);
 
         return view('dashboard.index', compact(
@@ -108,7 +147,11 @@ class DashboardController extends Controller
             'latestComplaints',
             'equipmentCategoriesCount',
             'monthlyBookings',
-            'allParentCategories'
+            'allParentCategories',
+            'monthlyRevenue',
+            'pendingCount',
+            'newComplaintsCount',
+            'canceledBookings'
         ));
     }
 }

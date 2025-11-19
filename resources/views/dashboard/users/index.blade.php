@@ -17,7 +17,8 @@
         }
 
         .action-dropdown .dropdown-menu {
-            min-width: 200px; /* تم تعديل العرض قليلاً */
+            min-width: 200px;
+            /* تم تعديل العرض قليلاً */
             border-radius: 0.5rem;
             box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
         }
@@ -34,18 +35,30 @@
             text-align: center;
             opacity: 0.7;
         }
+
         /* تم حذف Select2-related styles */
     </style>
 @endsection
 
 @section('content')
     <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        {{-- <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="h3 mb-0 text-gray-800">إدارة المستخدمين</h1>
             <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#createUserModal">
                 <i class="fas fa-user-plus fa-sm me-2"></i>إضافة مستخدم جديد
             </button>
-        </div>
+        </div> --}}<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800">إدارة المستخدمين</h1>
+    <div>
+        <a href="{{ route('admin.users.trash') }}" class="btn btn-outline-danger me-2">
+            <i class="fas fa-trash-alt"></i> سلة المحذوفات
+        </a>
+        <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#createUserModal">
+            <i class="fas fa-user-plus fa-sm me-2"></i>إضافة مستخدم جديد
+        </button>
+    </div>
+</div>
+
 
         @include('partials.alerts') {{-- تأكد من وجود ملف alerts.blade.php في مسار partials --}}
 
@@ -55,14 +68,14 @@
                     <h6 class="m-0 fw-bold text-primary mb-2 mb-md-0">
                         <i class="fas fa-users me-2"></i>قائمة المستخدمين ({{ $users->total() }})
                     </h6>
-                    <form action="{{ route('admin.users.index') }}" method="GET"
-                        class="d-flex" style="max-width: 400px; width: 100%;">
+                    <form action="{{ route('admin.users.index') }}" method="GET" class="d-flex"
+                        style="max-width: 400px; width: 100%;">
                         <input type="text" name="query" class="form-control" placeholder="ابحث بالاسم أو البريد..."
                             value="{{ $query ?? '' }}">
                         <button type="submit" class="btn btn-primary ms-2"><i class="fas fa-search"></i></button>
                         @if ($query ?? '')
-                            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary ms-2"
-                                title="إلغاء البحث"><i class="fas fa-times"></i></a>
+                            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary ms-2" title="إلغاء البحث"><i
+                                    class="fas fa-times"></i></a>
                         @endif
                     </form>
                 </div>
@@ -87,7 +100,8 @@
                                                 <span>{{ mb_substr($user->first_name, 0, 1) }}</span> {{-- استخدام first_name --}}
                                             </div>
                                             <div>
-                                                <div class="fw-bold">{{ $user->first_name }} {{ $user->last_name }}</div> {{-- استخدام first_name و last_name --}}
+                                                <div class="fw-bold">{{ $user->first_name }} {{ $user->last_name }}</div>
+                                                {{-- استخدام first_name و last_name --}}
                                                 <div class="text-muted small">{{ $user->email }}</div>
                                             </div>
                                         </div>
@@ -112,12 +126,27 @@
                                             <button class="btn btn-light btn-sm dropdown-toggle" type="button"
                                                 data-bs-toggle="dropdown">إجراءات</button>
                                             <ul class="dropdown-menu dropdown-menu-end">
+                                                <li>
+                                                    <a class="dropdown-item" href="{{ route('admin.users.show', $user) }}">
+                                                        <i class="fas fa-eye text-info"></i> عرض التفاصيل
+                                                    </a>
+                                                </li>
                                                 {{-- لا تسمح بتعديل أو حذف المستخدم الأول (Super Admin) أو المستخدم الحالي --}}
                                                 @if ($user->id !== 1 && auth()->id() !== $user->id)
                                                     @if ($user->is_active)
-                                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#deactivateUserModal{{ $user->id }}"><i class="fas fa-times-circle text-warning"></i> تعطيل المستخدم</a></li>
+                                                        <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                                data-bs-target="#deactivateUserModal{{ $user->id }}"><i
+                                                                    class="fas fa-times-circle text-warning"></i> تعطيل
+                                                                المستخدم</a></li>
                                                     @else
-                                                        <li><a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('activate-form-{{ $user->id }}').submit();"><i class="fas fa-check-circle text-success"></i> تفعيل المستخدم</a><form id="activate-form-{{ $user->id }}" action="{{ route('admin.users.activate', $user) }}" method="POST" class="d-none">@csrf</form></li>
+                                                        <li><a class="dropdown-item" href="#"
+                                                                onclick="event.preventDefault(); document.getElementById('activate-form-{{ $user->id }}').submit();"><i
+                                                                    class="fas fa-check-circle text-success"></i> تفعيل
+                                                                المستخدم</a>
+                                                            <form id="activate-form-{{ $user->id }}"
+                                                                action="{{ route('admin.users.activate', $user) }}"
+                                                                method="POST" class="d-none">@csrf</form>
+                                                        </li>
                                                     @endif
                                                 @endif
                                                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
@@ -177,7 +206,8 @@
                         </div>
                     </div>
                     <div class="modal-footer"><button type="button" class="btn btn-secondary"
-                            data-bs-dismiss="modal">إغلاق</button><button type="submit" class="btn btn-primary">حفظ</button>
+                            data-bs-dismiss="modal">إغلاق</button><button type="submit"
+                            class="btn btn-primary">حفظ</button>
                     </div>
                 </form>
             </div>

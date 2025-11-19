@@ -81,6 +81,13 @@
             <i class="fas fa-fw fa-hard-hat"></i>
             <span>إدارة المعدات</span></a>
     </li>
+{{--
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('admin.equipment.stats') }}">
+            <i class="fas fa-chart-bar"></i>
+            <span>إحصاءات المعدات</span>
+        </a>
+    </li> --}}
 
     <!-- إدارة الشكاوى والاستفسارات -->
     <li class="nav-item {{ Request::is('admin/complaints*') ? 'active' : '' }}">

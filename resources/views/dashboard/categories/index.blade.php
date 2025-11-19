@@ -30,11 +30,20 @@
 @section('content')
     <div class="container-fluid">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3 mb-0 text-gray-800">إدارة فئات المعدات</h1>
-            <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#createCategoryModal">
-                <i class="fas fa-plus fa-sm me-2"></i>إضافة فئة جديدة
-            </button>
-        </div>
+    <h1 class="h3 mb-0 text-gray-800">إدارة فئات المعدات</h1>
+    <div>
+        <a href="{{ route('admin.categories.stats') }}" class="btn btn-outline-primary me-2">
+            <i class="fas fa-chart-bar me-1"></i> إحصائيات الفئات
+        </a>
+        <a href="{{ route('admin.categories.trash') }}" class="btn btn-outline-danger  me-2">
+            <i class="fas fa-trash-alt"></i> سلة المحذوفات
+        </a>
+        <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#createCategoryModal">
+            <i class="fas fa-plus fa-sm me-2"></i>إضافة فئة جديدة
+        </button>
+    </div>
+</div>
+
 
         @include('partials.alerts')
 

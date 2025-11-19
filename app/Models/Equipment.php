@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder; // لاستخدام الـ scope
 use Illuminate\Database\Eloquent\Casts\Attribute; // لتحديد Accessor و Mutator بشكل حديث
-
+use Illuminate\Database\Eloquent\SoftDeletes;
 class Equipment extends Model
 {
-    use HasFactory;
+    use HasFactory,  SoftDeletes;
 
     /**
      * The table associated with the model.

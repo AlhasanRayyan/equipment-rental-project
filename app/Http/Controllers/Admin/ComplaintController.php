@@ -1,11 +1,12 @@
 <?php
-
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Message;
+use App\Models\User; // سنستخدم نموذج الرسائل لتمثيل الشكاوى
 use Illuminate\Http\Request;
-use App\Models\Message; // سنستخدم نموذج الرسائل لتمثيل الشكاوى
-use App\Models\User; // لربط الشكاوى بالمستخدمين
+
+// لربط الشكاوى بالمستخدمين
 
 class ComplaintController extends Controller
 {
@@ -17,9 +18,9 @@ class ComplaintController extends Controller
      */
     public function index(Request $request)
     {
-        $query = $request->input('query');
+        $query        = $request->input('query');
         $statusFilter = $request->input('status', 'unread'); // افتراضياً، اعرض الشكاوى غير المقروءة
-        $typeFilter = $request->input('type', 'all'); // فلتر حسب نوع الرسالة (إذا أضفت أنواعاً مخصصة)
+        $typeFilter   = $request->input('type', 'all');      // فلتر حسب نوع الرسالة (إذا أضفت أنواعاً مخصصة)
 
         $complaints = Message::query()
             ->whereIn('message_type', ['complaint', 'inquiry', 'notification']) // أنواع رسائل يمكن اعتبارها شكاوى/استفسارات
@@ -27,8 +28,8 @@ class ComplaintController extends Controller
                 $q->where('content', 'like', "%{$query}%")
                     ->orWhereHas('sender', function ($sq) use ($query) {
                         $sq->where('first_name', 'like', "%{$query}%")
-                           ->orWhere('last_name', 'like', "%{$query}%")
-                           ->orWhere('email', 'like', "%{$query}%");
+                            ->orWhere('last_name', 'like', "%{$query}%")
+                            ->orWhere('email', 'like', "%{$query}%");
                     });
             })
             ->when($statusFilter === 'unread', function ($q) {
@@ -63,7 +64,7 @@ class ComplaintController extends Controller
     public function show(Message $message)
     {
         // تأكد أنها شكوى أو استفسار
-        if (!in_array($message->message_type, ['complaint', 'inquiry', 'notification'])) {
+        if (! in_array($message->message_type, ['complaint', 'inquiry', 'notification'])) {
             abort(404, 'الرسالة ليست شكوى أو استفسار.');
         }
 
@@ -113,4 +114,99 @@ class ComplaintController extends Controller
 
         return redirect()->route('admin.complaints.index')->with('success', 'تم حذف الشكوى بنجاح.');
     }
+
+    public function trash(Request $request)
+    {
+        $query = $request->input('query');
+
+        $complaints = Message::onlyTrashed()
+            ->whereIn('message_type', ['complaint', 'inquiry'])
+            ->when($query, function ($q, $query) {
+                $q->where('content', 'like', "%{$query}%")
+                    ->orWhereHas('sender', function ($sq) use ($query) {
+                        $sq->where('first_name', 'like', "%{$query}%")
+                            ->orWhere('last_name', 'like', "%{$query}%")
+                            ->orWhere('email', 'like', "%{$query}%");
+                    });
+            })
+            ->with('sender')
+            ->orderBy('deleted_at', 'desc')
+            ->paginate(10);
+
+        return view('dashboard.complaints.trash', compact('complaints', 'query'));
+    }
+
+    public function restore($id)
+    {
+        $message = Message::onlyTrashed()->findOrFail($id);
+        $message->restore();
+
+        return redirect()->route('admin.complaints.trash')->with('success', 'تم استعادة الشكوى بنجاح.');
+    }
+
+    public function restoreAll()
+    {
+        Message::onlyTrashed()
+            ->whereIn('message_type', ['complaint', 'inquiry'])
+            ->restore();
+
+        return redirect()->route('admin.complaints.trash')->with('success', 'تم استعادة جميع الشكاوى المحذوفة.');
+    }
+
+    public function forceDelete($id)
+    {
+        $message = Message::onlyTrashed()->findOrFail($id);
+        $message->forceDelete();
+
+        return redirect()->route('admin.complaints.trash')->with('success', 'تم حذف الشكوى نهائياً.');
+    }
+
+    public function forceDeleteAll()
+    {
+        Message::onlyTrashed()
+            ->whereIn('message_type', ['complaint', 'inquiry'])
+            ->forceDelete();
+
+        return back()->with('success', 'تم حذف جميع الشكاوى نهائياً.');
+    }
+
+    public function archived(Request $request)
+    {
+        $query      = $request->input('query');
+        $typeFilter = $request->input('type', 'all');
+
+        $complaints = Message::query()
+            ->whereIn('message_type', ['complaint', 'inquiry', 'notification'])
+            ->where('is_resolved', true) //  هنا الفرق: نجيب بس المحلولة/المؤرشفة
+            ->when($query, function ($q, $query) {
+                $q->where('content', 'like', "%{$query}%")
+                    ->orWhereHas('sender', function ($sq) use ($query) {
+                        $sq->where('first_name', 'like', "%{$query}%")
+                            ->orWhere('last_name', 'like', "%{$query}%")
+                            ->orWhere('email', 'like', "%{$query}%");
+                    });
+            })
+            ->when($typeFilter !== 'all', function ($q) use ($typeFilter) {
+                $q->where('message_type', $typeFilter);
+            })
+            ->with('sender')
+            ->orderBy('updated_at', 'desc') // الأحدث حلاً أولاً
+            ->paginate(10);
+
+        $messageTypes = Message::select('message_type')->distinct()->pluck('message_type');
+
+        // نمرر فلتر ثابت عشان الواجهة تعرف إنها صفحة أرشيف
+        $statusFilter   = 'resolved';
+        $isArchivedPage = true;
+
+        return view('dashboard.complaints.index', compact(
+            'complaints',
+            'query',
+            'statusFilter',
+            'typeFilter',
+            'messageTypes',
+            'isArchivedPage'
+        ));
+    }
+
 }

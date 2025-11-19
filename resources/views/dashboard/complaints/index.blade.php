@@ -38,9 +38,29 @@
 
 @section('content')
     <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3 mb-0 text-gray-800">إدارة الشكاوى والاستفسارات</h1>
-        </div>
+       <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800">
+        @isset($isArchivedPage)
+            الشكاوى المؤرشفة (المحلولة)
+        @else
+            إدارة الشكاوى والاستفسارات
+        @endisset
+    </h1>
+    <div class="btn-group">
+        <a href="{{ route('admin.complaints.index') }}"
+           class="btn   {{ !isset($isArchivedPage) ? 'btn-primary' : 'btn-outline-primary' }}">
+           الشكاوى الحالية
+        </a>
+        <a href="{{ route('admin.complaints.archived') }}"
+           class="btn   {{ isset($isArchivedPage) ? 'btn-primary' : 'btn-outline-primary' }}">
+           الشكاوى المؤرشفة
+        </a>
+        <a href="{{ route('admin.complaints.trash') }}" class="btn   btn-outline-danger">
+           <i class="fas fa-trash-alt"></i> سلة المحذوفات
+        </a>
+    </div>
+</div>
+
 
         @include('partials.alerts')
 
@@ -50,18 +70,30 @@
                     <h6 class="m-0 fw-bold text-primary mb-2 mb-md-0">
                         <i class="fas fa-headset me-2"></i>قائمة الشكاوى ({{ $complaints->total() }})
                     </h6>
-                    <form id="complaintFilterForm" action="{{ route('admin.complaints.index') }}" method="GET"
-                        class="d-flex flex-wrap" style="max-width: 800px; width: 100%;">
-                        <input type="text" name="query" class="form-control me-2 mb-2 mb-md-0 flex-grow-1"
-                            placeholder="ابحث في المحتوى أو المرسل..." value="{{ $query ?? '' }}">
+                    <form id="complaintFilterForm"
+                        action="{{ isset($isArchivedPage) ? route('admin.complaints.archived') : route('admin.complaints.index') }}"
+                        method="GET" class="d-flex flex-wrap justify-content-end" style="max-width: 800px; width: 100%;">
 
-                        <select name="status" id="statusFilterSelect" class="form-select me-2 mb-2 mb-md-0"
-                            style="width: auto;">
-                            <option value="unread" {{ $statusFilter == 'unread' ? 'selected' : '' }}>غير مقروءة</option>
-                            <option value="read" {{ $statusFilter == 'read' ? 'selected' : '' }}>مقروءة</option>
-                            <option value="resolved" {{ $statusFilter == 'resolved' ? 'selected' : '' }}>تم الحل</option>
-                            <option value="all" {{ $statusFilter == 'all' ? 'selected' : '' }}>جميع الحالات</option>
-                        </select>
+                        <div class="input-group mb-2 mb-md-0 me-2" style="flex: 1 1 250px;">
+                            <input type="text" name="query" class="form-control"
+                                placeholder="ابحث في المحتوى أو المرسل..." value="{{ $query ?? '' }}">
+                            <button type="submit" class="btn btn-primary btn btn-primary">
+                                <i class="fas fa-search "></i>
+                            </button>
+
+                        </div>
+
+
+                        @unless (isset($isArchivedPage))
+                            <select name="status" id="statusFilterSelect" class="form-select me-2 mb-2 mb-md-0"
+                                style="width: auto;">
+                                <option value="unread" {{ $statusFilter == 'unread' ? 'selected' : '' }}>غير مقروءة</option>
+                                <option value="read" {{ $statusFilter == 'read' ? 'selected' : '' }}>مقروءة</option>
+                                <option value="resolved" {{ $statusFilter == 'resolved' ? 'selected' : '' }}>تم الحل</option>
+                                <option value="all" {{ $statusFilter == 'all' ? 'selected' : '' }}>جميع الحالات</option>
+                            </select>
+                        @endunless
+
 
                         <select name="type" id="typeFilterSelect" class="form-select me-2 mb-2 mb-md-0"
                             style="width: auto;">
@@ -72,8 +104,7 @@
                             @endforeach
                         </select>
 
-                        <button type="submit" class="btn btn-primary ms-2 mb-2 mb-md-0"><i
-                                class="fas fa-search"></i></button>
+
                         @if ($query || $statusFilter != 'unread' || $typeFilter != 'all')
                             <a href="{{ route('admin.complaints.index') }}" class="btn btn-secondary ms-2 mb-2 mb-md-0"
                                 title="إلغاء البحث والفلاتر"><i class="fas fa-times"></i></a>
@@ -126,7 +157,7 @@
                                     <td>{{ $complaint->created_at->diffForHumans() }}</td>
                                     <td class="text-center">
                                         <div class="dropdown action-dropdown">
-                                            <button class="btn btn-light btn-sm dropdown-toggle" type="button"
+                                            <button class="btn btn-light   dropdown-toggle" type="button"
                                                 data-bs-toggle="dropdown">إجراءات</button>
                                             <ul class="dropdown-menu dropdown-menu-end">
                                                 <li><a class="dropdown-item"

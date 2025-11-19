@@ -1,11 +1,13 @@
 <?php
 namespace App\Http\Controllers\Admin;
 
-use App\Models\AdminSetting;
 use App\Http\Controllers\Controller;
+use App\Models\AdminSetting;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\Request; // تأكد من استيراد الـ AdminSetting Model
+
+// تأكد من استيراد الـ AdminSetting Model
 
 class AdminSettingController extends Controller
 {
@@ -94,7 +96,29 @@ class AdminSettingController extends Controller
 
         return back()->with('success', 'تم تحديث الإعداد بنجاح');
     }
+    public function backup()
+    {
+        // نجيب كل الإعدادات
+        $settings = AdminSetting::orderBy('setting_key')->get();
 
+        // نجهز الداتا اللي بدنا نخزنها
+        $data = [
+            'generated_at' => now()->toDateTimeString(),
+            'generated_by' => Auth::user() ? Auth::user()->only(['id', 'first_name', 'last_name', 'email']) : null,
+            'settings'     => $settings->toArray(),
+        ];
+
+        // اسم الملف: backups/admin_settings_2025-11-18_12-30-15.json
+        $fileName = 'backups/admin_settings_' . now()->format('Y-m-d_H-i-s') . '.json';
+
+        // نخزن الملف في storage/app/backups
+        Storage::disk('local')->put($fileName, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        return back()->with(
+            'success',
+            'تم إنشاء نسخة احتياطية من إعدادات النظام وحفظها في مجلد التخزين (storage/app/backups).'
+        );
+    }
 
 // يمكنك إضافة دوال store و destroy هنا إذا كنت تريد السماح للمشرفين بإنشاء أو حذف الإعدادات
 /*
@@ -127,4 +151,62 @@ class AdminSettingController extends Controller
         return redirect()->route('admin.settings.index')->with('success', 'تم حذف الإعداد بنجاح.');
     }
     */
-};
+
+    public function trash(Request $request)
+{
+    $query = $request->input('query');
+
+    $settings = AdminSetting::onlyTrashed()
+        ->when($query, function ($q, $query) {
+            $q->where('setting_key', 'like', "%{$query}%")
+              ->orWhere('setting_value', 'like', "%{$query}%");
+        })
+        ->orderBy('deleted_at', 'desc')
+        ->paginate(10);
+
+    return view('dashboard.settings.trash', compact('settings', 'query'));
+}
+
+public function destroy(AdminSetting $adminSetting)
+{
+    // لو في إعدادات أساسية ما بدك تنحذف:
+    if (in_array($adminSetting->setting_key, ['tax_rate_percent', 'contact_email'])) {
+        return back()->with('error', 'لا يمكن حذف هذا الإعداد الأساسي.');
+    }
+
+    $adminSetting->delete(); // Soft delete لو مفعّلة في الموديل
+
+    return back()->with('success', 'تم نقل الإعداد إلى سلة المحذوفات.');
+}
+
+public function restore($id)
+{
+    $setting = AdminSetting::onlyTrashed()->findOrFail($id);
+    $setting->restore();
+
+    return redirect()->route('admin.settings.trash')->with('success', 'تم استعادة الإعداد.');
+}
+
+public function restoreAll()
+{
+    AdminSetting::onlyTrashed()->restore();
+
+    return redirect()->route('admin.settings.trash')->with('success', 'تم استعادة جميع الإعدادات المحذوفة.');
+}
+
+public function forceDelete($id)
+{
+    $setting = AdminSetting::onlyTrashed()->findOrFail($id);
+    $setting->forceDelete();
+
+    return redirect()->route('admin.settings.trash')->with('success', 'تم حذف الإعداد نهائياً.');
+}
+
+public function forceDeleteAll()
+{
+    AdminSetting::onlyTrashed()->forceDelete();
+
+    return back()->with('success', 'تم حذف جميع الإعدادات المحذوفة نهائياً.');
+}
+
+}

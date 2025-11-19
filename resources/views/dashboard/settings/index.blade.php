@@ -36,7 +36,16 @@
             {{-- <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#createSettingModal">
                 <i class="fas fa-plus fa-sm me-2"></i> إضافة إعداد جديد
             </button> --}}
-        </div>
+
+    <form action="{{ route('admin.settings.backup') }}" method="POST" class="d-inline">
+        @csrf
+        <button type="submit" class="btn btn-outline-secondary shadow-sm">
+            <i class="fas fa-database fa-sm me-1"></i>
+            إنشاء نسخة احتياطية
+        </button>
+    </form>
+</div>
+
 
         @include('partials.alerts')
 
@@ -78,8 +87,8 @@
                                                         data-bs-target="#editSettingModal{{ $setting->id }}"><i
                                                             class="fas fa-edit text-warning"></i> تعديل الإعداد</a></li>
                                                 {{-- يمكن إضافة خيار الحذف هنا إذا تم تفعيل دالة destroy في Controller --}}
-                                                {{-- <li><hr class="dropdown-divider"></li>
-                                                <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteSettingModal{{ $setting->id }}"><i class="fas fa-trash"></i> حذف الإعداد</a></li> --}}
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteSettingModal{{ $setting->id }}"><i class="fas fa-trash"></i> حذف الإعداد</a></li>
                                             </ul>
                                         </div>
                                     </td>
@@ -184,7 +193,7 @@
         </div>
 
         {{-- نافذة حذف الإعداد (مُعلق حالياً في Controller) --}}
-        {{-- <div class="modal fade" id="deleteSettingModal{{ $setting->id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal fade" id="deleteSettingModal{{ $setting->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <form action="{{ route('admin.settings.destroy', $setting) }}" method="POST">
@@ -206,7 +215,7 @@
                     </form>
                 </div>
             </div>
-        </div> --}}
+        </div>
     @endforeach
 @endsection
 
