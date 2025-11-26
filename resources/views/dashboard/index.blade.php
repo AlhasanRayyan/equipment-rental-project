@@ -79,10 +79,16 @@
                                                 ),
                                             )['equipment_count'] ?? 0;
                                     @endphp
-                                    <span class="badge text-white mb-2 me-1" style="background-color: {{ $color }};">
+                                    {{-- <span class="badge text-white mb-2 me-1" style="background-color: {{ $color }};">
                                         {{ $category->category_name }}
                                         ({{ $count }})
-                                    </span>
+                                    </span> --}}
+                                    <a href="{{ route('admin.equipment.index', ['category' => $category->id]) }}"
+                                        class="badge text-white mb-2 me-1"
+                                        style="background-color: {{ $color }}; text-decoration: none;">
+                                        {{ $category->category_name }}
+                                        ({{ $count }})
+                                    </a>
                                 @endforeach
                             </div>
                         </div>

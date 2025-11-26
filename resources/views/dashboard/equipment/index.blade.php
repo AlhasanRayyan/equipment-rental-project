@@ -36,41 +36,56 @@
             <h1 class="h3 mb-0 text-gray-800">إدارة المعدات</h1>
             <div>
                 <a href="{{ route('admin.equipment.stats') }}" class="btn btn-outline-primary me-2">
-                <i class="fas fa-chart-bar me-1"></i> إحصائيات المعدات
-            </a>
-            <a href="{{ route('admin.equipment.trash') }}" class="btn btn-outline-danger  me-2">
-                <i class="fas fa-trash-alt"></i> سلة المحذوفات
-            </a>
+                    <i class="fas fa-chart-bar me-1"></i> إحصائيات المعدات
+                </a>
+                <a href="{{ route('admin.equipment.trash') }}" class="btn btn-outline-danger  me-2">
+                    <i class="fas fa-trash-alt"></i> سلة المحذوفات
+                </a>
             </div>
         </div>
 
         @include('partials.alerts')
 
         <div class="card shadow">
+            
             <div class="card-header py-3">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
                     <h6 class="m-0 fw-bold text-primary mb-2 mb-md-0">
                         <i class="fas fa-hard-hat me-2"></i>قائمة المعدات ({{ $equipment->total() }})
                     </h6>
+
                     <form id="equipmentFilterForm" action="{{ route('admin.equipment.index') }}" method="GET"
                         class="d-flex" style="max-width: 600px; width: 100%;">
+
                         <input type="text" name="query" class="form-control me-2" placeholder="ابحث بالاسم أو الوصف..."
                             value="{{ $query ?? '' }}">
-                        <select name="status" id="statusFilterSelect" class="form-select me-2" style="width: auto;">
-                            {{-- تم إضافة id هنا --}}
-                            <option value="pending" {{ $statusFilter == 'pending' ? 'selected' : '' }}>بانتظار الموافقة
+
+                        <select name="status" id="statusFilterSelect" class="form-select me-2" style="width: auto;"
+                            onchange="this.form.submit()">
+                            <option value="all" {{ ($statusFilter ?? 'all') === 'all' ? 'selected' : '' }}>جميع المعدات
                             </option>
-                            <option value="approved" {{ $statusFilter == 'approved' ? 'selected' : '' }}>معتمد</option>
-                            <option value="all" {{ $statusFilter == 'all' ? 'selected' : '' }}>جميع المعدات</option>
+                            <option value="pending" {{ ($statusFilter ?? 'all') === 'pending' ? 'selected' : '' }}>
+                                بانتظار الموافقة
+                            </option>
+                            <option value="approved" {{ ($statusFilter ?? 'all') === 'approved' ? 'selected' : '' }}>
+                                معتمدة
+                            </option>
                         </select>
-                        <button type="submit" class="btn btn-primary ms-2"><i class="fas fa-search"></i></button>
-                        @if ($query || $statusFilter != 'pending')
+
+                        <button type="submit" class="btn btn-primary ms-2">
+                            <i class="fas fa-search"></i>
+                        </button>
+
+                        @if (($query ?? null) || ($statusFilter ?? 'all') !== 'all')
                             <a href="{{ route('admin.equipment.index') }}" class="btn btn-secondary ms-2"
-                                title="إلغاء البحث والفلاتر"><i class="fas fa-times"></i></a>
+                                title="إلغاء البحث والفلاتر">
+                                <i class="fas fa-times"></i>
+                            </a>
                         @endif
                     </form>
                 </div>
             </div>
+
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
@@ -223,7 +238,8 @@
                             <p>هل أنت متأكد من رفض المعدة <strong>{{ $item->name }}</strong>؟</p>
                             <div class="mb-3">
                                 <label for="reject_reason_{{ $item->id }}" class="form-label">سبب الرفض
-                                    (اختياري)</label>
+                                    (اختياري)
+                                </label>
                                 <textarea name="reject_reason" id="reject_reason_{{ $item->id }}" class="form-control" rows="3"></textarea>
                             </div>
                             <div class="alert alert-warning" role="alert">

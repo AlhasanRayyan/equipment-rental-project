@@ -11,6 +11,49 @@ use Illuminate\Support\Facades\Storage;
 
 class AdminSettingController extends Controller
 {
+    protected array $protectedKeys = [
+        'tax_rate_percent',
+        'contact_email',
+        'minimum_rental_days',
+        'terms_and_conditions_url',
+        'maintenance_mode',
+        'homepage_steps_subtitle',
+        'homepage_steps_title',
+        'homepage_step1_title',
+        'homepage_step2_title',
+        'homepage_step3_title',
+        'homepage_step4_title',
+        'homepage_why_subtitle',
+        'homepage_why_title',
+        'homepage_why_text',
+        'homepage_why_box1_title',
+        'homepage_why_box2_title',
+        'homepage_why_box3_title',
+        'homepage_why_box4_title',
+        'homepage_cta_title',
+        'homepage_cta_text',
+        'homepage_step1_tooltip',
+        'homepage_step2_tooltip',
+        'homepage_step3_tooltip',
+        'homepage_step4_tooltip',
+        'homepage_step1_icon',
+        'homepage_step2_icon',
+        'homepage_step3_icon',
+        'homepage_step4_icon',
+        'homepage_why_box1_icon',
+        'homepage_why_box2_icon',
+        'homepage_why_box3_icon',
+        'homepage_why_box4_icon',
+        'contact_address',
+        'contact_phone',
+        'contact_hours',
+        'contact_email',
+        'contact_icon_address',
+        'contact_icon_phone',
+        'contact_icon_hours',
+        'contact_icon_email',
+        'site_description',
+    ];
     /**
      * عرض قائمة بجميع إعدادات النظام.
      *
@@ -18,9 +61,15 @@ class AdminSettingController extends Controller
      */
     public function index()
     {
-        $settings = AdminSetting::orderBy('setting_key')->get();
+    $settings = AdminSetting::orderBy('setting_key')->get();
+    $protectedKeys = $this->protectedKeys;
 
-        return view('dashboard.settings.index', compact('settings'));
+    return view('dashboard.settings.index', compact('settings', 'protectedKeys'));
+    }
+    // صفحة التفاصيل
+    public function show(AdminSetting $adminSetting)
+    {
+        return view('dashboard.settings.show', compact('adminSetting'));
     }
 
     /**
@@ -153,60 +202,100 @@ class AdminSettingController extends Controller
     */
 
     public function trash(Request $request)
-{
-    $query = $request->input('query');
+    {
+        $query = $request->input('query');
 
-    $settings = AdminSetting::onlyTrashed()
-        ->when($query, function ($q, $query) {
-            $q->where('setting_key', 'like', "%{$query}%")
-              ->orWhere('setting_value', 'like', "%{$query}%");
-        })
-        ->orderBy('deleted_at', 'desc')
-        ->paginate(10);
+        $settings = AdminSetting::onlyTrashed()
+            ->when($query, function ($q, $query) {
+                $q->where('setting_key', 'like', "%{$query}%")
+                    ->orWhere('setting_value', 'like', "%{$query}%");
+            })
+            ->orderBy('deleted_at', 'desc')
+            ->paginate(10);
 
-    return view('dashboard.settings.trash', compact('settings', 'query'));
-}
-
-public function destroy(AdminSetting $adminSetting)
-{
-    // لو في إعدادات أساسية ما بدك تنحذف:
-    if (in_array($adminSetting->setting_key, ['tax_rate_percent', 'contact_email'])) {
-        return back()->with('error', 'لا يمكن حذف هذا الإعداد الأساسي.');
+        return view('dashboard.settings.trash', compact('settings', 'query'));
     }
 
-    $adminSetting->delete(); // Soft delete لو مفعّلة في الموديل
+    // public function destroy(AdminSetting $adminSetting)
+    // {
+    //     // لو في إعدادات أساسية ما بدك تنحذف:
+    //     if (in_array($adminSetting->setting_key, ['tax_rate_percent', 'contact_email'])) {
+    //         return back()->with('error', 'لا يمكن حذف هذا الإعداد الأساسي.');
+    //     }
 
-    return back()->with('success', 'تم نقل الإعداد إلى سلة المحذوفات.');
-}
+    //     $adminSetting->delete(); // Soft delete لو مفعّلة في الموديل
 
-public function restore($id)
-{
-    $setting = AdminSetting::onlyTrashed()->findOrFail($id);
-    $setting->restore();
+    //     return back()->with('success', 'تم نقل الإعداد إلى سلة المحذوفات.');
+    // }
+    public function destroy(AdminSetting $adminSetting)
+    {
+        if (in_array($adminSetting->setting_key, $this->protectedKeys)) {
+            return back()->with('error', 'لا يمكن حذف هذا الإعداد الأساسي من النظام.');
+        }
 
-    return redirect()->route('admin.settings.trash')->with('success', 'تم استعادة الإعداد.');
-}
+        $adminSetting->delete();
 
-public function restoreAll()
-{
-    AdminSetting::onlyTrashed()->restore();
+        return back()->with('success', 'تم نقل الإعداد إلى سلة المحذوفات.');
+    }
 
-    return redirect()->route('admin.settings.trash')->with('success', 'تم استعادة جميع الإعدادات المحذوفة.');
-}
+    public function restore($id)
+    {
+        $setting = AdminSetting::onlyTrashed()->findOrFail($id);
+        $setting->restore();
 
-public function forceDelete($id)
-{
-    $setting = AdminSetting::onlyTrashed()->findOrFail($id);
-    $setting->forceDelete();
+        return redirect()->route('admin.settings.trash')->with('success', 'تم استعادة الإعداد.');
+    }
 
-    return redirect()->route('admin.settings.trash')->with('success', 'تم حذف الإعداد نهائياً.');
-}
+    public function restoreAll()
+    {
+        AdminSetting::onlyTrashed()->restore();
 
-public function forceDeleteAll()
-{
-    AdminSetting::onlyTrashed()->forceDelete();
+        return redirect()->route('admin.settings.trash')->with('success', 'تم استعادة جميع الإعدادات المحذوفة.');
+    }
 
-    return back()->with('success', 'تم حذف جميع الإعدادات المحذوفة نهائياً.');
-}
+    public function forceDelete($id)
+    {
+        $setting = AdminSetting::onlyTrashed()->findOrFail($id);
+        // $setting->forceDelete();
+
+        // return redirect()->route('admin.settings.trash')->with('success', 'تم حذف الإعداد نهائياً.');
+
+        if (in_array($setting->setting_key, $this->protectedKeys)) {
+            return back()->with('error', 'لا يمكن حذف هذا الإعداد الأساسي نهائيًا.');
+        }
+
+        // لو الإعداد صورة نخلي عندك خيار حذفها
+        if ($setting->setting_value && str_starts_with($setting->setting_value, 'storage/')) {
+            $oldPath = str_replace('storage/', '', $setting->setting_value);
+            Storage::disk('public')->delete($oldPath);
+        }
+
+        $setting->forceDelete();
+
+        return back()->with('success', 'تم حذف الإعداد نهائيًا.');
+    }
+
+    public function forceDeleteAll()
+    {
+        // AdminSetting::onlyTrashed()->forceDelete();
+
+        // return back()->with('success', 'تم حذف جميع الإعدادات المحذوفة نهائياً.');
+        $settings = AdminSetting::onlyTrashed()->get();
+
+        foreach ($settings as $setting) {
+            if (in_array($setting->setting_key, $this->protectedKeys)) {
+                continue; // ما نحذف المحمي
+            }
+
+            if ($setting->setting_value && str_starts_with($setting->setting_value, 'storage/')) {
+                $oldPath = str_replace('storage/', '', $setting->setting_value);
+                Storage::disk('public')->delete($oldPath);
+            }
+
+            $setting->forceDelete();
+        }
+
+        return back()->with('success', 'تم حذف جميع الإعدادات (غير المحمية) نهائيًا.');
+    }
 
 }

@@ -1,11 +1,11 @@
 <?php
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Equipment;
-use Illuminate\Http\Request;
-use App\Models\EquipmentCategory;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\Equipment;
+use App\Models\EquipmentCategory;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EquipmentController extends Controller
 {
@@ -15,30 +15,45 @@ class EquipmentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\View\View
      */
+
     public function index(Request $request)
     {
         $query        = $request->input('query');
-        $statusFilter = $request->input('status', 'pending');
+        // لو نخليها بانتظار الموافقة زي ما كانت افضل عشان ينتبه عليها الادمن من اول ما يفتح لوحة التحكم
+        $statusFilter = $request->input('status', 'all'); // افتراضياً: جميع المعدات
+        $categoryId   = $request->input('category');      // لو جاي من لوحة التحكم لما يضغط على فئة
 
-        $equipment = Equipment::query()
+        $equipment = Equipment::with(['owner', 'category', 'images'])
             ->when($query, function ($q, $query) {
                 $q->where('name', 'like', "%{$query}%")
-                    ->orWhere('description', 'like', "%{$query}%");
+                    ->orWhere('description', 'like', "%{$query}%")
+                    ->orWhereHas('owner', function ($sub) use ($query) {
+                        $sub->where('first_name', 'like', "%{$query}%")
+                            ->orWhere('last_name', 'like', "%{$query}%");
+                    });
             })
-            ->when($statusFilter === 'pending', function ($q) {
-                $q->where('is_approved_by_admin', false);
+            ->when($statusFilter !== 'all', function ($q) use ($statusFilter) {
+                if ($statusFilter === 'pending') {
+                    $q->where('is_approved_by_admin', false);
+                } elseif ($statusFilter === 'approved') {
+                    $q->where('is_approved_by_admin', true);
+                }
             })
-            ->when($statusFilter === 'approved', function ($q) {
-                $q->where('is_approved_by_admin', true);
-            })
-            ->when($statusFilter === 'all', function ($q) {
+            ->when($categoryId, function ($q) use ($categoryId) {
+                $q->where('category_id', $categoryId);
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
-
+            ->paginate(10)
+            ->withQueryString();
         $categories = EquipmentCategory::all();
 
-        return view('dashboard.equipment.index', compact('equipment', 'query', 'statusFilter', 'categories'));
+        return view('dashboard.equipment.index', compact(
+            'equipment',
+            'query',
+            'statusFilter',
+            'categoryId',
+            'categories'
+        ));
     }
 
     /**
@@ -97,6 +112,7 @@ class EquipmentController extends Controller
             ->with(['owner', 'category'])
             ->orderBy('deleted_at', 'desc')
             ->paginate(10);
+        // dd(view()->exists('dashboard.equipment.trash'));
 
         return view('dashboard.equipment.trash', compact('equipment', 'query'));
     }

@@ -38,28 +38,28 @@
 
 @section('content')
     <div class="container-fluid">
-       <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0 text-gray-800">
-        @isset($isArchivedPage)
-            الشكاوى المؤرشفة (المحلولة)
-        @else
-            إدارة الشكاوى والاستفسارات
-        @endisset
-    </h1>
-    <div class="btn-group">
-        <a href="{{ route('admin.complaints.index') }}"
-           class="btn   {{ !isset($isArchivedPage) ? 'btn-primary' : 'btn-outline-primary' }}">
-           الشكاوى الحالية
-        </a>
-        <a href="{{ route('admin.complaints.archived') }}"
-           class="btn   {{ isset($isArchivedPage) ? 'btn-primary' : 'btn-outline-primary' }}">
-           الشكاوى المؤرشفة
-        </a>
-        <a href="{{ route('admin.complaints.trash') }}" class="btn   btn-outline-danger">
-           <i class="fas fa-trash-alt"></i> سلة المحذوفات
-        </a>
-    </div>
-</div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0 text-gray-800">
+                @isset($isArchivedPage)
+                    الشكاوى المؤرشفة (المحلولة)
+                @else
+                    إدارة الشكاوى والاستفسارات
+                @endisset
+            </h1>
+            <div>
+                <a href="{{ route('admin.complaints.index') }}"
+                    class="btn   {{ !isset($isArchivedPage) ? 'btn-primary' : 'btn-outline-primary' }}">
+                    الشكاوى الحالية
+                </a>
+                <a href="{{ route('admin.complaints.archived') }}"
+                    class="btn   {{ isset($isArchivedPage) ? 'btn-primary' : 'btn-outline-primary' }}">
+                    الشكاوى المؤرشفة
+                </a>
+                <a href="{{ route('admin.complaints.trash') }}" class="btn   btn-outline-danger">
+                    <i class="fas fa-trash-alt"></i> سلة المحذوفات
+                </a>
+            </div>
+        </div>
 
 
         @include('partials.alerts')
@@ -87,10 +87,10 @@
                         @unless (isset($isArchivedPage))
                             <select name="status" id="statusFilterSelect" class="form-select me-2 mb-2 mb-md-0"
                                 style="width: auto;">
+                                <option value="all" {{ $statusFilter == 'all' ? 'selected' : '' }}>جميع الحالات</option>
                                 <option value="unread" {{ $statusFilter == 'unread' ? 'selected' : '' }}>غير مقروءة</option>
                                 <option value="read" {{ $statusFilter == 'read' ? 'selected' : '' }}>مقروءة</option>
                                 <option value="resolved" {{ $statusFilter == 'resolved' ? 'selected' : '' }}>تم الحل</option>
-                                <option value="all" {{ $statusFilter == 'all' ? 'selected' : '' }}>جميع الحالات</option>
                             </select>
                         @endunless
 

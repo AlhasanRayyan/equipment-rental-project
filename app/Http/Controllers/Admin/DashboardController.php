@@ -129,7 +129,7 @@ class DashboardController extends Controller
             $item->month_name = $date->translatedFormat('F Y'); // مثال: "يناير 2025"
             return $item;
         });
-        $canceledBookings = Booking::where('booking_status', 'canceled')->count();
+        $canceledBookings = Booking::where('booking_status', 'cancelled')->count();
 
         $stats = [
             'total_users'           => $totalUsers,

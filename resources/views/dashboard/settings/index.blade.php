@@ -36,15 +36,19 @@
             {{-- <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#createSettingModal">
                 <i class="fas fa-plus fa-sm me-2"></i> إضافة إعداد جديد
             </button> --}}
-
-    <form action="{{ route('admin.settings.backup') }}" method="POST" class="d-inline">
-        @csrf
-        <button type="submit" class="btn btn-outline-secondary shadow-sm">
-            <i class="fas fa-database fa-sm me-1"></i>
-            إنشاء نسخة احتياطية
-        </button>
-    </form>
-</div>
+            <div>
+                <a href="{{ route('admin.settings.trash') }}" class="btn btn-outline-danger">
+                    <i class="fas fa-trash-alt me-1"></i> سلة المحذوفات
+                </a>
+                <form action="{{ route('admin.settings.backup') }}" method="POST" class="d-inline">
+                    @csrf
+                    <button type="submit" class="btn btn-outline-secondary shadow-sm">
+                        <i class="fas fa-database fa-sm me-1"></i>
+                        إنشاء نسخة احتياطية
+                    </button>
+                </form>
+            </div>
+        </div>
 
 
         @include('partials.alerts')
@@ -78,7 +82,7 @@
                                     </td>
                                     <td>{{ $setting->updatedBy->first_name ?? 'N/A' }}</td> {{-- عرض اسم المستخدم الذي قام بالتحديث --}}
                                     <td>{{ $setting->updated_at->format('Y-m-d H:i') }}</td>
-                                    <td class="text-center">
+                                    {{-- <td class="text-center">
                                         <div class="dropdown action-dropdown">
                                             <button class="btn btn-light btn-sm dropdown-toggle" type="button"
                                                 data-bs-toggle="dropdown">إجراءات</button>
@@ -86,12 +90,88 @@
                                                 <li><a class="dropdown-item" href="#" data-bs-toggle="modal"
                                                         data-bs-target="#editSettingModal{{ $setting->id }}"><i
                                                             class="fas fa-edit text-warning"></i> تعديل الإعداد</a></li>
-                                                {{-- يمكن إضافة خيار الحذف هنا إذا تم تفعيل دالة destroy في Controller --}}
-                                                <li><hr class="dropdown-divider"></li>
-                                                <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#deleteSettingModal{{ $setting->id }}"><i class="fas fa-trash"></i> حذف الإعداد</a></li>
+                                                {{-- يمكن إضافة خيار الحذف هنا إذا تم تفعيل دالة destroy في Controller --}
+                                                <li>
+                                                    <hr class="dropdown-divider">
+                                                </li>
+                                                <li><a class="dropdown-item text-danger" href="#"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#deleteSettingModal{{ $setting->id }}"><i
+                                                            class="fas fa-trash"></i> حذف الإعداد</a></li>
+                                            </ul>
+                                        </div>
+                                    </td> --}}
+                                    {{-- <td class="text-center">
+                                        <div class="dropdown action-dropdown">
+                                            <button class="btn btn-light btn-sm dropdown-toggle" type="button"
+                                                data-bs-toggle="dropdown">إجراءات</button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('admin.settings.show', $setting) }}">
+                                                        <i class="fas fa-eye text-info"></i> عرض التفاصيل
+                                                    </a>
+                                                </li>
+
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#editSettingModal{{ $setting->id }}">
+                                                        <i class="fas fa-edit text-warning"></i> تعديل الإعداد
+                                                    </a>
+                                                </li>
+
+
+
+                                                @if (!in_array($setting->setting_key, $protectedKeys))
+                                                    <li>
+                                                        <hr class="dropdown-divider">
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item text-danger" href="#"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#deleteSettingModal{{ $setting->id }}">
+                                                            <i class="fas fa-trash"></i> حذف (إلى السلة)
+                                                        </a>
+                                                    </li>
+                                                @endif
+                                            </ul>
+                                        </div>
+                                    </td> --}}
+                                    <td class="text-center">
+                                        <div class="dropdown action-dropdown">
+                                            <button class="btn btn-light btn-sm dropdown-toggle" type="button"
+                                                data-bs-toggle="dropdown">إجراءات</button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('admin.settings.show', $setting) }}">
+                                                        <i class="fas fa-eye text-info"></i> عرض التفاصيل
+                                                    </a>
+                                                </li>
+
+                                                <li>
+                                                    <a class="dropdown-item" href="#" data-bs-toggle="modal"
+                                                        data-bs-target="#editSettingModal{{ $setting->id }}">
+                                                        <i class="fas fa-edit text-warning"></i> تعديل الإعداد
+                                                    </a>
+                                                </li>
+
+                                                @if (!in_array($setting->setting_key, $protectedKeys))
+                                                    <li>
+                                                        <hr class="dropdown-divider">
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item text-danger" href="#"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#deleteSettingModal{{ $setting->id }}">
+                                                            <i class="fas fa-trash"></i> حذف (إلى السلة)
+                                                        </a>
+                                                    </li>
+                                                @endif
                                             </ul>
                                         </div>
                                     </td>
+
                                 </tr>
                             @empty
                                 <tr>
@@ -193,7 +273,7 @@
         </div>
 
         {{-- نافذة حذف الإعداد (مُعلق حالياً في Controller) --}}
-        <div class="modal fade" id="deleteSettingModal{{ $setting->id }}" tabindex="-1" aria-hidden="true">
+        {{-- <div class="modal fade" id="deleteSettingModal{{ $setting->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <form action="{{ route('admin.settings.destroy', $setting) }}" method="POST">
@@ -215,7 +295,56 @@
                     </form>
                 </div>
             </div>
-        </div>
+        </div> --}}
+        {{-- نافذة حذف الإعداد --}}
+        {{-- <div class="modal fade" id="deleteSettingModal{{ $setting->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="{{ route('admin.settings.destroy', $setting) }}" method="POST">
+                        @csrf @method('DELETE')
+                        <div class="modal-header">
+                            <h5 class="modal-title">تأكيد الحذف</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>هل أنت متأكد من حذف الإعداد <strong>{{ $setting->setting_key }}</strong>؟</p>
+                            <div class="alert alert-warning" role="alert">
+                                سيتم نقل هذا الإعداد إلى سلة المحذوفات، يمكنك استرجاعه لاحقًا.
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                            <button type="submit" class="btn btn-danger">حذف (إلى السلة)</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div> --}}
+        @if (!in_array($setting->setting_key, $protectedKeys))
+            <div class="modal fade" id="deleteSettingModal{{ $setting->id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{{ route('admin.settings.destroy', $setting) }}" method="POST">
+                            @csrf @method('DELETE')
+                            <div class="modal-header">
+                                <h5 class="modal-title">تأكيد الحذف</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>هل أنت متأكد من حذف الإعداد <strong>{{ $setting->setting_key }}</strong>؟</p>
+                                <div class="alert alert-warning" role="alert">
+                                    سيتم نقل هذا الإعداد إلى سلة المحذوفات، يمكنك استرجاعه لاحقًا.
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                                <button type="submit" class="btn btn-danger">حذف (إلى السلة)</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @endif
     @endforeach
 @endsection
 

@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bookings', function (Blueprint $table) {
-                                $table->softDeletes(); // deleted_at
+            $table->softDeletes(); // deleted_at
 
         });
     }
@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('bookings', function (Blueprint $table) {
-                            $table->dropSoftDeletes();
+            $table->dropSoftDeletes();
 
         });
     }

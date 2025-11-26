@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminSettingController;
+use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\ComplaintController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EquipmentCategoryController;
@@ -21,6 +22,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/{user}/activate', [UserController::class, 'activate'])->name('activate');
         Route::post('/{user}/deactivate', [UserController::class, 'deactivate'])->name('deactivate');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
+        // هان بختلف لانه الرابط بختلف تاع التفاصيل فيه كلمة show
         Route::get('/{user}/show', [UserController::class, 'show'])->name('show');
 
         // سلة المحذوفات
@@ -40,6 +42,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/stats', [EquipmentController::class, 'stats'])->name('stats');
 
         Route::get('/', [EquipmentController::class, 'index'])->name('index');
+        // برضو هان
+        Route::get('/trash', [EquipmentController::class, 'trash'])->name('trash');
         Route::get('/{equipment}', [EquipmentController::class, 'show'])->name('show');
 
         Route::post('/{equipment}/approve', [EquipmentController::class, 'approve'])->name('approve');
@@ -47,7 +51,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::delete('/{equipment}', [EquipmentController::class, 'destroy'])->name('destroy');    // حذف المعدة
 
         //  سلة المحذوفات
-        Route::get('/trash', [EquipmentController::class, 'trash'])->name('trash');
         Route::post('/{id}/restore', [EquipmentController::class, 'restore'])->name('restore');
         Route::post('/restore-all', [EquipmentController::class, 'restoreAll'])->name('restoreAll');
         Route::delete('/{id}/force-delete', [EquipmentController::class, 'forceDelete'])->name('forceDelete');
@@ -60,13 +63,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         //  نحطّ الأرشيف قبل '/{message}' عشان ما ينفهم كـ ID
         Route::get('/archived', [ComplaintController::class, 'archived'])->name('archived');
         Route::get('/', [ComplaintController::class, 'index'])->name('index');
+        // لازم هان
+        Route::get('/trash', [ComplaintController::class, 'trash'])->name('trash');
         Route::get('/{message}', [ComplaintController::class, 'show'])->name('show');                           // لعرض تفاصيل شكوى
         Route::post('/{message}/mark-as-read', [ComplaintController::class, 'markAsRead'])->name('markAsRead'); // لتمييز الشكوى كمقروءة
         Route::post('/{message}/resolve', [ComplaintController::class, 'resolve'])->name('resolve');            // لحل الشكوى
         Route::delete('/{message}', [ComplaintController::class, 'destroy'])->name('destroy');                  // لحذف شكوى
 
         // سلة المحذوفات
-        Route::get('/trash', [ComplaintController::class, 'trash'])->name('trash');
         Route::post('/{id}/restore-from-trash', [ComplaintController::class, 'restore'])->name('restore');
         Route::post('/restore-all', [ComplaintController::class, 'restoreAll'])->name('restoreAll');
         Route::delete('/{id}/force-delete', [ComplaintController::class, 'forceDelete'])->name('forceDelete');
@@ -77,10 +81,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::prefix('settings')->name('settings.')->group(function () {
         Route::get('/', [AdminSettingController::class, 'index'])->name('index');
         Route::put('/{adminSetting}', [AdminSettingController::class, 'update'])->name('update'); // لتعديل إعداد معين
+        // لازم هان
+        Route::get('/trash', [AdminSettingController::class, 'trash'])->name('trash');
+        Route::get('/{adminSetting}', [AdminSettingController::class, 'show'])->name('show');
 
         //  سلة المحذوفات
-        Route::delete('/{setting}', [AdminSettingController::class, 'destroy'])->name('destroy');                  // لحذف شكوى
-        Route::get('/trash', [AdminSettingController::class, 'trash'])->name('trash');
+        Route::delete('/{adminSetting}', [AdminSettingController::class, 'destroy'])->name('destroy'); // لحذف شكوى
         Route::post('/{id}/restore', [AdminSettingController::class, 'restore'])->name('restore');
         Route::post('/restore-all', [AdminSettingController::class, 'restoreAll'])->name('restoreAll');
         Route::delete('/{id}/force-delete', [AdminSettingController::class, 'forceDelete'])->name('forceDelete');
@@ -98,7 +104,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::delete('/{equipmentCategory}', [EquipmentCategoryController::class, 'destroy'])->name('destroy');
         //  صفحة إحصائيات الفئات
         Route::get('/stats', [EquipmentCategoryController::class, 'stats'])->name('stats');
-                                                                                                                                    // عرض المعدات المرتبطة بالفئة
+        // عرض المعدات المرتبطة بالفئة
         Route::get('/{equipmentCategory}/equipment', [EquipmentCategoryController::class, 'showEquipment'])->name('showEquipment'); // **جديد: عرض المعدات المرتبطة بفئة**
 
         //  سلة المحذوفات
@@ -109,4 +115,26 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::delete('/force-delete-all', [EquipmentCategoryController::class, 'forceDeleteAll'])->name('forceDeleteAll');
 
     });
+// ادارة الحجوزات
+    Route::prefix('bookings')->name('bookings.')->group(function () {
+        Route::get('/', [BookingController::class, 'index'])->name('index');
+        // لازم يكون قبل رابط التفاصيل عشان ما يعطيني ايررورر 404 انتبهي
+        Route::get('/trash', [BookingController::class, 'trash'])->name('trash');
+        Route::get('/{booking}', [BookingController::class, 'show'])->name('show');
+        Route::delete('/{booking}', [BookingController::class, 'destroy'])->name('destroy');
+
+        // تغيير حالة الحجز
+        Route::post('/{booking}/confirm', [BookingController::class, 'confirm'])->name('confirm');
+        Route::post('/{booking}/activate', [BookingController::class, 'activate'])->name('activate');
+        Route::post('/{booking}/complete', [BookingController::class, 'complete'])->name('complete');
+        Route::post('/{booking}/hold', [BookingController::class, 'hold'])->name('hold'); // يرجعه pending
+        Route::post('/{booking}/cancel', [BookingController::class, 'cancel'])->name('cancel');
+
+        // سلة محذوفات الحجوزات
+        Route::post('/{id}/restore', [BookingController::class, 'restore'])->name('restore');
+        Route::delete('/{id}/force-delete', [BookingController::class, 'forceDelete'])->name('forceDelete');
+        Route::post('/restore-all', [BookingController::class, 'restoreAll'])->name('restoreAll');
+        Route::delete('/force-delete-all', [BookingController::class, 'forceDeleteAll'])->name('forceDeleteAll');
+    });
+
 });
