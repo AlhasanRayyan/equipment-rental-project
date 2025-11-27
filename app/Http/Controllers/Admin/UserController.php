@@ -2,14 +2,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\StoreUserRequest;
+use App\Http\Requests\Admin\UpdateUserRequest;
+// بطلت تلزم
+// use Illuminate\Validation\Rule;
 use App\Models\Booking;
 use App\Models\Message;
 use App\Models\User;
+// لاستخدام قواعد التحقق الفريدة
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash; // تأكد من استيراد الـ User Model
-use Illuminate\Validation\Rule;
-// لاستخدام قواعد التحقق الفريدة
+use Illuminate\Support\Facades\Hash;
+
+// تأكد من استيراد الـ User Model
 
 class UserController extends Controller
 {
@@ -19,20 +24,56 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\View\View
      */
+    // public function index(Request $request)
+    // {
+    //     $query  = $request->input('query');
+    //     $status = $request->input('status', 'all'); // default = all
+    //     $role   = $request->input('role', 'all');   // default = all
+
+    //     $users = User::query()
+    //         ->when($query, function ($q, $query) {
+    //             $q->where('first_name', 'like', "%{$query}%")
+    //                 ->orWhere('last_name', 'like', "%{$query}%")
+    //                 ->orWhere('email', 'like', "%{$query}%");
+    //         })->when($status && $status !== 'all', function ($q) use ($status) {
+    //         $q->where('is_active', $status === 'active');
+    //     })
+    //         ->when($role && $role !== 'all', function ($q) use ($role) {
+    //             $q->where('role', $role);
+    //         })
+
+    //         ->orderBy('created_at', 'desc')
+    //         ->paginate(10)       // عرض 10 مستخدمين في كل صفحة
+    //         ->withQueryString(); // عشان يحافظ على الفلاتر مع الـ pagination
+
+    //     return view('dashboard.users.index', compact('users', 'query', 'status', 'role'));
+    // }
     public function index(Request $request)
     {
-        $query = $request->input('query');
+        $query  = $request->input('query');
+        $status = $request->input('status', 'all'); // default = all
+        $role   = $request->input('role', 'all');   // default = all
 
         $users = User::query()
-            ->when($query, function ($q, $query) {
-                $q->where('first_name', 'like', "%{$query}%")
-                    ->orWhere('last_name', 'like', "%{$query}%")
-                    ->orWhere('email', 'like', "%{$query}%");
+            ->when($query, function ($q) use ($query) {
+                $q->where(function ($q) use ($query) {
+                    $q->where('first_name', 'like', "%{$query}%")
+                        ->orWhere('last_name', 'like', "%{$query}%")
+                        ->orWhere('email', 'like', "%{$query}%");
+                });
+            })
+            ->when($status !== 'all', function ($q) use ($status) {
+                // active → is_active = 1   |  inactive → is_active = 0
+                $q->where('is_active', $status === 'active' ? 1 : 0 );
+            })
+            ->when($role !== 'all', function ($q) use ($role) {
+                $q->where('role', $role);
             })
             ->orderBy('created_at', 'desc')
-            ->paginate(10); // عرض 10 مستخدمين في كل صفحة
+            ->paginate(10)
+            ->withQueryString(); // عشان يحافظ على الفلاتر في الصفحات
 
-        return view('dashboard.users.index', compact('users', 'query'));
+        return view('dashboard.users.index', compact('users', 'query', 'status', 'role'));
     }
 
     /**
@@ -41,23 +82,39 @@ class UserController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request)
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'first_name' => ['required', 'string', 'max:255'],
+    //         'last_name'  => ['required', 'string', 'max:255'],
+    //         'email'      => ['required', 'string', 'email', 'max:255', 'unique:users'],
+    //         // 'password'   => ['required', 'string', 'min:8','regex:/[a-z]/', 'regex:/[0-9]/'],
+    //         'password'   => ['required', 'string', 'min:8'],
+    //         'role'       => ['required', 'string', Rule::in(['user', 'admin'])],
+    //     ]);
+
+    //     User::create([
+    //         'first_name' => $request->first_name,
+    //         'last_name'  => $request->last_name,
+    //         'email'      => $request->email,
+    //         'password'   => Hash::make($request->password),
+    //         'role'       => $request->role,
+    //         'is_active'  => true, // المستخدمون الجدد يكونون نشطين افتراضياً
+    //     ]);
+
+    //     return redirect()->route('admin.users.index')->with('success', 'تم إضافة المستخدم بنجاح.');
+    // }
+    public function store(StoreUserRequest $request)
     {
-        $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name'  => ['required', 'string', 'max:255'],
-            'email'      => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password'   => ['required', 'string', 'min:8'],
-            'role'       => ['required', 'string', Rule::in(['user', 'admin'])],
-        ]);
+        $data = $request->validated();
 
         User::create([
-            'first_name' => $request->first_name,
-            'last_name'  => $request->last_name,
-            'email'      => $request->email,
-            'password'   => Hash::make($request->password),
-            'role'       => $request->role,
-            'is_active'  => true, // المستخدمون الجدد يكونون نشطين افتراضياً
+            'first_name' => $data['first_name'],
+            'last_name'  => $data['last_name'],
+            'email'      => $data['email'],
+            'password'   => Hash::make($data['password']),
+            'role'       => $data['role'],
+            'is_active'  => true,
         ]);
 
         return redirect()->route('admin.users.index')->with('success', 'تم إضافة المستخدم بنجاح.');
@@ -70,26 +127,48 @@ class UserController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, User $user)
-    {
-        $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name'  => ['required', 'string', 'max:255'],
-            'email'      => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'password'   => ['nullable', 'string', 'min:8'], // يمكن تركها فارغة للتحديث
-            'role'       => ['required', 'string', Rule::in(['user', 'admin'])],
-        ]);
+    // public function update(Request $request, User $user)
+    // {
+    //     $request->validate([
+    //         'first_name' => ['required', 'string', 'max:255'],
+    //         'last_name'  => ['required', 'string', 'max:255'],
+    //         'email'      => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+    //         'password'   => ['nullable', 'string', 'min:8'], // يمكن تركها فارغة للتحديث
+    //         'role'       => ['required', 'string', Rule::in(['user', 'admin'])],
+    //     ]);
 
+    //     $userData = [
+    //         'first_name' => $request->first_name,
+    //         'last_name'  => $request->last_name,
+    //         'email'      => $request->email,
+    //         'role'       => $request->role,
+    //     ];
+
+    //     // فقط قم بتحديث كلمة المرور إذا تم إدخال واحدة جديدة
+    //     if ($request->filled('password')) {
+    //         $userData['password'] = Hash::make($request->password);
+    //     }
+
+    //     $user->update($userData);
+
+    //     return redirect()->route('admin.users.index')->with('success', 'تم تحديث المستخدم بنجاح.');
+    // }
+    public function update(UpdateUserRequest $request, User $user)
+    {
+        $data = $request->validated();
+// حماية إضافية: ممنوع تغيير دور الـ Super Admin (ID = 1)
+        if ($user->id === 1 && $data['role'] !== 'admin') {
+            return back()->with('error', 'لا يمكن تغيير صلاحيات المستخدم الأساسي (Super Admin).');
+        }
         $userData = [
-            'first_name' => $request->first_name,
-            'last_name'  => $request->last_name,
-            'email'      => $request->email,
-            'role'       => $request->role,
+            'first_name' => $data['first_name'],
+            'last_name'  => $data['last_name'],
+            'email'      => $data['email'],
+            'role'       => $data['role'],
         ];
 
-        // فقط قم بتحديث كلمة المرور إذا تم إدخال واحدة جديدة
-        if ($request->filled('password')) {
-            $userData['password'] = Hash::make($request->password);
+        if (! empty($data['password'])) {
+            $userData['password'] = Hash::make($data['password']);
         }
 
         $user->update($userData);
@@ -145,11 +224,19 @@ class UserController extends Controller
             ->whereIn('message_type', ['complaint', 'inquiry'])
             ->latest()
             ->get();
+        $stats = [
+            'total_bookings'   => Booking::where('renter_id', $user->id)->count(),
+            'cancelled'        => Booking::where('renter_id', $user->id)->where('booking_status', 'cancelled')->count(),
+            'completed'        => Booking::where('renter_id', $user->id)->where('booking_status', 'completed')->count(),
+            'total_complaints' => $complaints->count(),
+        ];
 
         return view('dashboard.users.show', [
             'user'       => $user,
             'rentals'    => $rentals,
             'complaints' => $complaints,
+            'stats'      => $stats,
+
         ]);
     }
     /**

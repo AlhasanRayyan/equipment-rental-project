@@ -9,6 +9,41 @@
             <i class="fas fa-arrow-right"></i> رجوع لقائمة المستخدمين
         </a>
     </div>
+{{-- ملخص سريع لنشاط المستخدم --}}
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <div class="small text-muted">إجمالي الحجوزات</div>
+                <div class="h4 mb-0">{{ $stats['total_bookings'] }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <div class="small text-muted">الحجوزات المكتملة</div>
+                <div class="h4 mb-0 text-success">{{ $stats['completed'] }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <div class="small text-muted">الحجوزات الملغاة</div>
+                <div class="h4 mb-0 text-danger">{{ $stats['cancelled'] }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card shadow-sm">
+            <div class="card-body text-center">
+                <div class="small text-muted">عدد الشكاوى / الاستفسارات</div>
+                <div class="h4 mb-0">{{ $stats['total_complaints'] }}</div>
+            </div>
+        </div>
+    </div>
+</div>
 
     {{-- بطاقة بيانات المستخدم الأساسية --}}
     <div class="card shadow mb-4">

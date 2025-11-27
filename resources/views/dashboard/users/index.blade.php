@@ -48,16 +48,16 @@
                 <i class="fas fa-user-plus fa-sm me-2"></i>إضافة مستخدم جديد
             </button>
         </div> --}}<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0 text-gray-800">إدارة المستخدمين</h1>
-    <div>
-        <a href="{{ route('admin.users.trash') }}" class="btn btn-outline-danger me-2">
-            <i class="fas fa-trash-alt"></i> سلة المحذوفات
-        </a>
-        <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#createUserModal">
-            <i class="fas fa-user-plus fa-sm me-2"></i>إضافة مستخدم جديد
-        </button>
-    </div>
-</div>
+            <h1 class="h3 mb-0 text-gray-800">إدارة المستخدمين</h1>
+            <div>
+                <a href="{{ route('admin.users.trash') }}" class="btn btn-outline-danger me-2">
+                    <i class="fas fa-trash-alt"></i> سلة المحذوفات
+                </a>
+                <button class="btn btn-primary shadow-sm" data-bs-toggle="modal" data-bs-target="#createUserModal">
+                    <i class="fas fa-user-plus fa-sm me-2"></i>إضافة مستخدم جديد
+                </button>
+            </div>
+        </div>
 
 
         @include('partials.alerts') {{-- تأكد من وجود ملف alerts.blade.php في مسار partials --}}
@@ -68,7 +68,7 @@
                     <h6 class="m-0 fw-bold text-primary mb-2 mb-md-0">
                         <i class="fas fa-users me-2"></i>قائمة المستخدمين ({{ $users->total() }})
                     </h6>
-                    <form action="{{ route('admin.users.index') }}" method="GET" class="d-flex"
+                    {{-- <form action="{{ route('admin.users.index') }}" method="GET" class="d-flex"
                         style="max-width: 400px; width: 100%;">
                         <input type="text" name="query" class="form-control" placeholder="ابحث بالاسم أو البريد..."
                             value="{{ $query ?? '' }}">
@@ -77,7 +77,38 @@
                             <a href="{{ route('admin.users.index') }}" class="btn btn-secondary ms-2" title="إلغاء البحث"><i
                                     class="fas fa-times"></i></a>
                         @endif
+                    </form> --}}
+                    <form action="{{ route('admin.users.index') }}" method="GET" class="d-flex flex-wrap"
+                        style="max-width: 600px; width: 100%;">
+
+                        <div class="input-group mb-2 mb-md-0 me-2" style="flex:1 1 250px;">
+                            <input type="text" name="query" class="form-control" placeholder="ابحث بالاسم أو البريد..."
+                                value="{{ $query ?? '' }}">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+
+                        <select name="status" class="form-select me-2 mb-2 mb-md-0" style="width:auto;" onchange="this.form.submit()">
+                            <option value="all" {{ ($status ?? 'all') == 'all' ? 'selected' : '' }}>كل الحالات</option>
+                            <option value="active" {{ ($status ?? '') == 'active' ? 'selected' : '' }}>نشط</option>
+                            <option value="inactive" {{ ($status ?? '') == 'inactive' ? 'selected' : '' }}>غير نشط</option>
+                        </select>
+
+                        <select name="role" class="form-select me-2 mb-2 mb-md-0" style="width:auto;" onchange="this.form.submit()">
+                            <option value="all" {{ ($role ?? 'all') == 'all' ? 'selected' : '' }}>كل الأدوار</option>
+                            <option value="user" {{ ($role ?? '') == 'user' ? 'selected' : '' }}>مستخدم</option>
+                            <option value="admin" {{ ($role ?? '') == 'admin' ? 'selected' : '' }}>مدير</option>
+                        </select>
+
+                        @if ($query || ($status ?? 'all') !== 'all' || ($role ?? 'all') !== 'all')
+                            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary ms-2 mb-2 mb-md-0"
+                                title="إلغاء البحث والفلاتر">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        @endif
                     </form>
+
                 </div>
             </div>
             <div class="card-body">
@@ -88,6 +119,7 @@
                                 <th>المستخدم</th>
                                 <th>الدور</th> {{-- عمود الدور --}}
                                 <th class="text-center">الحالة</th>
+                                <th class="text-center">آخر تسجيل دخول</th>
                                 <th class="text-center">الإجراءات</th>
                             </tr>
                         </thead>
@@ -121,6 +153,11 @@
                                             <span class="badge bg-warning text-dark">غير نشط</span>
                                         @endif
                                     </td>
+                                    <td class="text-center">
+                                        {{-- {{ $user->last_login_at ? $user->last_login_at->format('Y-m-d H:i') : '-' }} --}}
+                                        {{ $user->last_login_at ? $user->last_login_at->diffForHumans() : '-'}}
+                                    </td>
+
                                     <td class="text-center">
                                         <div class="dropdown action-dropdown">
                                             <button class="btn btn-light btn-sm dropdown-toggle" type="button"

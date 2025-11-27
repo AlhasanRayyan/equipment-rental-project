@@ -32,6 +32,7 @@ class User extends Authenticatable
         'location_text',
         'is_active',
         'last_login',
+        'last_login_at',
         'average_owner_rating',
         'average_renter_rating',
     ];
@@ -53,6 +54,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+                'last_login_at'     => 'datetime',
         'password' => 'hashed', // Laravel 10+ يقوم بتجزئة (hashing) الباسورد تلقائياً
         'is_active' => 'boolean',
         'last_login' => 'datetime',

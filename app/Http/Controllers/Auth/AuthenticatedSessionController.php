@@ -36,6 +36,10 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
         $user = Auth::user();
 
+        // ⭐ تحديث وقت آخر تسجيل دخول
+        $user->update([
+            'last_login_at' => now(),
+        ]);
         //  لو جاي من رابط فيه redirect (زي login?redirect=equipments.create)
         if ($request->has('redirect')) {
             return redirect()->route($request->redirect);

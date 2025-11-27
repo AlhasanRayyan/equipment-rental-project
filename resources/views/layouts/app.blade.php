@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
@@ -85,7 +85,7 @@
             font-weight: 700;
         }
         .sidebar .sidebar-divider { border-top: 1px solid rgba(255, 255, 255, 0.15); }
-        
+
         @media (max-width: 768px) {
             .sidebar { position: fixed; z-index: 1030; right: -250px; }
             .sidebar.toggled { right: 0; }
@@ -145,8 +145,10 @@
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="me-2 d-none d-lg-inline text-gray-600 small">{{ Auth::user()->name ?? 'زائر' }}</span>
-                                <img class="img-profile rounded-circle" src="https://placehold.co/60x60/4e73df/ffffff?text={{ substr(Auth::user()->name ?? 'Z', 0, 1) }}">
+
+                                <span class="me-2 d-none d-lg-inline text-gray-600 small">{{ Auth::user()->first_name . ' ' . Auth::user()->last_name  }}</span>
+                                <img class="img-profile rounded-circle" src="https://placehold.co/60x60/4e73df/ffffff?text={{ substr(Auth::user()->first_name . ' ' . Auth::user()->last_name , 0, 1) }}">
+                                {{-- <img class="img-profile rounded-circle" src="https://ui-avatars.com/api/?name={{Auth::user()->first_name . ' ' . Auth::user()->last_name}}"> --}}
                             </a>
                             <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in text-end" aria-labelledby="userDropdown">
                                 <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -180,7 +182,7 @@
 
     <script>
         (function() {
-            "use strict"; 
+            "use strict";
             var sidebarToggle = document.querySelector("#sidebarToggleTop");
             if (sidebarToggle) {
                 sidebarToggle.addEventListener('click', function(event) {
