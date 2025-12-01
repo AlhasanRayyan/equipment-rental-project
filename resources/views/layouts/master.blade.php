@@ -23,6 +23,8 @@
     <link rel="stylesheet" href="{{ asset('assets/home/css/libs.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/home/css/main.css') }}">
 
+      @stack('styles')
+
 </head>
 
 <body class="page-home">

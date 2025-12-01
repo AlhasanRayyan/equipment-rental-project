@@ -11,7 +11,10 @@ use App\Http\Controllers\Admin\EquipmentController;
 use App\Http\Controllers\Category\CategoryController;
 use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\EquipmentCategoryController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\OwnerEquipmentController;
+use App\Models\Conversation;
+use Illuminate\Support\Facades\Broadcast;
 
 // 1. Frontend / Public Website Routes
 // ========================================================================
@@ -34,6 +37,12 @@ Route::get('/owner/equipments/{id}/edit', [OwnerEquipmentController::class, 'edi
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 
+Route::middleware(['auth'])->group(function () {
+    // مسارات المفضلة
+    Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+    Route::delete('/favorites/{favorite}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
+    Route::post('/favorites/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle'); // للتبديل من أي صفحة
+});
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
 
@@ -86,4 +95,27 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     });
 });
 
-require __DIR__ . '/auth.php'; // تأكد من وجود هذا السطر
+
+
+// قناة خاصة بالمحادثات
+Broadcast::channel('conversations.{conversationId}', function ($user, $conversationId) {
+    // يجب أن يكون المستخدم مسجلاً الدخول
+    if (!$user) {
+        return false;
+    }
+
+    $conversation = Conversation::find($conversationId);
+
+    // تحقق أن المستخدم هو إما المالك أو المستأجر في هذه المحادثة
+    return $conversation && ($user->id === $conversation->owner_id || $user->id === $conversation->renter_id);
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/chat', function () {
+        return view('chat.index'); 
+    })->name('chat.index');
+
+});
+
+
+require __DIR__ . '/auth.php';
