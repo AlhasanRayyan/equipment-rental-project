@@ -2,6 +2,7 @@ import './bootstrap'; // لاستيراد axios وتوابعه
 
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js'; // استيراد Pusher مباشرة
+// import axios from 'axios';
 
 // تعيين Pusher على النافذة (مطلوب لـ Echo)
 window.Pusher = Pusher;
@@ -22,7 +23,7 @@ window.Echo = new Echo({
 window.Echo.connector.options.authorizer = (channel, options) => {
     return {
         authorize: (socketId, callback) => {
-            axios.post('/api/broadcasting/auth', {
+            window.axios.post('/api/broadcasting/auth', {
                 channel_name: channel.name,
                 socket_id: socketId
             })

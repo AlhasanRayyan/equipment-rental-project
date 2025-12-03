@@ -1,19 +1,18 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+// use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory,  Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -53,15 +52,15 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-                'last_login_at'     => 'datetime',
-        'password' => 'hashed', // Laravel 10+ يقوم بتجزئة (hashing) الباسورد تلقائياً
-        'is_active' => 'boolean',
-        'last_login' => 'datetime',
-        'average_owner_rating' => 'decimal:2',
+        'email_verified_at'     => 'datetime',
+        'password'              => 'hashed',
+        'last_login_at'         => 'datetime',
+        'password'              => 'hashed', // Laravel 10+ يقوم بتجزئة (hashing) الباسورد تلقائياً
+        'is_active'             => 'boolean',
+        'last_login'            => 'datetime',
+        'average_owner_rating'  => 'decimal:2',
         'average_renter_rating' => 'decimal:2',
-        'role' => 'string',
+        'role'                  => 'string',
     ];
 
     public function isUser(): bool
@@ -84,7 +83,7 @@ class User extends Authenticatable
     {
         return Attribute::make(
             get: function () {
-                $ownerRating = $this->average_owner_rating;
+                $ownerRating  = $this->average_owner_rating;
                 $renterRating = $this->average_renter_rating;
 
                 if ($ownerRating > 0 && $renterRating > 0) {
@@ -107,7 +106,7 @@ class User extends Authenticatable
 
     public function rentedBookings(): HasMany
 
-    public function rentedBookings()
+    // public function rentedBookings()
     {
         return $this->hasMany(Booking::class, 'renter_id');
     }
@@ -119,21 +118,21 @@ class User extends Authenticatable
 
     public function payments(): HasMany
 
-    public function payments()
+    // public function payments()
     {
         return $this->hasMany(Payment::class, 'user_id');
     }
 
     public function writtenReviews(): HasMany
 
-    public function writtenReviews()
+    // public function writtenReviews()
     {
         return $this->hasMany(Review::class, 'reviewer_id');
     }
 
     public function receivedReviews(): HasMany
 
-    public function receivedReviews()
+    // public function receivedReviews()
     {
         return $this->hasMany(Review::class, 'reviewed_user_id');
     }
@@ -156,20 +155,20 @@ class User extends Authenticatable
         // سنعتمد على جلب المحادثات في الـ controller
         // ولكن يمكن إضافة علاقة مباشرة من الـ User إلى الـ Messages
         return $this->hasMany(Message::class, 'sender_id')
-                    ->orWhere('receiver_id', $this->id); // هذه الطريقة ليست مثالية للموديل ولكنها ممكنة
+            ->orWhere('receiver_id', $this->id); // هذه الطريقة ليست مثالية للموديل ولكنها ممكنة
     }
 
     // العلاقات الأصلية التي قدمتها لموديل الرسائل
     public function sentMessages(): HasMany
 
-    public function sentMessages()
+    // public function sentMessages()
     {
         return $this->hasMany(Message::class, 'sender_id');
     }
 
     public function receivedMessages(): HasMany
 
-    public function receivedMessages()
+    // public function receivedMessages()
     {
         return $this->hasMany(Message::class, 'receiver_id');
     }
@@ -180,17 +179,17 @@ class User extends Authenticatable
     }
 
     public function favorites(): HasMany
-  /**
+    /**
      * العناصر المفضلة الخاصة بالمستخدم
      */
-    public function favorites()
+    // public function favorites()
     {
         return $this->hasMany(UserFavorite::class, 'user_id');
     }
 
     public function updatedAdminSettings(): HasMany
 
-    public function updatedAdminSettings()
+    // public function updatedAdminSettings()
     {
         return $this->hasMany(AdminSetting::class, 'updated_by');
     }
@@ -200,12 +199,12 @@ class User extends Authenticatable
     {
         return "{$this->first_name} {$this->last_name}";
     }
-}
+// }
     public function equipments()
-{
-    return $this->hasMany(Equipment::class, 'owner_id');
-}
-   /**
+    {
+        return $this->hasMany(Equipment::class, 'owner_id');
+    }
+    /**
      * الفواتير الخاصة بالمستخدم
      */
     // public function invoices()
@@ -213,18 +212,18 @@ class User extends Authenticatable
     //     return $this->hasMany(Invoice::class, 'user_id');
     // }
     public function invoices()
-{
-    return $this->hasManyThrough(
-        Invoice::class,   // المودل النهائي
-        Booking::class,   // المودل الوسيط
-        'renter_id',      // المفتاح في جدول الحجوزات اللي يربط المستخدم (مثلاً renter_id أو user_id)
-        'booking_id',     // المفتاح في جدول الفواتير اللي يربط الحجز
-        'id',             // المفتاح الأساسي في جدول المستخدمين
-        'id'              // المفتاح الأساسي في جدول الحجوزات
-    );
-}
+    {
+        return $this->hasManyThrough(
+            Invoice::class, // المودل النهائي
+            Booking::class, // المودل الوسيط
+            'renter_id',    // المفتاح في جدول الحجوزات اللي يربط المستخدم (مثلاً renter_id أو user_id)
+            'booking_id',   // المفتاح في جدول الفواتير اللي يربط الحجز
+            'id',           // المفتاح الأساسي في جدول المستخدمين
+            'id'            // المفتاح الأساسي في جدول الحجوزات
+        );
+    }
 
-      /**
+    /**
      * جميع الحجوزات التي تخص المستخدم (كمالك أو كمستأجر)
      */
     public function bookings()

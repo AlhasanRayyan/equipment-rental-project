@@ -1,22 +1,15 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminSettingController;
-use App\Http\Controllers\Admin\ComplaintController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\EquipmentCategoryController;
-use App\Http\Controllers\FavoriteController;
-use App\Http\Controllers\Admin\EquipmentController;
-use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Equipment\EquipmentsController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OwnerEquipmentController;
+use App\Http\Controllers\User\UserProfileController;
 use App\Models\Conversation;
 use Illuminate\Support\Facades\Broadcast;
-use App\Http\Controllers\User\UserProfileController;
 use Illuminate\Support\Facades\Route;
 
-
-include 'admin.php' ;
+include 'admin.php';
 
 // 1. Frontend / Public Website Routes
 // ========================================================================
@@ -39,6 +32,7 @@ Route::get('/owner/equipments/{id}/edit', [OwnerEquipmentController::class, 'edi
 
 Route::get('/about', [HomeController::class, 'about'])->name('about');
 // صفحة تواصل معنا: GET للجميع، POST للمسجلين فقط
+Route::post('/contact', [HomeController::class, 'sendContact'])->middleware('auth')->name('contact.send');
 Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 
 Route::middleware(['auth'])->group(function () {
@@ -48,14 +42,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/favorites/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle'); // للتبديل من أي صفحة
 });
 
-Route::post('/contact', [HomeController::class, 'sendContact'])->middleware('auth')->name('contact.send');
-
-
 // للأسئلة الشائعة
 Route::view('/faq', 'frontend.faq')->name('faq');
 // Route User
 Route::middleware(['auth', 'user'])->group(function () {
-
     // الملف الشخصي
     Route::get('/profile', [UserProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/section/{type}', [UserProfileController::class, 'loadSection'])->name('profile.section');
@@ -63,12 +53,10 @@ Route::middleware(['auth', 'user'])->group(function () {
     Route::put('/profile/update', [UserProfileController::class, 'update'])->name('profile.update');
 });
 
-
-
 // قناة خاصة بالمحادثات
 Broadcast::channel('conversations.{conversationId}', function ($user, $conversationId) {
     // يجب أن يكون المستخدم مسجلاً الدخول
-    if (!$user) {
+    if (! $user) {
         return false;
     }
 
@@ -80,10 +68,9 @@ Broadcast::channel('conversations.{conversationId}', function ($user, $conversat
 
 Route::middleware('auth')->group(function () {
     Route::get('/chat', function () {
-        return view('chat.index'); 
+        return view('chat.index');
     })->name('chat.index');
 
 });
-
 
 require __DIR__ . '/auth.php';
