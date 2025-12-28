@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\EquipmentTrackingController;
 use App\Http\Controllers\ChatController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,3 +35,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::post('/messages/{message}/read', [ChatController::class, 'markAsRead']);
     Route::get('/conversations/{conversation}', [ChatController::class, 'getConversationDetails']);
 });
+
+Route::post('/equipment-tracking', [EquipmentTrackingController::class, 'store']);
+
