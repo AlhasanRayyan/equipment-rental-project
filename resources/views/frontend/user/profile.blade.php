@@ -94,7 +94,8 @@
             pointer-events: auto;
         }
 
-        .dropdown-content a ,.dropdown-content form .dropdown-link {
+        .dropdown-content a,
+        .dropdown-content form .dropdown-link {
             display: block;
             padding: 12px 16px;
             text-decoration: none;
@@ -106,23 +107,27 @@
             gap: 8px;
         }
 
-        .dropdown-content a:hover , .dropdown-content form .dropdown-link:hover{
+        .dropdown-content a:hover,
+        .dropdown-content form .dropdown-link:hover {
             background-color: #ffd633;
             color: #000;
         }
-.dropdown-content form {
-    margin: 0;
-    padding: 0;
-}
-.dropdown-content form .dropdown-link {
-    background: none;
-    border: none;
-    width: 100%;
-    text-align: right;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: inherit;
-}
+
+        .dropdown-content form {
+            margin: 0;
+            padding: 0;
+        }
+
+        .dropdown-content form .dropdown-link {
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: right;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: inherit;
+        }
+
         .notif-header {
             background-color: #ffd633;
             color: #000;
@@ -350,12 +355,11 @@
                                         </button>
                                     </form> --}}
                                     <form action="{{ route('logout') }}" method="POST" class="logout-form">
-    @csrf
-    <button type="submit" class="dropdown-link">
-        <i class="fas fa-sign-out-alt"></i> تسجيل خروج
-    </button>
-</form>
-
+                                        @csrf
+                                        <button type="submit" class="dropdown-link">
+                                            <i class="fas fa-sign-out-alt"></i> تسجيل خروج
+                                        </button>
+                                    </form>
                                 @else
                                     <a href="{{ route('login') }}"><i class="fas fa-sign-in-alt"></i> تسجيل دخول</a>
                                     <a href="{{ route('register') }}"><i class="fas fa-user-plus"></i> إنشاء حساب</a>
@@ -552,128 +556,136 @@
             <!-- end user info section  -->
         </main>
         <!-- start footer html  -->
-    <footer class="page-footer">
-    <div class="uk-container uk-container-large">
+        <footer class="page-footer">
+            <div class="uk-container uk-container-large">
 
-        <div class="page-footer-middle">
-            <div class="uk-grid uk-child-width-1-4@l uk-child-width-1-2@s" data-uk-grid>
+                <div class="page-footer-middle">
+                    <div class="uk-grid uk-child-width-1-4@l uk-child-width-1-2@s" data-uk-grid>
 
-                {{-- القسم الأول --}}
-                <div class="uk-flex-first@l">
-                    <div class="title">عن المنصة</div>
-                    <p>
-                        منصة تتيح للمستخدمين خدمات من تأجير واستئجار معدات البناء بجميع أنواعها وبأسعار مناسبة.
-                    </p>
-                    <ul class="social-list">
-                        <li class="social-list__item"><a class="social-list__link" href="#"><i class="fab fa-facebook-f"></i></a></li>
-                        <li class="social-list__item"><a class="social-list__link" href="#"><i class="fab fa-twitter"></i></a></li>
-                        <li class="social-list__item"><a class="social-list__link" href="#"><i class="fab fa-google-plus-g"></i></a></li>
-                        <li class="social-list__item"><a class="social-list__link" href="#"><i class="fab fa-linkedin-in"></i></a></li>
-                        <li class="social-list__item"><a class="social-list__link" href="#"><i class="fab fa-vimeo-v"></i></a></li>
-                    </ul>
+                        {{-- القسم الأول --}}
+                        <div class="uk-flex-first@l">
+                            <div class="title">عن المنصة</div>
+                            <p>
+                                منصة تتيح للمستخدمين خدمات من تأجير واستئجار معدات البناء بجميع أنواعها وبأسعار مناسبة.
+                            </p>
+                            <ul class="social-list">
+                                <li class="social-list__item"><a class="social-list__link" href="#"><i
+                                            class="fab fa-facebook-f"></i></a></li>
+                                <li class="social-list__item"><a class="social-list__link" href="#"><i
+                                            class="fab fa-twitter"></i></a></li>
+                                <li class="social-list__item"><a class="social-list__link" href="#"><i
+                                            class="fab fa-google-plus-g"></i></a></li>
+                                <li class="social-list__item"><a class="social-list__link" href="#"><i
+                                            class="fab fa-linkedin-in"></i></a></li>
+                                <li class="social-list__item"><a class="social-list__link" href="#"><i
+                                            class="fab fa-vimeo-v"></i></a></li>
+                            </ul>
+                        </div>
+
+                        {{-- القسم الثاني --}}
+                        <div class="uk-flex-last@l">
+                            <div class="title">معلومات التواصل</div>
+                            <ul class="contacts-list">
+                                <li class="contacts-list-item">
+                                    <div class="contacts-list-item__icon">
+                                        <img src="{{ asset('assets/home/img/icons/ico-phone24.svg') }}" data-uk-svg
+                                            alt="For Rental Support">
+                                    </div>
+                                    <div class="contacts-list-item__desc">
+                                        <div class="contacts-list-item__label">الدعم الفني</div>
+                                        <div class="contacts-list-item__content">
+                                            <a href="tel:+970597234892">+970 59 723 4892</a>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li class="contacts-list-item">
+                                    <div class="contacts-list-item__icon">
+                                        <img src="{{ asset('assets/home/img/icons/ico-timer.svg') }}" data-uk-svg
+                                            alt="The Office Hours">
+                                    </div>
+                                    <div class="contacts-list-item__desc">
+                                        <div class="contacts-list-item__label">ساعات العمل</div>
+                                        <div class="contacts-list-item__content">السبت - الخميس (8ص - 6م)</div>
+                                    </div>
+                                </li>
+
+                                <li class="contacts-list-item">
+                                    <div class="contacts-list-item__icon">
+                                        <img src="{{ asset('assets/home/img/icons/ico-mail.svg') }}" data-uk-svg
+                                            alt="Send Us Email">
+                                    </div>
+                                    <div class="contacts-list-item__desc">
+                                        <div class="contacts-list-item__label">راسلنا على الإيميل</div>
+                                        <div class="contacts-list-item__content">
+                                            <a href="mailto:rentals@my-domain.net">rentals@my-domain.net</a>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        {{-- القسم الثالث --}}
+                        <div>
+                            <div class="title">روابط مفيدة</div>
+                            <ul class="uk-nav uk-list-disc">
+                                <li><a href="{{ route('home') }}">الصفحة الرئيسية</a></li>
+                                <li><a href="{{ route('categories') }}">الفئات</a></li>
+                                <li><a href="{{ route('equipments') }}">المعدات</a></li>
+                                <li><a href="{{ route('contact') }}">تواصل معنا</a></li>
+                                <li><a href="{{ route('about') }}">عن المنصة</a></li>
+                            </ul>
+                        </div>
+
+                        {{-- القسم الرابع --}}
+                        <div>
+                            <div class="title">اكتشف المنصة</div>
+                            <ul class="uk-nav uk-list-disc">
+                                <li><a href="{{ route('register') }}">إنشاء حساب</a></li>
+                                <li><a href="{{ route('login') }}">تسجيل دخول</a></li>
+                                <li><a href="{{ route('faq') }}">اقرأ الأسئلة الشائعة</a></li>
+                            </ul>
+                        </div>
+
+                    </div>
                 </div>
 
-                {{-- القسم الثاني --}}
-                <div class="uk-flex-last@l">
-                    <div class="title">معلومات التواصل</div>
-                    <ul class="contacts-list">
-                        <li class="contacts-list-item">
-                            <div class="contacts-list-item__icon">
-                                <img src="{{ asset('assets/home/img/icons/ico-phone24.svg') }}" data-uk-svg alt="For Rental Support">
-                            </div>
-                            <div class="contacts-list-item__desc">
-                                <div class="contacts-list-item__label">الدعم الفني</div>
-                                <div class="contacts-list-item__content">
-                                    <a href="tel:+970597234892">+970 59 723 4892</a>
-                                </div>
-                            </div>
-                        </li>
-
-                        <li class="contacts-list-item">
-                            <div class="contacts-list-item__icon">
-                                <img src="{{ asset('assets/home/img/icons/ico-timer.svg') }}" data-uk-svg alt="The Office Hours">
-                            </div>
-                            <div class="contacts-list-item__desc">
-                                <div class="contacts-list-item__label">ساعات العمل</div>
-                                <div class="contacts-list-item__content">السبت - الخميس (8ص - 6م)</div>
-                            </div>
-                        </li>
-
-                        <li class="contacts-list-item">
-                            <div class="contacts-list-item__icon">
-                                <img src="{{ asset('assets/home/img/icons/ico-mail.svg') }}" data-uk-svg alt="Send Us Email">
-                            </div>
-                            <div class="contacts-list-item__desc">
-                                <div class="contacts-list-item__label">راسلنا على الإيميل</div>
-                                <div class="contacts-list-item__content">
-                                    <a href="mailto:rentals@my-domain.net">rentals@my-domain.net</a>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
+                {{-- الفوتر السفلي --}}
+                <div class="page-footer-bottom">
+                    <span>(c) 2025 SPCER - تأجير معدات البناء. جميع الحقوق محفوظة</span>
                 </div>
 
-                {{-- القسم الثالث --}}
-                <div>
-                    <div class="title">روابط مفيدة</div>
-                    <ul class="uk-nav uk-list-disc">
-                        <li><a href="{{ route('home') }}">الصفحة الرئيسية</a></li>
-                        <li><a href="{{ route('categories') }}">الفئات</a></li>
-                        <li><a href="{{ route('equipments') }}">المعدات</a></li>
-                        <li><a href="{{ route('contact') }}">تواصل معنا</a></li>
-                        <li><a href="{{ route('about') }}">عن المنصة</a></li>
-                    </ul>
-                </div>
-
-                {{-- القسم الرابع --}}
-                <div>
-                    <div class="title">اكتشف المنصة</div>
-                    <ul class="uk-nav uk-list-disc">
-                        <li><a href="{{ route('register') }}">إنشاء حساب</a></li>
-                        <li><a href="{{ route('login') }}">تسجيل دخول</a></li>
-                        <li><a href="{{ route('faq') }}">اقرأ الأسئلة الشائعة</a></li>
-                    </ul>
-                </div>
-
-            </div>
-        </div>
-
-        {{-- الفوتر السفلي --}}
-        <div class="page-footer-bottom">
-            <span>(c) 2025 SPCER - تأجير معدات البناء. جميع الحقوق محفوظة</span>
-        </div>
-
-        <a class="totop-link" href="#top" data-uk-scroll>
-            <img src="{{ asset('assets/home/img/icons/ico-totop.svg') }}" alt="totop">
-            <span>العودة للأعلى</span>
-        </a>
-    </div>
-
-    {{-- القائمة الجانبية للموبايل --}}
-    <div id="offcanvas" data-uk-offcanvas="overlay: true">
-        <div class="uk-offcanvas-bar">
-            <button class="uk-offcanvas-close" type="button" data-uk-close></button>
-
-            <div class="uk-margin">
-                <div class="logo">
-                    <a class="logo__link" href="{{ route('home') }}">
-                        <img class="logo__img" src="{{ asset('assets/home/img/logo.png') }}" alt="logo">
-                    </a>
-                </div>
+                <a class="totop-link" href="#top" data-uk-scroll>
+                    <img src="{{ asset('assets/home/img/icons/ico-totop.svg') }}" alt="totop">
+                    <span>العودة للأعلى</span>
+                </a>
             </div>
 
-            <div class="uk-margin">
-                <ul class="uk-nav-default uk-nav-parent-icon" data-uk-nav>
-                    <li><a href="{{ route('home') }}">الصفحة الرئيسية</a></li>
-                    <li><a href="{{ route('categories') }}">الفئات</a></li>
-                    <li><a href="{{ route('equipments') }}">المعدات</a></li>
-                    <li><a href="{{ route('about') }}">عن المنصة</a></li>
-                    <li><a href="{{ route('contact') }}">تواصل معنا</a></li>
-                </ul>
+            {{-- القائمة الجانبية للموبايل --}}
+            <div id="offcanvas" data-uk-offcanvas="overlay: true">
+                <div class="uk-offcanvas-bar">
+                    <button class="uk-offcanvas-close" type="button" data-uk-close></button>
+
+                    <div class="uk-margin">
+                        <div class="logo">
+                            <a class="logo__link" href="{{ route('home') }}">
+                                <img class="logo__img" src="{{ asset('assets/home/img/logo.png') }}" alt="logo">
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="uk-margin">
+                        <ul class="uk-nav-default uk-nav-parent-icon" data-uk-nav>
+                            <li><a href="{{ route('home') }}">الصفحة الرئيسية</a></li>
+                            <li><a href="{{ route('categories') }}">الفئات</a></li>
+                            <li><a href="{{ route('equipments') }}">المعدات</a></li>
+                            <li><a href="{{ route('about') }}">عن المنصة</a></li>
+                            <li><a href="{{ route('contact') }}">تواصل معنا</a></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-</footer>
+        </footer>
 
         <!-- end footer html  -->
     </div>
