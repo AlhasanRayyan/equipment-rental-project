@@ -186,45 +186,7 @@
             </div>
         </div>
 
-        <div class="section-category">
-            <div class="uk-container">
-                <div class="section-title uk-text-center">
-                    <div class="uk-text-meta">ستجد لدينا افضل المعدات</div>
-                    <div class="uk-h2">تصفح فئات المعدات</div>
-                </div>
-                <div class="section-content">
-                    <div class="uk-grid uk-child-width-1-3@m uk-child-width-1-2@s" data-uk-grid>
-                        @forelse ($featuredCategories as $category)
-                            <div>
-                                <div class="category-item">
-                                    <a class="category-item__link uk-inline-clip uk-transition-toggle"
-                                        href="{{ route('equipments', ['category' => $category->id]) }}" tabindex="0">
-                                        <div class="category-item__media">
-                                            <img src="{{ $category->image_url ? asset('storage/' . $category->image_url) : asset('assets/home/img/category-default.jpg') }}"
-                                                alt="{{ $category->category_name }}" />
-                                            <div class="uk-transition-fade">
-                                                <div class="uk-overlay-primary uk-position-cover"></div>
-                                                <div class="uk-position-center"><span
-                                                        data-uk-icon="icon: plus; ratio: 2"></span></div>
-                                            </div>
-                                        </div>
-                                        <div class="category-item__title"> <span>{{ $category->category_name }}</span>
-                                        </div>
-                                    </a>
-                                </div>
-                            </div>
-                        @empty
-                            <div class="uk-width-1-1 uk-text-center">
-                                <p>لا توجد فئات متاحة حالياً.</p>
-                            </div>
-                        @endforelse
-                    </div>
-                    <div class="uk-margin-large-top uk-text-center"><a class="uk-button uk-button-default uk-button-large"
-                            href="{{ route('categories') }}"><span>المزيد من الفئات</span></a></div>
-                    {{-- تم التعديل --}}
-                </div>
-            </div>
-        </div>
+  
         <div class="section-about">
             <div class="uk-container">
                 <div class="section-content">
