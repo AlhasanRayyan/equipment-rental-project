@@ -31,6 +31,9 @@ class EquipmentTracking extends Model
         'speed',
         'battery_level',
         'status',
+        'start_time',
+        'end_time',
+        'duration',
         // 'timestamp' is covered by created_at
     ];
 
@@ -45,6 +48,9 @@ class EquipmentTracking extends Model
         'speed' => 'decimal:2',     // 6, 2
         'battery_level' => 'decimal:2', // 5, 2
         'status' => 'string', // Enum in DB, treated as string
+        'start_time' => 'datetime',
+        'end_time' => 'datetime',  
+        'duration' => 'decimal:2',
         // 'timestamp' is implicitly covered by 'created_at'
     ];
 
@@ -81,9 +87,9 @@ class EquipmentTracking extends Model
     public function getDistanceFromLastLocation(): float
     {
         $previousLocation = $this->equipment->trackingRecords()
-                                            ->where('id', '<', $this->id)
-                                            ->latest('created_at')
-                                            ->first();
+            ->where('id', '<', $this->id)
+            ->latest('created_at')
+            ->first();
 
         if (!$previousLocation) {
             return 0.0; // No previous location to compare
@@ -101,8 +107,8 @@ class EquipmentTracking extends Model
         $dLon = $lon2 - $lon1;
 
         $a = sin($dLat / 2) * sin($dLat / 2) +
-             cos($lat1) * cos($lat2) *
-             sin($dLon / 2) * sin($dLon / 2);
+            cos($lat1) * cos($lat2) *
+            sin($dLon / 2) * sin($dLon / 2);
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
         return $earthRadius * $c; // Distance in kilometers

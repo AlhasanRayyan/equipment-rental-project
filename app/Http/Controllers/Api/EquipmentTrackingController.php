@@ -22,6 +22,10 @@ class EquipmentTrackingController extends Controller
             'speed'         => 'nullable|numeric|min:0',
             'battery_level' => 'nullable|numeric|between:0,100',
             'status'        => 'required|string|in:online,offline,moving,idle,maintenance', // حسب الـ Enum عندك
+
+            'start_time'    => 'nullable|date',
+            'end_time'      => 'nullable|date|after_or_equal:start_time',
+            'duration'      => 'nullable|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -40,6 +44,9 @@ class EquipmentTrackingController extends Controller
                 'speed'         => $request->speed ?? 0,
                 'battery_level' => $request->battery_level,
                 'status'        => $request->status,
+                'start_time'    => $request->start_time,
+                'end_time'      => $request->end_time,
+                'duration'      => $request->duration,
             ]);
 
             // 3. إرجاع استجابة نجاح
@@ -48,7 +55,6 @@ class EquipmentTrackingController extends Controller
                 'message' => 'Tracking data recorded successfully',
                 'data'    => $tracking
             ], 201);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status'  => 'error',
