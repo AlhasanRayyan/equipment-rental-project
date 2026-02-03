@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -34,6 +35,7 @@ class User extends Authenticatable
         'last_login_at',
         'average_owner_rating',
         'average_renter_rating',
+        'google_id',
     ];
 
     /**
@@ -199,7 +201,7 @@ class User extends Authenticatable
     {
         return "{$this->first_name} {$this->last_name}";
     }
-// }
+    // }
     public function equipments()
     {
         return $this->hasMany(Equipment::class, 'owner_id');

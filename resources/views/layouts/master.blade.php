@@ -127,7 +127,7 @@
                 <div class="page-header-bottom__left">
                     <div class="logo">
                         <a class="logo__link" href="{{ route('home') }}">
-                            <img class="logo__img" src="{{ asset('assets/home/img/logo.png') }}" alt="شعار الموقع">
+                            <img class="logo__img" src="{{ asset('assets/img/logo.png') }}" alt="شعار الموقع" width="90" height="90" >
                         </a>
                     </div>
                 </div>

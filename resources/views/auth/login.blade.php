@@ -4,15 +4,18 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         /* Styles from your new template, adjusted for better integration */
-        body { /* Ensure body has no extra margin/padding from Breeze or defaults */
+        body {
+            /* Ensure body has no extra margin/padding from Breeze or defaults */
             margin: 0;
             padding: 0;
-            background-color: white !important; /* Force white background */
+            background-color: white !important;
+            /* Force white background */
         }
 
         .vh-100 {
             min-height: 100vh;
         }
+
         .divider:after,
         .divider:before {
             content: "";
@@ -45,10 +48,67 @@
             gap: 10px;
             background-color: #ffffff;
             padding: 30px;
-            width: 450px; /* Adjusted to match screenshot width */
+            width: 450px;
+            /* Adjusted to match screenshot width */
             border-radius: 20px;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); /* Added shadow to match screenshot */
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            /* Added shadow to match screenshot */
+        }
+
+        /* تنسيق الفاصل "أو" */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: #888;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #eee;
+        }
+
+        .divider:not(:empty)::before {
+            margin-left: .5em;
+        }
+
+        .divider:not(:empty)::after {
+            margin-right: .5em;
+        }
+
+        /* تنسيق زر جوجل */
+        .btn-google {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            height: 50px;
+            background-color: #ffffff;
+            border: 1px solid #ecedec;
+            border-radius: 10px;
+            text-decoration: none !important;
+            color: #2d2d2d;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-google:hover {
+            background-color: #f8f9fa;
+            border-color: #ddd;
+            color: #2d2d2d;
+        }
+
+        .btn-google img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            flex-shrink: 0;
+            /* يمنع الصورة من الانضغاط */
         }
 
         @media (max-width: 450px) {
@@ -76,20 +136,29 @@
             height: 50px;
             display: flex;
             align-items: center;
-            padding-right: 10px; /* For RTL text alignment */
-            padding-left: 10px; /* For the icon */
+            padding-right: 10px;
+            /* For RTL text alignment */
+            padding-left: 10px;
+            /* For the icon */
             transition: 0.2s ease-in-out;
         }
+
         /* Adjusted icon and input positioning for RTL */
-        .inputForm svg, .inputForm i {
-            margin-left: 10px; /* Space after icon */
+        .inputForm svg,
+        .inputForm i {
+            margin-left: 10px;
+            /* Space after icon */
             margin-right: 0;
         }
+
         .inputForm .input {
             margin-right: 0;
-            margin-left: 10px; /* Space after input text before icon/button */
-            text-align: right; /* Align input text to the right */
+            margin-left: 10px;
+            /* Space after input text before icon/button */
+            text-align: right;
+            /* Align input text to the right */
         }
+
         .inputForm .input::placeholder {
             text-align: right;
         }
@@ -130,13 +199,17 @@
 
         .span {
             font-size: 14px;
-            margin-right: 5px; /* Adjust for RTL */
+            margin-right: 5px;
+            /* Adjust for RTL */
             color: #edb509;
             font-weight: 500;
             cursor: pointer;
         }
-        .flex-row > div > input[type="checkbox"] { /* Style for checkbox */
-            margin-left: 8px; /* Space between checkbox and label */
+
+        .flex-row>div>input[type="checkbox"] {
+            /* Style for checkbox */
+            margin-left: 8px;
+            /* Space between checkbox and label */
         }
 
         .button-submit {
@@ -151,6 +224,7 @@
             width: 100%;
             cursor: pointer;
         }
+
         .button-submit:hover {
             background-color: #f1c339;
         }
@@ -189,29 +263,38 @@
             justify-content: center;
             align-items: center;
         }
+
         .img-column img {
             max-width: 100%;
             height: auto;
-            display: block; /* Remove extra space below image */
+            display: block;
+            /* Remove extra space below image */
         }
+
         /* Ensure the main container for the form and image uses full height */
         .container-fluid.h-custom {
-            height: 100vh; /* Use full viewport height */
+            height: 100vh;
+            /* Use full viewport height */
             display: flex;
             align-items: center;
             justify-content: center;
         }
+
         /* Make the row also take full height if needed */
-        .container-fluid.h-custom > .row {
+        .container-fluid.h-custom>.row {
             height: 100%;
-            align-items: center; /* Center vertically */
+            align-items: center;
+            /* Center vertically */
         }
 
         /* Small adjustment for error messages to match the input form styling */
         .x-input-error {
-            color: #ef4444; /* Tailwind red-500 */
-            font-size: 0.875rem; /* text-sm */
-            margin-top: 0.5rem; /* mt-2 */
+            color: #ef4444;
+            /* Tailwind red-500 */
+            font-size: 0.875rem;
+            /* text-sm */
+            margin-top: 0.5rem;
+            /* mt-2 */
         }
     </style>
 
@@ -236,8 +319,8 @@
                             <label for="email">الإيميل </label>
                         </div>
                         <div class="inputForm">
-                            <input type="email" id="email" class="input" placeholder="أدخل الإيميل" name="email"
-                                value="{{ old('email') }}" required autofocus autocomplete="username" />
+                            <input type="email" id="email" class="input" placeholder="أدخل الإيميل"
+                                name="email" value="{{ old('email') }}" required autofocus autocomplete="username" />
                             <svg height="20" viewBox="0 0 32 32" width="20" xmlns="http://www.w3.org/2000/svg">
                                 <g id="Layer_3" data-name="Layer 3">
                                     <path
@@ -253,10 +336,11 @@
                             <label for="passwordInput">كلمة المرور </label>
                         </div>
                         <div class="inputForm">
-                            <input type="password" id="passwordInput" class="input" placeholder="أدخل كلمة المرور" name="password"
-                                required autocomplete="current-password" />
+                            <input type="password" id="passwordInput" class="input" placeholder="أدخل كلمة المرور"
+                                name="password" required autocomplete="current-password" />
                             <i id="togglePassword" class="fa-solid fa-eye" style="cursor:pointer;"></i>
-                            <svg height="20" viewBox="-64 0 512 512" width="20" xmlns="http://www.w3.org/2000/svg">
+                            <svg height="20" viewBox="-64 0 512 512" width="20"
+                                xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="m336 512h-288c-26.453125 0-48-21.523438-48-48v-224c0-26.476562 21.546875-48 48-48h288c26.453125 0 48 21.523438 48 48v224c0 26.476562-21.546875 48-48 48zm-288-288c-8.8125 0-16 7.167969-16 16v224c0 8.832031 7.1875 16 16 16h288c8.8125 0 16-7.167969 16-16v-224c0-8.832031-7.1875-16-16-16zm0 0">
                                 </path>
@@ -270,7 +354,8 @@
                         <!-- Remember Me & Forgot Password -->
                         <div class="flex-row mt-4">
                             <div>
-                                <input id="remember_me" type="checkbox" name="remember" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
+                                <input id="remember_me" type="checkbox" name="remember"
+                                    class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
                                 <label for="remember_me" class="ms-2 text-sm text-gray-600">{{ __('تذكرني') }}</label>
                             </div>
 
@@ -280,9 +365,19 @@
                                 </a>
                             @endif
                         </div>
-
+                        <!-- زر تسجيل الدخول العادي -->
                         <button type="submit" class="button-submit">{{ __('تسجيل الدخول') }}</button>
-                        <p class="p">ليس لديك حساب ؟
+
+                        <!-- الفاصل (أو) -->
+                        <div class="divider">أو</div>
+
+                        <!-- زر جوجل المطور -->
+                        <a href="{{ route('google.login') }}" class="btn-google">
+                            <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" alt="Google">
+                            <span>تسجيل الدخول بواسطة جوجل</span>
+                        </a>
+
+                        <p class="p mt-3">ليس لديك حساب ؟
                             @if (Route::has('register'))
                                 <a href="{{ route('register') }}" class="span">إنشاء حساب</a>
                             @endif
