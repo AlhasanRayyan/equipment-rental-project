@@ -370,13 +370,18 @@
 
                         <!-- الفاصل (أو) -->
                         <div class="divider">أو</div>
-
-                        <!-- زر جوجل المطور -->
-                        <a href="{{ route('google.login') }}" class="btn-google">
+                        <!-- زر جوجل (موجود مسبقاً) -->
+                        <a href="{{ route('google.login') }}" class="btn-google mb-2">
                             <img src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg" alt="Google">
                             <span>تسجيل الدخول بواسطة جوجل</span>
                         </a>
 
+                        <!-- زر فيسبوك الجديد -->
+                        <a href="{{ route('facebook.login') }}" class="btn-google"
+                            style="background-color: #1877F2; color: white; border: none;">
+                            <i class="fa-brands fa-facebook" style="font-size: 20px;"></i>
+                            <span>تسجيل الدخول بواسطة فيسبوك</span>
+                        </a>
                         <p class="p mt-3">ليس لديك حساب ؟
                             @if (Route::has('register'))
                                 <a href="{{ route('register') }}" class="span">إنشاء حساب</a>

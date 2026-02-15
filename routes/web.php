@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\FacebookController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Equipment\EquipmentsController;
 use App\Http\Controllers\FavoriteController;
@@ -77,5 +78,10 @@ Route::middleware('auth')->group(function () {
 
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');
 Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback']);
+
+
+Route::get('auth/facebook', [FacebookController::class, 'redirectToFacebook'])->name('facebook.login');
+Route::get('auth/facebook/callback', [FacebookController::class, 'handleFacebookCallback']);
+
 
 require __DIR__ . '/auth.php';
