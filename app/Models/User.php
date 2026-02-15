@@ -241,4 +241,27 @@ class User extends Authenticatable
     //     // لو عندك عمود renter_id بجدول المعدات
     //     return $this->hasMany(Equipment::class, 'renter_id');
     // }
+
+
+
+// داخل كلاس User
+
+    /**
+     * الوصول للاسم عن طريق $user->name
+     */
+    public function getNameAttribute()
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
+
+    /**
+     * الوصول للرابط عن طريق $user->avatar_url
+     */
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->profile_picture_url) {
+            return asset($this->profile_picture_url);
+        }
+        return asset('assets/home/img/default-user.png');
+    }
 }

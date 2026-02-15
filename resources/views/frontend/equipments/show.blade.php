@@ -166,7 +166,7 @@
                                         <td>{{ $equipment->monthly_rate ?? '-' }} $</td>
                                     </tr>
                                     <tr>
-                                        <td>قيمة الإيداع:</td>
+                                        <td>قيمة التأمين:</td>
                                         <td>{{ $equipment->deposit_amount ?? '-' }} $</td>
                                     </tr>
                                 </table>
@@ -176,16 +176,18 @@
 
                     <div class="uk-width-1-3@m">
                         <div class="equipment-sidebar">
-
                             {{-- ✅ بيانات المالك --}}
-                            <div
-                                class="equipment-user uk-card uk-card-default uk-card-body uk-text-center uk-margin-medium-bottom">
-                                <img class="uk-border-circle"
-                                    src="{{ $equipment->owner->avatar_url ?? asset('assets/home/img/default-user.png') }}"
-                                    width="120" height="120" alt="">
-                                <h4 class="uk-margin-small-top">{{ $equipment->owner->name }}</h4>
-                                <p>{{ $equipment->owner->description ?? 'مالك المعدات' }}</p>
-                            </div>
+                            @if ($equipment->owner)
+                                <div
+                                    class="equipment-user uk-card uk-card-default uk-card-body uk-text-center uk-margin-medium-bottom">
+                                    <img class="uk-border-circle" src="{{ $equipment->owner->avatar_url }}" width="120"
+                                        height="120" alt="{{ $equipment->owner->name }}">
+
+                                    <h4 class="uk-margin-small-top">{{ $equipment->owner->name }}</h4>
+
+                                    <p>{{ $equipment->owner->description ?? 'مالك المعدات' }}</p>
+                                </div>
+                            @endif
 
                             {{-- ✅ نموذج استئجار المعدة --}}
                             <form action="" method="POST"
