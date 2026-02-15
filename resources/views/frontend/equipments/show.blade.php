@@ -189,51 +189,44 @@
                                 </div>
                             @endif
 
-                            {{-- ✅ نموذج استئجار المعدة --}}
-                            <form action="" method="POST"
+                            <form action="{{ route('bookings.store') }}" method="POST"
                                 class="uk-card uk-card-default uk-card-body equipment-order">
                                 @csrf
                                 <input type="hidden" name="equipment_id" value="{{ $equipment->id }}">
 
-                                <div class="equipment-order__price">
-                                    <span>مدة الإيجار<small>اختر المدة</small></span>
-                                </div>
-
                                 <div class="equipment-order__form">
                                     <div class="uk-margin">
-                                        <div class="uk-inline uk-width-1-1">
-                                            <select class="uk-select uk-form-large" name="rental_type" required>
-                                                <option value="">مدة الإيجار</option>
-                                                <option value="daily">يومي</option>
-                                                <option value="weekly">أسبوعي</option>
-                                                <option value="monthly">شهري</option>
-                                            </select>
-                                            <span class="uk-form-icon">
-                                                <img class="timer"
-                                                    src="{{ asset('assets/home/img/icons/ico-timer.svg') }}"
-                                                    alt="timer" data-uk-svg>
-                                            </span>
-                                        </div>
+                                        <select class="uk-select uk-form-large" name="rental_rate_type"
+                                            id="rental_rate_type" required>
+                                            <option value="">مدة الإيجار</option>
+                                            <option value="daily" data-price="{{ $equipment->daily_rate }}">يومي
+                                                ({{ $equipment->daily_rate }}$)</option>
+                                            <option value="weekly" data-price="{{ $equipment->weekly_rate }}">أسبوعي
+                                                ({{ $equipment->weekly_rate }}$)</option>
+                                            <option value="monthly" data-price="{{ $equipment->monthly_rate }}">شهري
+                                                ({{ $equipment->monthly_rate }}$)</option>
+                                        </select>
                                     </div>
 
                                     <div class="uk-margin">
-                                        <input class="uk-input" type="date" name="start_date" required
-                                            placeholder="تاريخ البدء">
+                                        <label>تاريخ البدء</label>
+                                        <input class="uk-input" type="date" name="start_date" id="start_date"
+                                            required min="{{ date('Y-m-d') }}">
                                     </div>
 
                                     <div class="uk-margin">
-                                        <input class="uk-input" type="date" name="end_date" required
-                                            placeholder="تاريخ الإنتهاء">
+                                        <label>تاريخ الإنتهاء</label>
+                                        <input class="uk-input" type="date" name="end_date" id="end_date" required
+                                            min="{{ date('Y-m-d') }}">
                                     </div>
 
                                     <div class="uk-margin">
-                                        <input class="uk-input" type="text" name="delivery_address"
-                                            placeholder="أدخل عنوانك">
+                                        <input class="uk-input" type="text" name="pickup_location"
+                                            placeholder="عنوان الاستلام">
                                     </div>
 
                                     <div class="uk-margin">
                                         <div class="equipment-order__value">
-                                            <span data-uk-icon="check"></span>
                                             <span id="rentalDays">المدة بالأيام : -</span>
                                         </div>
                                     </div>
@@ -242,18 +235,19 @@
                                 <div class="equipment-order-total">
                                     <ul>
                                         <li><span>إجمالي الإيجار</span><span id="rentalTotal">-</span></li>
-                                        <li><span>قيمة الإيداع</span><span>{{ $equipment->deposit_amount ?? 0 }} $</span>
-                                        </li>
-                                        <li><span>الإجمالي</span><span id="rentalGrand">-</span></li>
+                                        <li><span>قيمة الإيداع (تأمين)</span><span>{{ $equipment->deposit_amount }}
+                                                $</span></li>
+                                        <hr>
+                                        <li><span>الإجمالي النهائي</span><span id="rentalGrand">-</span></li>
                                     </ul>
 
                                     <button class="uk-button uk-button-large uk-width-1-1" type="submit">
                                         <span>استئجار الآن</span>
-                                        <img class="makos" src="{{ asset('assets/home/img/icons/arrow.svg') }}"
-                                            alt="arrow" data-uk-svg>
                                     </button>
                                 </div>
                             </form>
+
+
                         </div>
                     </div>
 
@@ -318,6 +312,31 @@
                 endInput.addEventListener('change', updatePrices);
                 typeSelect.addEventListener('change', updatePrices);
             });
+        </script>
+        <script>
+            const startDateInput = document.getElementById('start_date');
+            const endDateInput = document.getElementById('end_date');
+            const rateSelect = document.getElementById('rental_rate_type');
+            const deposit = {{ $equipment->deposit_amount ?? 0 }};
+
+            function calculatePrice() {
+                const start = new Date(startDateInput.value);
+                const end = new Date(endDateInput.value);
+                const rate = parseFloat(rateSelect.options[rateSelect.selectedIndex]?.getAttribute('data-price') || 0);
+
+                if (start && end && end > start && rate > 0) {
+                    const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+                    const totalRent = days * rate;
+
+                    document.getElementById('rentalDays').innerText = "المدة بالأيام : " + days;
+                    document.getElementById('rentalTotal').innerText = totalRent.toFixed(2) + " $";
+                    document.getElementById('rentalGrand').innerText = (totalRent + deposit).toFixed(2) + " $";
+                }
+            }
+
+            startDateInput.addEventListener('change', calculatePrice);
+            endDateInput.addEventListener('change', calculatePrice);
+            rateSelect.addEventListener('change', calculatePrice);
         </script>
     @endpush
 

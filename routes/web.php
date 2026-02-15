@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\FacebookController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\Equipment\EquipmentsController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\FrontBookingController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OwnerEquipmentController;
 use App\Http\Controllers\User\UserProfileController;
@@ -82,6 +83,14 @@ Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallba
 
 Route::get('auth/facebook', [FacebookController::class, 'redirectToFacebook'])->name('facebook.login');
 Route::get('auth/facebook/callback', [FacebookController::class, 'handleFacebookCallback']);
+
+
+
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/bookings/store', [FrontBookingController::class, 'store'])->name('bookings.store');
+});
+
 
 
 require __DIR__ . '/auth.php';
