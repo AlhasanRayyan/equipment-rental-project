@@ -4,10 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use App\Models\Invoice;
+use Illuminate\Database\Eloquent\Builder;
+use App\Models\Review;
+
+
 
 class Booking extends Model
 {
-    use SoftDeletes;
+    use HasFactory,  SoftDeletes;
 
     protected $fillable = [
         'equipment_id',
@@ -44,4 +51,17 @@ class Booking extends Model
     {
         return $this->belongsTo(User::class, 'owner_id');
     }
+    public function invoice(): HasOne
+    {
+        return $this->hasOne(Invoice::class, 'booking_id');
+    }
+    public function scopeCompleted(Builder $query): Builder
+    {
+        return $query->where('booking_status', 'completed');
+    }
+    public function review(): HasOne
+    {
+        return $this->hasOne(Review::class, 'booking_id');
+    }
+   
 }

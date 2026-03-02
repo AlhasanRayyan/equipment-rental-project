@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin; // تأكد من هذا السطر
 use App\Http\Controllers\Controller;
 use App\Models\Booking; // استدعاء الموديل
 use Illuminate\Http\Request;
+use App\Notifications\AppAlertNotification;
+use App\Services\NotificationService;
 
 class BookingController extends Controller
 {
@@ -46,22 +48,55 @@ class BookingController extends Controller
 
     public function confirm(Booking $booking)
     {
+        $booking->load(['equipment', 'renter']);
+
         $booking->update([
             'booking_status' => 'confirmed',
             'confirmed_at'   => now(),
         ]);
+
+NotificationService::bookingConfirmed($booking, $booking->equipment);
+        // $booking->renter->notify(new AppAlertNotification(
+        //     kind: 'booking_confirmed',
+        //     title: 'تم تأكيد الحجز',
+        //     message: "تم تأكيد الحجز #{$booking->id} للمعدة: {$booking->equipment->name}",
+        //     url: route('admin.bookings.show', $booking->id),
+        //     meta: ['booking_id' => $booking->id]
+        // ));
+
         return back()->with('success', 'تم تأكيد الحجز.');
     }
-
     // ... باقي الدوال (activate, complete, cancel) تأكد أنها موجودة هنا
 
     public function cancel(Request $request, Booking $booking)
     {
+        $booking->load(['equipment', 'renter']);
+
         $booking->update([
             'booking_status' => 'cancelled',
             'cancelled_at'   => now(),
             'cancellation_reason' => $request->reason
         ]);
+
+       NotificationService::bookingCancelled($booking, $booking->equipment, $request->reason);
+        // // للمستأجر
+        // $booking->renter->notify(new AppAlertNotification(
+        //     kind: 'booking_cancelled',
+        //     title: 'تم إلغاء الحجز',
+        //     message: "تم إلغاء الحجز #{$booking->id}",
+        //     url: route('admin.bookings.show', $booking->id),
+        //     meta: ['booking_id' => $booking->id]
+        // ));
+
+        // // للمالك (اختياري)
+        // $booking->owner->notify(new AppAlertNotification(
+        //     kind: 'booking_cancelled',
+        //     title: 'تم إلغاء حجز',
+        //     message: "تم إلغاء حجز #{$booking->id} على المعدة {$booking->equipment->name}",
+        //     url: route('admin.bookings.show', $booking->id),
+        //     meta: ['booking_id' => $booking->id]
+        // ));
+
         return back()->with('success', 'تم إلغاء الحجز.');
     }
 

@@ -1,10 +1,16 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Equipment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\AppAlertNotification;
+use App\Models\User;
+use App\Services\NotificationService;
+
+
 
 class FrontBookingController extends Controller
 {
@@ -25,13 +31,13 @@ class FrontBookingController extends Controller
         $start = new \DateTime($request->start_date);
         $end = new \DateTime($request->end_date);
         $days = $start->diff($end)->days;
-        if($days == 0) $days = 1;
+        if ($days == 0) $days = 1;
 
         $rate = $equipment->getRateByType($request->rental_rate_type);
         $totalCost = $days * $rate;
 
         // 3. إنشاء الحجز
-        Booking::create([
+        $booking =  Booking::create([
             'equipment_id' => $equipment->id,
             'renter_id' => Auth::id(), // المستخدم الحالي
             'owner_id' => $equipment->owner_id,
@@ -45,6 +51,28 @@ class FrontBookingController extends Controller
             'booking_status' => 'pending',
             'pickup_location' => $request->pickup_location,
         ]);
+
+        NotificationService::bookingRequest($booking, $equipment);
+
+        // $equipment->owner->notify(new AppAlertNotification(
+        //     kind: 'booking_request',
+        //     title: 'طلب حجز جديد',
+        //     message: "وصل طلب حجز جديد للمعدة: {$equipment->name} (حجز #{$booking->id})",
+        //     url: route('admin.bookings.show', $booking->id),
+        //     meta: ['booking_id' => $booking->id, 'equipment_id' => $equipment->id]
+        // ));
+
+        // // للأدمن
+        // User::where('role', 'admin')->get()->each(
+        //     fn($admin) =>
+        //     $admin->notify(new AppAlertNotification(
+        //         kind: 'booking_request',
+        //         title: 'حجز جديد في النظام',
+        //         message: "تم إنشاء حجز جديد #{$booking->id} على {$equipment->name}",
+        //         url: route('admin.bookings.show', $booking->id),
+        //         meta: ['booking_id' => $booking->id]
+        //     ))
+        // );
 
         return back()->with('success', 'تم إرسال طلب الحجز بنجاح، بانتظار موافقة المالك.');
     }

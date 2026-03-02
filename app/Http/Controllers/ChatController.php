@@ -8,7 +8,9 @@ use App\Models\Message;
 use App\Models\Equipment; // قد تحتاجها عند بدء محادثة جديدة مرتبطة بمعدة
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\AppAlertNotification;
 use Illuminate\Validation\Rule;
+use App\Services\NotificationService;
 
 class ChatController extends Controller
 {
@@ -19,19 +21,19 @@ class ChatController extends Controller
 
         // جلب المحادثات التي يكون المستخدم الحالي إما المالك أو المستأجر فيها
         $conversations = Conversation::where('owner_id', $user->id)
-                                    ->orWhere('renter_id', $user->id)
-                                    ->orderByDesc('last_message_at') // ترتيب حسب آخر رسالة
-                                    ->with(['owner', 'renter', 'equipment', 'messages' => function($q) {
-                                        $q->latest()->take(1); // جلب آخر رسالة لكل محادثة
-                                    }])
-                                    ->get();
+            ->orWhere('renter_id', $user->id)
+            ->orderByDesc('last_message_at') // ترتيب حسب آخر رسالة
+            ->with(['owner', 'renter', 'equipment', 'messages' => function ($q) {
+                $q->latest()->take(1); // جلب آخر رسالة لكل محادثة
+            }])
+            ->get();
 
         // حساب الرسائل غير المقروءة لكل محادثة
         $conversations->each(function ($conversation) use ($user) {
             $conversation->unread_messages_count = $conversation->messages()
-                                                                ->where('is_read', false)
-                                                                ->where('receiver_id', $user->id) // الرسائل التي استلمها المستخدم ولم يقرأها
-                                                                ->count();
+                ->where('is_read', false)
+                ->where('receiver_id', $user->id) // الرسائل التي استلمها المستخدم ولم يقرأها
+                ->count();
             // أضف المستخدم الآخر كـ attribute للمحادثة لتسهيل الوصول إليه في الفرونت إند
             $conversation->append('other_user');
         });
@@ -54,9 +56,9 @@ class ChatController extends Controller
 
         // تحديد جميع رسائل الطرف الآخر كمقروءة عند فتح المحادثة
         $conversation->messages()
-                     ->where('receiver_id', $user->id)
-                     ->where('is_read', false)
-                     ->update(['is_read' => true]);
+            ->where('receiver_id', $user->id)
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
 
         return response()->json($messages);
     }
@@ -87,6 +89,13 @@ class ChatController extends Controller
             'message_type' => 'text', // أو 'attachment' إذا كنت ستدعم المرفقات
             // 'attachment_url' => '', // سيتم تحديثه إذا كان هناك مرفق
         ]);
+        NotificationService::newMessage(
+            conversation: $conversation,
+            receiver: $receiver,
+            sender: $user,
+            messageId: $message->id
+        );
+
 
         // // إذا كان فيه مرفق (أتركها معلقة حالياً إذا لم تكن تدعمها الآن)
         // if ($request->hasFile('attachment')) {
@@ -128,11 +137,11 @@ class ChatController extends Controller
 
         // البحث عن محادثة موجودة بين هذين المستخدمين ولنفس المعدة (إذا وجدت)
         $conversation = Conversation::where('owner_id', $ownerId)
-                                    ->where('renter_id', $renterId)
-                                    ->when($request->equipment_id, function ($query, $equipmentId) {
-                                        $query->where('equipment_id', $equipmentId);
-                                    })
-                                    ->first();
+            ->where('renter_id', $renterId)
+            ->when($request->equipment_id, function ($query, $equipmentId) {
+                $query->where('equipment_id', $equipmentId);
+            })
+            ->first();
 
         if (!$conversation) {
             // إذا لم توجد محادثة، نقوم بإنشاء واحدة جديدة
@@ -161,7 +170,7 @@ class ChatController extends Controller
     // }
 
 
-    
+
     public function getConversationDetails(Conversation $conversation)
     {
         $user = Auth::user();

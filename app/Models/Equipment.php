@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder; // لاستخدام الـ scope
 use Illuminate\Database\Eloquent\Casts\Attribute; // لتحديد Accessor و Mutator بشكل حديث
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Equipment extends Model
 {
     use HasFactory,  SoftDeletes;
@@ -128,7 +129,7 @@ class Equipment extends Model
     protected function distance(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->attributes['distance'] ?? null, // Default to null if not loaded
+            get: fn() => $this->attributes['distance'] ?? null, // Default to null if not loaded
         );
     }
 
@@ -192,10 +193,10 @@ class Equipment extends Model
             $longitude,
             $latitude,
         ])
-        ->whereNotNull('location_latitude')
-        ->whereNotNull('location_longitude')
-        ->having('distance', '<', $radiusKm)
-        ->orderBy('distance');
+            ->whereNotNull('location_latitude')
+            ->whereNotNull('location_longitude')
+            ->having('distance', '<', $radiusKm)
+            ->orderBy('distance');
     }
 
     // Relationships
@@ -262,4 +263,6 @@ class Equipment extends Model
     {
         return $this->hasMany(UserFavorite::class, 'equipment_id');
     }
+
+  
 }

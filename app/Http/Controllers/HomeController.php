@@ -21,7 +21,7 @@ class HomeController extends Controller
         // $contactPhone    = AdminSetting::where('setting_key', 'contact_phone')->first()->setting_value ?? '+970 59 723 4892';
         // $officeHours     = AdminSetting::where('setting_key', 'office_hours')->first()->setting_value ?? 'السبت - الخميس ( 8ص - 6م)';
         // $contactEmail    = AdminSetting::where('setting_key', 'contact_email')->first()->setting_value ?? 'rentals@my-domain.net';
-        // $siteDescription = AdminSetting::where('setting_key', 'site_description')->first()->setting_value ?? 'منصة تتيح للمستخدمين خدمات من تأجير واستئجار معدات بجميع أنواعها وبأسعار مناسبة';
+        $siteDescription = AdminSetting::where('setting_key', 'site_description')->first()->setting_value ?? 'منصة تتيح للمستخدمين خدمات من تأجير واستئجار معدات بجميع أنواعها وبأسعار مناسبة';
 
         return view('home', compact(
             'equipmentCategories',
@@ -30,7 +30,7 @@ class HomeController extends Controller
             // 'contactPhone',
             // 'officeHours',
             // 'contactEmail',
-            // 'siteDescription'
+            'siteDescription'
         ));
     }
 

@@ -2,61 +2,106 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Notification;
 use App\Models\User;
 use App\Models\Booking;
 use App\Models\Equipment;
+use App\Notifications\GenericDatabaseNotification;
 
 class NotificationSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        // Ensure dependencies exist: users, bookings, equipment
-        if (User::count() === 0) {
-            $this->call(UserSeeder::class);
-        }
-        if (Booking::count() === 0) {
-            $this->call(BookingSeeder::class);
-        }
-        if (Equipment::count() === 0) {
-            $this->call(EquipmentSeeder::class);
-        }
+        if (User::count() === 0) $this->call(UserSeeder::class);
+        if (Booking::count() === 0) $this->call(BookingSeeder::class);
+        if (Equipment::count() === 0) $this->call(EquipmentSeeder::class);
 
         $users = User::all();
-        $bookings = Booking::all();
+        $bookings = Booking::with(['renter','owner','equipment'])->get();
         $equipments = Equipment::all();
 
-        // Create general notifications for various users
+        $types = [
+            'booking_request',
+            'booking_confirmed',
+            'booking_cancelled',
+            'payment_received',
+            'payment_failed',
+            'refund_issued',
+            'new_message',
+            'equipment_approved',
+            'equipment_rejected',
+            'review_received',
+            'system_alert'
+        ];
+
+        // إشعارات عامة لكل مستخدم
         foreach ($users as $user) {
-            Notification::factory(rand(3, 8))->forUser($user)->create();
+            $count = rand(3, 8);
+            for ($i = 0; $i < $count; $i++) {
+                $kind = $types[array_rand($types)];
+                $user->notify(new GenericDatabaseNotification(
+                    kind: $kind,
+                    message: "إشعار تجريبي: {$kind}"
+                ));
+            }
         }
 
-        // Create specific booking-related notifications
+        // إشعارات مرتبطة بالحجوزات
         foreach ($bookings as $booking) {
-            // Renter gets confirmation/cancellation notifications
-            Notification::factory()->forUser($booking->renter)->forBooking($booking)->type('booking_confirmed')->create();
+            // للمستأجر
+            $booking->renter->notify(new GenericDatabaseNotification(
+                kind: 'booking_confirmed',
+                message: "تم تأكيد الحجز #{$booking->id} للمعدة {$booking->equipment->name}",
+                url: route('admin.bookings.show', $booking->id),
+                extra: ['booking_id' => $booking->id]
+            ));
+
             if (rand(0,1)) {
-                Notification::factory()->forUser($booking->renter)->forBooking($booking)->type('new_message')->unread()->create();
+                $booking->renter->notify(new GenericDatabaseNotification(
+                    kind: 'new_message',
+                    message: "لديك رسالة جديدة بخصوص الحجز #{$booking->id}",
+                    url: route('admin.bookings.show', $booking->id),
+                    extra: ['booking_id' => $booking->id]
+                ));
             }
 
-            // Owner gets request/payment notifications
-            Notification::factory()->forUser($booking->owner)->forBooking($booking)->type('booking_request')->unread()->create();
-            Notification::factory()->forUser($booking->owner)->forBooking($booking)->type('payment_received')->create();
+            // للمالك
+            $booking->owner->notify(new GenericDatabaseNotification(
+                kind: 'booking_request',
+                message: "طلب حجز جديد للمعدة {$booking->equipment->name} (حجز #{$booking->id})",
+                url: route('admin.bookings.show', $booking->id),
+                extra: ['booking_id' => $booking->id]
+            ));
+
+            $booking->owner->notify(new GenericDatabaseNotification(
+                kind: 'payment_received',
+                message: "تم استلام دفعة للحجز #{$booking->id}",
+                url: route('admin.bookings.show', $booking->id),
+                extra: ['booking_id' => $booking->id]
+            ));
         }
 
-        // Create some system alerts and expired notifications
-        Notification::factory(5)->type('system_alert')->create();
-        Notification::factory(3)->expired()->type('system_alert')->create();
-        Notification::factory(2)->type('equipment_approved')->forUser(User::where('role', 'user')->inRandomOrder()->first())->create([
-            'reference_id' => $equipments->random()->id,
-        ]);
+        // system alerts
+        $randomUser = $users->random();
+        for ($i=0; $i<5; $i++) {
+            $randomUser->notify(new GenericDatabaseNotification(
+                kind: 'system_alert',
+                message: 'تنبيه نظام تجريبي'
+            ));
+        }
 
+        // equipment approved example
+        if ($equipments->count() > 0) {
+            $u = User::where('role','user')->inRandomOrder()->first() ?? $users->random();
+            $eq = $equipments->random();
 
-        $this->command->info('Notifications seeded!');
+            $u->notify(new GenericDatabaseNotification(
+                kind: 'equipment_approved',
+                message: "تمت الموافقة على المعدة {$eq->name}",
+                extra: ['equipment_id' => $eq->id]
+            ));
+        }
+
+        $this->command->info('Notifications seeded (Laravel database notifications)!');
     }
 }

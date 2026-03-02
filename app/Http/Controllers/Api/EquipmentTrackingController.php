@@ -6,9 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Models\EquipmentTracking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Equipment;
+use App\Models\User;
+use App\Notifications\EquipmentMovedNotification;
+use App\Notifications\AppAlertNotification;
+use  App\Services\NotificationService;
 
 class EquipmentTrackingController extends Controller
 {
+    // إعدادات الحركة
+    private float $moveThresholdKm = 0.05; // 50 متر = 0.05 كم
+    private int $cooldownMinutes = 5;          // لا تعيد نفس الإشعار لنفس المعدة خلال 5 دقائق
+
+
     /**
      * تخزين سجل تتبع جديد
      */
@@ -21,7 +31,7 @@ class EquipmentTrackingController extends Controller
             'longitude'     => 'required|numeric|between:-180,180',
             'speed'         => 'nullable|numeric|min:0',
             'battery_level' => 'nullable|numeric|between:0,100',
-            'status'        => 'required|string|in:online,offline,moving,idle,maintenance', // حسب الـ Enum عندك
+            'status'        => 'required|string|in:online,offline,moving,idle', // حسب الـ Enum عندك
 
             'start_time'    => 'nullable|date',
             'end_time'      => 'nullable|date|after_or_equal:start_time',
@@ -36,6 +46,10 @@ class EquipmentTrackingController extends Controller
         }
 
         try {
+            // قبل ما نخزن: هات آخر نقطة (إذا موجودة)
+            $last = EquipmentTracking::where('equipment_id', $request->equipment_id)
+                ->latest('id')
+                ->first();
             // 2. إنشاء السجل في قاعدة البيانات
             $tracking = EquipmentTracking::create([
                 'equipment_id'  => $request->equipment_id,
@@ -47,7 +61,25 @@ class EquipmentTrackingController extends Controller
                 'start_time'    => $request->start_time,
                 'end_time'      => $request->end_time,
                 'duration'      => $request->duration,
-            ]);
+            ]);  // 3) بعد التخزين: فحص الحركة + إشعار (بدون ما نغير response)
+            if ($last) {
+                $distanceKm = $this->haversineKm(
+                    (float)$last->latitude,
+                    (float)$last->longitude,
+                    (float)$tracking->latitude,
+                    (float)$tracking->longitude
+                );
+
+                if ($distanceKm >= $this->moveThresholdKm) {
+                    $this->notifyIfNotSpam(
+                        equipmentId: (int)$request->equipment_id,
+                        latitude: (float)$tracking->latitude,
+                        longitude: (float)$tracking->longitude,
+                        speed: (float)($tracking->speed ?? 0),
+                        distanceKm: (float)$distanceKm
+                    );
+                }
+            }
 
             // 3. إرجاع استجابة نجاح
             return response()->json([
@@ -62,5 +94,80 @@ class EquipmentTrackingController extends Controller
                 'error'   => $e->getMessage()
             ], 500);
         }
+    }
+    /**
+     * إرسال إشعار عند الحركة + cooldown لمنع التكرار
+     */
+    private function notifyIfNotSpam(int $equipmentId, float $latitude, float $longitude, float $speed, float $distanceKm): void
+    {
+        $equipment = Equipment::with('owner')->find($equipmentId);
+        if (!$equipment || !$equipment->owner) return;
+
+        //  cooldown: لا تعيدي نفس إشعار الحركة لنفس المعدة خلال X دقائق
+        $recent = $equipment->owner->notifications()
+            ->where('created_at', '>=', now()->subMinutes($this->cooldownMinutes))
+            ->where('data->kind', 'equipment_moved')
+            ->where('data->equipment_id', $equipmentId)
+            ->exists();
+
+        if ($recent) return;
+
+        //  سطر واحد… بس السيرفس رح يرسل للمالك + للأدمن كمان
+        NotificationService::equipmentMoved(
+            equipment: $equipment,
+            distanceKm: $distanceKm,
+            lat: $latitude,
+            lng: $longitude,
+            speed: $speed
+        );
+    }
+
+    //  للمالك
+    // $equipment->owner->notify(new AppAlertNotification(
+    //     kind: 'equipment_moved',
+    //     title: 'تحذير حركة',
+    //     message: "تحركت المعدة {$equipment->name} لمسافة تقريباً " . round($distanceKm, 3) . " كم",
+    //     url: route('read_notify'),
+    //     meta: [
+    //         'equipment_id' => $equipment->id,
+    //         'lat' => $latitude,
+    //         'lng' => $longitude,
+    //         'speed' => $speed,
+    //         'distance_km' => $distanceKm,
+    //     ]
+    // ));
+
+    //  للأدمنز
+    // $admins = User::where('role', 'admin')->get();
+    // foreach ($admins as $admin) {
+    //     $admin->notify(new AppAlertNotification(
+    //         kind: 'equipment_moved',
+    //         title: 'تحذير حركة (GPS)',
+    //         message: "تحركت المعدة {$equipment->name} لمسافة ~ " . round($distanceKm, 3) . " كم",
+    //         url: route('read_notify'),
+    //         meta: [
+    //             'equipment_id' => $equipment->id,
+    //             'lat' => $latitude,
+    //             'lng' => $longitude,
+    //             'speed' => $speed,
+    //             'distance_km' => $distanceKm,
+    //         ]
+    //     ));
+    // }
+
+    private function haversineKm(float $lat1, float $lon1, float $lat2, float $lon2): float
+    {
+        $earth = 6371; // km
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2)
+            + cos(deg2rad($lat1)) * cos(deg2rad($lat2))
+            * sin($dLon / 2) * sin($dLon / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earth * $c; // KM
     }
 }
