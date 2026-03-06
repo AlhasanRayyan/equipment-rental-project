@@ -106,7 +106,7 @@ class HomeController extends Controller
         }
     }
 
-    // ================= عن الموقع =================
+    //  عن الموقع
     public function about()
     {
         $usersCount      = \App\Models\User::count();
@@ -189,7 +189,7 @@ class HomeController extends Controller
 
     }
 
-    // ================= تواصل معنا - عرض الصفحة =================
+    //  تواصل معنا - عرض الصفحة
     public function contact()
     {
         $keys = [
@@ -222,7 +222,7 @@ class HomeController extends Controller
         ]);
     }
 
-    // ================= تواصل معنا - استلام الفورم =================
+    //  تواصل معنا - استلام الفورم
     public function sendContact(Request $request)
     {
         $user = Auth::user(); // مضمون لأنه داخل middleware auth

@@ -86,12 +86,7 @@ Route::middleware('auth')->group(function () {
         $n->markAsRead();
         return back();
     })->name('notifications.read');
-    // Route::get('read-notify/{id}', function ($id) {
-    //     $n = Auth::user()->notifications()->findOrFail($id);
-    //     $n->markAsRead();
-    //     // لو عندك url بالداتا:
-    //     return isset($n->data['url']) ? redirect($n->data['url']) : back();
-    // })->name('read');
+
 
     Route::delete('delete-notify/{id}', function ($id) {
         $n = Auth::user()->notifications()->findOrFail($id);

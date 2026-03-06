@@ -16,7 +16,7 @@ class FrontBookingController extends Controller
 {
     public function store(Request $request)
     {
-        // 1. التحقق من صحة البيانات
+        //  التحقق من صحة البيانات
         $request->validate([
             'equipment_id' => 'required|exists:equipment,id',
             'rental_rate_type' => 'required|in:daily,weekly,monthly',
@@ -27,7 +27,7 @@ class FrontBookingController extends Controller
 
         $equipment = Equipment::findOrFail($request->equipment_id);
 
-        // 2. حساب السعر في السيرفر (للأمان، لا نعتمد على سعر الجافاسكربت)
+        //  حساب السعر في السيرفر
         $start = new \DateTime($request->start_date);
         $end = new \DateTime($request->end_date);
         $days = $start->diff($end)->days;
@@ -36,7 +36,7 @@ class FrontBookingController extends Controller
         $rate = $equipment->getRateByType($request->rental_rate_type);
         $totalCost = $days * $rate;
 
-        // 3. إنشاء الحجز
+        //  إنشاء الحجز
         $booking =  Booking::create([
             'equipment_id' => $equipment->id,
             'renter_id' => Auth::id(), // المستخدم الحالي
@@ -54,25 +54,7 @@ class FrontBookingController extends Controller
 
         NotificationService::bookingRequest($booking, $equipment);
 
-        // $equipment->owner->notify(new AppAlertNotification(
-        //     kind: 'booking_request',
-        //     title: 'طلب حجز جديد',
-        //     message: "وصل طلب حجز جديد للمعدة: {$equipment->name} (حجز #{$booking->id})",
-        //     url: route('admin.bookings.show', $booking->id),
-        //     meta: ['booking_id' => $booking->id, 'equipment_id' => $equipment->id]
-        // ));
-
-        // // للأدمن
-        // User::where('role', 'admin')->get()->each(
-        //     fn($admin) =>
-        //     $admin->notify(new AppAlertNotification(
-        //         kind: 'booking_request',
-        //         title: 'حجز جديد في النظام',
-        //         message: "تم إنشاء حجز جديد #{$booking->id} على {$equipment->name}",
-        //         url: route('admin.bookings.show', $booking->id),
-        //         meta: ['booking_id' => $booking->id]
-        //     ))
-        // );
+      
 
         return back()->with('success', 'تم إرسال طلب الحجز بنجاح، بانتظار موافقة المالك.');
     }

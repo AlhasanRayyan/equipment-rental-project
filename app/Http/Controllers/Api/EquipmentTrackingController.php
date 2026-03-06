@@ -24,7 +24,7 @@ class EquipmentTrackingController extends Controller
      */
     public function store(Request $request)
     {
-        // 1. التحقق من صحة البيانات المرسلة (Validation)
+        //  التحقق من صحة البيانات المرسلة (Validation)
         $validator = Validator::make($request->all(), [
             'equipment_id'  => 'required|exists:equipment,id', // يجب أن يكون المعدّة موجودة في جدول equipment
             'latitude'      => 'required|numeric|between:-90,90',
@@ -46,11 +46,11 @@ class EquipmentTrackingController extends Controller
         }
 
         try {
-            // قبل ما نخزن: هات آخر نقطة (إذا موجودة)
+            // قبل ما نخزن: هات آخر نقطة
             $last = EquipmentTracking::where('equipment_id', $request->equipment_id)
                 ->latest('id')
                 ->first();
-            // 2. إنشاء السجل في قاعدة البيانات
+            //  إنشاء السجل في قاعدة البيانات
             $tracking = EquipmentTracking::create([
                 'equipment_id'  => $request->equipment_id,
                 'latitude'      => $request->latitude,
@@ -61,7 +61,8 @@ class EquipmentTrackingController extends Controller
                 'start_time'    => $request->start_time,
                 'end_time'      => $request->end_time,
                 'duration'      => $request->duration,
-            ]);  // 3) بعد التخزين: فحص الحركة + إشعار (بدون ما نغير response)
+            ]);
+              //  بعد التخزين: فحص الحركة + إشعار
             if ($last) {
                 $distanceKm = $this->haversineKm(
                     (float)$last->latitude,
@@ -81,7 +82,7 @@ class EquipmentTrackingController extends Controller
                 }
             }
 
-            // 3. إرجاع استجابة نجاح
+            //  إرجاع استجابة نجاح
             return response()->json([
                 'status'  => 'success',
                 'message' => 'Tracking data recorded successfully',
@@ -103,7 +104,7 @@ class EquipmentTrackingController extends Controller
         $equipment = Equipment::with('owner')->find($equipmentId);
         if (!$equipment || !$equipment->owner) return;
 
-        //  cooldown: لا تعيدي نفس إشعار الحركة لنفس المعدة خلال X دقائق
+        //   لا تعيدي نفس إشعار الحركة لنفس المعدة خلال X دقائق
         $recent = $equipment->owner->notifications()
             ->where('created_at', '>=', now()->subMinutes($this->cooldownMinutes))
             ->where('data->kind', 'equipment_moved')
@@ -121,39 +122,6 @@ class EquipmentTrackingController extends Controller
             speed: $speed
         );
     }
-
-    //  للمالك
-    // $equipment->owner->notify(new AppAlertNotification(
-    //     kind: 'equipment_moved',
-    //     title: 'تحذير حركة',
-    //     message: "تحركت المعدة {$equipment->name} لمسافة تقريباً " . round($distanceKm, 3) . " كم",
-    //     url: route('read_notify'),
-    //     meta: [
-    //         'equipment_id' => $equipment->id,
-    //         'lat' => $latitude,
-    //         'lng' => $longitude,
-    //         'speed' => $speed,
-    //         'distance_km' => $distanceKm,
-    //     ]
-    // ));
-
-    //  للأدمنز
-    // $admins = User::where('role', 'admin')->get();
-    // foreach ($admins as $admin) {
-    //     $admin->notify(new AppAlertNotification(
-    //         kind: 'equipment_moved',
-    //         title: 'تحذير حركة (GPS)',
-    //         message: "تحركت المعدة {$equipment->name} لمسافة ~ " . round($distanceKm, 3) . " كم",
-    //         url: route('read_notify'),
-    //         meta: [
-    //             'equipment_id' => $equipment->id,
-    //             'lat' => $latitude,
-    //             'lng' => $longitude,
-    //             'speed' => $speed,
-    //             'distance_km' => $distanceKm,
-    //         ]
-    //     ));
-    // }
 
     private function haversineKm(float $lat1, float $lon1, float $lat2, float $lon2): float
     {
