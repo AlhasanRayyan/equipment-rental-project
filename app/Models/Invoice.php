@@ -142,8 +142,8 @@ class Invoice extends Model
         $prefix = 'INV-';
         $yearMonth = Carbon::now()->format('Ym');
         $lastInvoice = static::where('invoice_number', 'like', $prefix . $yearMonth . '%')
-                             ->orderBy('invoice_number', 'desc')
-                             ->first();
+            ->orderBy('invoice_number', 'desc')
+            ->first();
 
         $lastNumber = 0;
         if ($lastInvoice) {
@@ -163,8 +163,8 @@ class Invoice extends Model
     public function scopeOverdue(Builder $query): void
     {
         $query->where('status', 'issued')
-              ->whereNotNull('due_date')
-              ->where('due_date', '<', Carbon::today());
+            ->whereNotNull('due_date')
+            ->where('due_date', '<', Carbon::today());
     }
 
     // Relationships
@@ -176,5 +176,15 @@ class Invoice extends Model
     public function booking(): BelongsTo
     {
         return $this->belongsTo(Booking::class, 'booking_id');
+    }
+
+    // توليد رقم الفاتورة تلقائيًا عند الإنشاء
+    protected static function booted()
+    {
+        static::creating(function ($invoice) {
+            if (empty($invoice->invoice_number)) {
+                $invoice->invoice_number = $invoice->generateInvoiceNumber();
+            }
+        });
     }
 }

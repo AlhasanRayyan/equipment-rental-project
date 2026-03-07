@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Admin; // تأكد من هذا السطر
 use App\Http\Controllers\Controller;
 use App\Models\Booking; // استدعاء الموديل
 use Illuminate\Http\Request;
-use App\Notifications\AppAlertNotification;
 use App\Services\NotificationService;
+use App\Models\Invoice;
 
 class BookingController extends Controller
 {
@@ -46,6 +46,19 @@ class BookingController extends Controller
         return view('dashboard.bookings.show', compact('booking'));
     }
 
+    // public function confirm(Booking $booking)
+    // {
+    //     $booking->load(['equipment', 'renter']);
+
+    //     $booking->update([
+    //         'booking_status' => 'confirmed',
+    //         'confirmed_at'   => now(),
+    //     ]);
+
+    //     NotificationService::bookingConfirmed($booking, $booking->equipment);
+
+    //     return back()->with('success', 'تم تأكيد الحجز.');
+    // }
     public function confirm(Booking $booking)
     {
         $booking->load(['equipment', 'renter']);
@@ -55,10 +68,27 @@ class BookingController extends Controller
             'confirmed_at'   => now(),
         ]);
 
-NotificationService::bookingConfirmed($booking, $booking->equipment);
+        $subtotal = (float) $booking->total_cost;
+        $taxRate = 0.16; // ضريبة
+        $taxAmount = $subtotal * $taxRate;
+        $totalAmount = $subtotal + $taxAmount;
 
+        Invoice::firstOrCreate(
+            ['booking_id' => $booking->id],
+            [
+                'invoice_number' => (new Invoice())->generateInvoiceNumber(),
+                'issue_date'     => now()->toDateString(),
+                'due_date'       => now()->addDays(7)->toDateString(),
+                'subtotal'       => $subtotal,
+                'tax_amount'     => $taxAmount,
+                'total_amount'   => $totalAmount,
+                'status'         => 'issued',
+            ]
+        );
 
-        return back()->with('success', 'تم تأكيد الحجز.');
+        NotificationService::bookingConfirmed($booking, $booking->equipment);
+
+        return back()->with('success', 'تم تأكيد الحجز وإنشاء الفاتورة بنجاح.');
     }
 
     public function cancel(Request $request, Booking $booking)
@@ -71,8 +101,8 @@ NotificationService::bookingConfirmed($booking, $booking->equipment);
             'cancellation_reason' => $request->reason
         ]);
 
-       NotificationService::bookingCancelled($booking, $booking->equipment, $request->reason);
-   
+        NotificationService::bookingCancelled($booking, $booking->equipment, $request->reason);
+
 
         return back()->with('success', 'تم إلغاء الحجز.');
     }

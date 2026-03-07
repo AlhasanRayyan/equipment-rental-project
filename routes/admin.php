@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ComplaintController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EquipmentCategoryController;
 use App\Http\Controllers\Admin\EquipmentController;
+use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -135,6 +136,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::delete('/{id}/force-delete', [BookingController::class, 'forceDelete'])->name('forceDelete');
         Route::post('/restore-all', [BookingController::class, 'restoreAll'])->name('restoreAll');
         Route::delete('/force-delete-all', [BookingController::class, 'forceDeleteAll'])->name('forceDeleteAll');
+    });
+
+    // الفواتير
+    Route::prefix('invoices')->name('invoices.')->group(function () {
+        Route::get('/', [InvoiceController::class, 'index'])->name('index');
+        Route::get('/{invoice}', [InvoiceController::class, 'show'])->name('show');
+        Route::get('/{invoice}/download', [InvoiceController::class, 'download'])->name('download');
     });
 
 });

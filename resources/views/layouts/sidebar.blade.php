@@ -95,7 +95,12 @@
         </a>
     </li>
 
-
+<li class="nav-item {{ request()->routeIs('admin.invoices.*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ route('admin.invoices.index') }}">
+        <i class="fas fa-file-invoice-dollar"></i>
+        <span>الفواتير</span>
+    </a>
+</li>
     <!-- إدارة الشكاوى والاستفسارات -->
     <li class="nav-item {{ Request::is('admin/complaints*') ? 'active' : '' }}">
         <a class="nav-link" href="{{ route('admin.complaints.index') }}">

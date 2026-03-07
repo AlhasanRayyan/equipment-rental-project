@@ -63,5 +63,5 @@ class Booking extends Model
     {
         return $this->hasOne(Review::class, 'booking_id');
     }
-   
+    
 }
