@@ -33,7 +33,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
         Route::delete('/trash/{id}/force-delete', [UserController::class, 'forceDelete'])->name('forceDelete');
         Route::delete('/trash/force-delete-all', [UserController::class, 'forceDeleteAll'])->name('forceDeleteAll');
-
     });
 
     // مسارات إدارة المعدات (مراجعة الإعلانات والموافقة)
@@ -55,7 +54,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/restore-all', [EquipmentController::class, 'restoreAll'])->name('restoreAll');
         Route::delete('/{id}/force-delete', [EquipmentController::class, 'forceDelete'])->name('forceDelete');
         Route::delete('/force-delete-all', [EquipmentController::class, 'forceDeleteAll'])->name('forceDeleteAll');
-
     });
 
     // مسارات إدارة الشكاوى والاستفسارات
@@ -113,9 +111,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/restore-all', [EquipmentCategoryController::class, 'restoreAll'])->name('restoreAll');
         Route::delete('/{id}/force-delete', [EquipmentCategoryController::class, 'forceDelete'])->name('forceDelete');
         Route::delete('/force-delete-all', [EquipmentCategoryController::class, 'forceDeleteAll'])->name('forceDeleteAll');
-
     });
-// ادارة الحجوزات
+    // ادارة الحجوزات
     Route::prefix('bookings')->name('bookings.')->group(function () {
         Route::get('/', [BookingController::class, 'index'])->name('index');
         // لازم يكون قبل رابط التفاصيل عشان ما يعطيني ايررورر 404 انتبهي
@@ -136,5 +133,30 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/restore-all', [BookingController::class, 'restoreAll'])->name('restoreAll');
         Route::delete('/force-delete-all', [BookingController::class, 'forceDeleteAll'])->name('forceDeleteAll');
     });
+});
 
+
+
+// --- مسارات المالك (Owner Dashboard) ---
+
+
+Route::middleware(['auth'])->prefix('owner')->name('owner.')->group(function () {
+
+    // إدارة المعدات الخاصة بالمالك
+    // Route::prefix('equipment')->name('equipment.')->group(function () {
+    //     Route::get('/', [EquipmentController::class, 'index'])->name('index');
+    //     Route::get('/create', [EquipmentController::class, 'create'])->name('create');
+    //     Route::post('/store', [EquipmentController::class, 'store'])->name('store');
+    // });
+
+    // إدارة الحجوزات القادمة للمالك (فقط حجوزات معداته)
+    Route::prefix('bookings')->name('bookings.')->group(function () {
+        Route::get('/', [App\Http\Controllers\Owner\BookingController::class, 'index'])->name('index');
+        Route::get('/{booking}', [App\Http\Controllers\Owner\BookingController::class, 'show'])->name('show');
+
+        // إجراءات المالك على الحجز
+        Route::post('/{booking}/confirm', [App\Http\Controllers\Owner\BookingController::class, 'confirm'])->name('confirm');
+        Route::post('/{booking}/cancel', [App\Http\Controllers\Owner\BookingController::class, 'cancel'])->name('cancel');
+        Route::post('/{booking}/complete', [App\Http\Controllers\Owner\BookingController::class, 'complete'])->name('complete');
+    });
 });
