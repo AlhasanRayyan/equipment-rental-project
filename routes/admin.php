@@ -8,12 +8,14 @@ use App\Http\Controllers\Admin\EquipmentCategoryController;
 use App\Http\Controllers\Admin\EquipmentController;
 use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\TrackingController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
 
     // مسار لوحة التحكم الرئيسية (لوحة تحكم المشرف)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');
 
     // مسارات إدارة المستخدمين
     Route::prefix('users')->name('users.')->group(function () {

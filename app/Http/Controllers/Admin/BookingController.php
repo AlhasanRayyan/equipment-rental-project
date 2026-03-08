@@ -46,19 +46,6 @@ class BookingController extends Controller
         return view('dashboard.bookings.show', compact('booking'));
     }
 
-    // public function confirm(Booking $booking)
-    // {
-    //     $booking->load(['equipment', 'renter']);
-
-    //     $booking->update([
-    //         'booking_status' => 'confirmed',
-    //         'confirmed_at'   => now(),
-    //     ]);
-
-    //     NotificationService::bookingConfirmed($booking, $booking->equipment);
-
-    //     return back()->with('success', 'تم تأكيد الحجز.');
-    // }
     public function confirm(Booking $booking)
     {
         $booking->load(['equipment', 'renter']);

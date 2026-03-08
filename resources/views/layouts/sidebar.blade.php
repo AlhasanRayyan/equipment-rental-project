@@ -81,6 +81,13 @@
             <i class="fas fa-fw fa-hard-hat"></i>
             <span>إدارة المعدات</span></a>
     </li>
+
+    <li class="nav-item {{ request()->routeIs('admin.tracking.*') ? 'active' : '' }}">
+    <a class="nav-link" href="{{ route('admin.tracking.index') }}">
+        <i class="fas fa-map-marked-alt"></i>
+        <span>تتبع المعدات</span>
+    </a>
+</li>
     {{--
     <li class="nav-item">
         <a class="nav-link" href="{{ route('admin.equipment.stats') }}">

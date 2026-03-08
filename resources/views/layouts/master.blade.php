@@ -189,7 +189,6 @@
         .logout-form {
             margin: 0;
         }
-
     </style>
 
     @stack('styles')
@@ -220,6 +219,8 @@
                                         href="{{ route('categories') }}">الفئات</a></li>
                                 <li class="{{ request()->routeIs('equipments*') ? 'uk-active' : '' }}"><a
                                         href="{{ route('equipments') }}">المعدات</a></li>
+                                <li class="{{ request()->routeIs('tracking.*') ? 'uk-active' : '' }}"><a
+                                        href="{{ route('tracking.index') }}">تتبع معداتي</a></li>
                                 <li class="{{ request()->routeIs('about') ? 'uk-active' : '' }}"><a
                                         href="{{ route('about') }}">عن المنصة</a></li>
                                 <li class="{{ request()->routeIs('contact') ? 'uk-active' : '' }}"><a

@@ -264,5 +264,5 @@ class Equipment extends Model
         return $this->hasMany(UserFavorite::class, 'equipment_id');
     }
 
-  
+
 }

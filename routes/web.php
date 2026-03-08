@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\TrackingController ;
+
 
 
 include 'admin.php';
@@ -46,6 +48,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::delete('/favorites/{favorite}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
     Route::post('/favorites/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle'); // للتبديل من أي صفحة
+
+    // ggogle maps
+        Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');
+
 });
 
 // للأسئلة الشائعة
