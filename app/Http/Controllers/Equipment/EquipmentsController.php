@@ -98,7 +98,7 @@ class EquipmentsController extends Controller
 
         $equipment->update($validated);
 
-        // ✅ إذا رفع صور جديدة
+        // إذا رفع صور جديدة
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $imageFile) {
                 $path = $imageFile->store('equipments', 'public');

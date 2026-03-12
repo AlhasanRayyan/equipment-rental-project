@@ -38,6 +38,7 @@ class Equipment extends Model
         'location_latitude',
         'location_longitude',
         'location_address',
+        'position',
         'status',
         'is_approved_by_admin',
         'has_gps_tracker',
@@ -65,6 +66,15 @@ class Equipment extends Model
         'total_reviews' => 'integer',
         'last_maintenance_date' => 'date',
         'status' => 'string', // Enum in DB, treated as string in application
+    ];
+
+    public const POSITION_LABELS = [
+        'north_gaza'    => 'شمال غزة',
+        'gaza_city'     => 'غزة',
+        'middle_area'   => 'الوسطى',
+        'deir_al_balah' => 'دير البلح',
+        'khan_younis'   => 'خانيونس',
+        'rafah'         => 'رفح',
     ];
 
     // Accessors (Methods from classDiagram)
@@ -263,6 +273,4 @@ class Equipment extends Model
     {
         return $this->hasMany(UserFavorite::class, 'equipment_id');
     }
-
-
 }
