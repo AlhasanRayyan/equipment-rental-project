@@ -21,7 +21,7 @@ class HomeController extends Controller
         // $contactPhone    = AdminSetting::where('setting_key', 'contact_phone')->first()->setting_value ?? '+970 59 723 4892';
         // $officeHours     = AdminSetting::where('setting_key', 'office_hours')->first()->setting_value ?? 'السبت - الخميس ( 8ص - 6م)';
         // $contactEmail    = AdminSetting::where('setting_key', 'contact_email')->first()->setting_value ?? 'rentals@my-domain.net';
-        // $siteDescription = AdminSetting::where('setting_key', 'site_description')->first()->setting_value ?? 'منصة تتيح للمستخدمين خدمات من تأجير واستئجار معدات بجميع أنواعها وبأسعار مناسبة';
+        $siteDescription = AdminSetting::where('setting_key', 'site_description')->first()->setting_value ?? 'منصة تتيح للمستخدمين خدمات من تأجير واستئجار معدات بجميع أنواعها وبأسعار مناسبة';
 
         return view('home', compact(
             'equipmentCategories',
@@ -30,7 +30,7 @@ class HomeController extends Controller
             // 'contactPhone',
             // 'officeHours',
             // 'contactEmail',
-            // 'siteDescription'
+            'siteDescription'
         ));
     }
 
@@ -106,7 +106,7 @@ class HomeController extends Controller
         }
     }
 
-    // ================= عن الموقع =================
+    //  عن الموقع
     public function about()
     {
         $usersCount      = \App\Models\User::count();
@@ -189,7 +189,7 @@ class HomeController extends Controller
 
     }
 
-    // ================= تواصل معنا - عرض الصفحة =================
+    //  تواصل معنا - عرض الصفحة
     public function contact()
     {
         $keys = [
@@ -222,7 +222,7 @@ class HomeController extends Controller
         ]);
     }
 
-    // ================= تواصل معنا - استلام الفورم =================
+    //  تواصل معنا - استلام الفورم
     public function sendContact(Request $request)
     {
         $user = Auth::user(); // مضمون لأنه داخل middleware auth

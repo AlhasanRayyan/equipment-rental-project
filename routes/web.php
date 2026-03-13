@@ -11,6 +11,11 @@ use App\Http\Controllers\User\UserProfileController;
 use App\Models\Conversation;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\TrackingController ;
+
+
 
 include 'admin.php';
 
@@ -43,6 +48,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
     Route::delete('/favorites/{favorite}', [FavoriteController::class, 'destroy'])->name('favorites.destroy');
     Route::post('/favorites/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle'); // للتبديل من أي صفحة
+
+    // ggogle maps
+        Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');
+
 });
 
 // للأسئلة الشائعة
@@ -74,6 +83,40 @@ Route::middleware('auth')->group(function () {
         return view('chat.index');
     })->name('chat.index');
 
+    Route::get('read-notify', function () {
+        return view('dashboard.read_notify');
+    })->name('read_notify');
+
+    Route::put('notifications/{id}/read', function ($id) {
+        $n = Auth::user()->notifications()->findOrFail($id);
+        $n->markAsRead();
+        return back();
+    })->name('notifications.read');
+
+
+    Route::delete('delete-notify/{id}', function ($id) {
+        $n = Auth::user()->notifications()->findOrFail($id);
+        $n->delete();
+        return back();
+    })->name('delete');
+
+    Route::get('read-all-notify', function () {
+        Auth::user()->unreadNotifications->markAsRead();
+        return back();
+    })->name('readall');
+
+
+    // صفحة إشعارات المستخدم (Front)
+    Route::get('/my-notifications', [NotificationController::class, 'index'])->name('front.notifications.index');
+
+    // تعليم إشعار كمقروء
+    Route::put('/my-notifications/{id}/read', [NotificationController::class, 'read'])->name('front.notifications.read');
+
+    // حذف إشعار
+    Route::delete('/my-notifications/{id}', [NotificationController::class, 'destroy'])->name('front.notifications.destroy');
+
+    // تعليم الكل كمقروء
+    Route::put('/my-notifications/read-all', [NotificationController::class, 'readAll'])->name('front.notifications.readall');
 });
 
 

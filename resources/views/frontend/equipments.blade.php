@@ -177,7 +177,7 @@
                 @endforelse
             </div>
 
-        
+
         </div>
     </div>
 

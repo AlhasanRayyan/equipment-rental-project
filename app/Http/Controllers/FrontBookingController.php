@@ -1,16 +1,22 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\Equipment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\AppAlertNotification;
+use App\Models\User;
+use App\Services\NotificationService;
+
+
 
 class FrontBookingController extends Controller
 {
     public function store(Request $request)
     {
-        // 1. التحقق من صحة البيانات
+        //  التحقق من صحة البيانات
         $request->validate([
             'equipment_id' => 'required|exists:equipment,id',
             'rental_rate_type' => 'required|in:daily,weekly,monthly',
@@ -21,17 +27,17 @@ class FrontBookingController extends Controller
 
         $equipment = Equipment::findOrFail($request->equipment_id);
 
-        // 2. حساب السعر في السيرفر (للأمان، لا نعتمد على سعر الجافاسكربت)
+        //  حساب السعر في السيرفر
         $start = new \DateTime($request->start_date);
         $end = new \DateTime($request->end_date);
         $days = $start->diff($end)->days;
-        if($days == 0) $days = 1;
+        if ($days == 0) $days = 1;
 
         $rate = $equipment->getRateByType($request->rental_rate_type);
         $totalCost = $days * $rate;
 
-        // 3. إنشاء الحجز
-        Booking::create([
+        //  إنشاء الحجز
+        $booking =  Booking::create([
             'equipment_id' => $equipment->id,
             'renter_id' => Auth::id(), // المستخدم الحالي
             'owner_id' => $equipment->owner_id,
@@ -45,6 +51,10 @@ class FrontBookingController extends Controller
             'booking_status' => 'pending',
             'pickup_location' => $request->pickup_location,
         ]);
+
+        NotificationService::bookingRequest($booking, $equipment);
+
+      
 
         return back()->with('success', 'تم إرسال طلب الحجز بنجاح، بانتظار موافقة المالك.');
     }

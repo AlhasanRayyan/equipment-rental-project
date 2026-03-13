@@ -49,7 +49,7 @@ class EquipmentTracking extends Model
         'battery_level' => 'decimal:2', // 5, 2
         'status' => 'string', // Enum in DB, treated as string
         'start_time' => 'datetime',
-        'end_time' => 'datetime',  
+        'end_time' => 'datetime',
         'duration' => 'decimal:2',
         // 'timestamp' is implicitly covered by 'created_at'
     ];
@@ -120,18 +120,18 @@ class EquipmentTracking extends Model
      * Scope a query to only include recent tracking records (e.g., last 24 hours).
      * +scopeRecent() QueryBuilder
      */
-    public function scopeRecent(Builder $query): void
+    public function scopeRecent(Builder $query): Builder
     {
-        $query->where('created_at', '>=', Carbon::now()->subDay());
+        return $query->where('created_at', '>=', Carbon::now()->subDay());
     }
 
     /**
      * Scope a query to only include tracking records for a specific equipment.
      * +scopeByEquipment(equipment_id) QueryBuilder
      */
-    public function scopeByEquipment(Builder $query, int $equipmentId): void
+    public function scopeByEquipment(Builder $query, int $equipmentId): Builder
     {
-        $query->where('equipment_id', $equipmentId);
+        return $query->where('equipment_id', $equipmentId);
     }
 
     // Relationships

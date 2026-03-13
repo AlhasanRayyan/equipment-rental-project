@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder; // لاستخدام الـ scope
 use Illuminate\Database\Eloquent\Casts\Attribute; // لتحديد Accessor و Mutator بشكل حديث
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Equipment extends Model
 {
     use HasFactory,  SoftDeletes;
@@ -37,6 +38,7 @@ class Equipment extends Model
         'location_latitude',
         'location_longitude',
         'location_address',
+        'position',
         'status',
         'is_approved_by_admin',
         'has_gps_tracker',
@@ -64,6 +66,15 @@ class Equipment extends Model
         'total_reviews' => 'integer',
         'last_maintenance_date' => 'date',
         'status' => 'string', // Enum in DB, treated as string in application
+    ];
+
+    public const POSITION_LABELS = [
+        'north_gaza'    => 'شمال غزة',
+        'gaza_city'     => 'غزة',
+        'middle_area'   => 'الوسطى',
+        'deir_al_balah' => 'دير البلح',
+        'khan_younis'   => 'خانيونس',
+        'rafah'         => 'رفح',
     ];
 
     // Accessors (Methods from classDiagram)
@@ -128,7 +139,7 @@ class Equipment extends Model
     protected function distance(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->attributes['distance'] ?? null, // Default to null if not loaded
+            get: fn() => $this->attributes['distance'] ?? null, // Default to null if not loaded
         );
     }
 
@@ -192,10 +203,10 @@ class Equipment extends Model
             $longitude,
             $latitude,
         ])
-        ->whereNotNull('location_latitude')
-        ->whereNotNull('location_longitude')
-        ->having('distance', '<', $radiusKm)
-        ->orderBy('distance');
+            ->whereNotNull('location_latitude')
+            ->whereNotNull('location_longitude')
+            ->having('distance', '<', $radiusKm)
+            ->orderBy('distance');
     }
 
     // Relationships

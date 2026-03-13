@@ -57,6 +57,68 @@ class ReviewFactory extends Factory
             'created_at' => $reviewDate,
         ];
     }
+    public function pending()
+{
+    return $this->state(fn () => [
+        'booking_status' => 'pending',
+        'payment_status' => 'pending',
+        'confirmed_at' => null,
+        'cancelled_at' => null,
+        'cancellation_reason' => null,
+    ]);
+}
+
+public function confirmed()
+{
+    return $this->state(fn () => [
+        'booking_status' => 'confirmed',
+        'confirmed_at' => now(),
+    ]);
+}
+
+public function active()
+{
+    return $this->state(fn () => [
+        'booking_status' => 'active',
+    ]);
+}
+
+public function completed()
+{
+    return $this->state(fn () => [
+        'booking_status' => 'completed',
+    ]);
+}
+
+public function cancelled()
+{
+    return $this->state(fn () => [
+        'booking_status' => 'cancelled',
+        'cancelled_at' => now(),
+        'cancellation_reason' => 'تم الإلغاء من السيدر',
+    ]);
+}
+
+public function paid()
+{
+    return $this->state(fn () => [
+        'payment_status' => 'paid',
+    ]);
+}
+
+public function paymentFailed()
+{
+    return $this->state(fn () => [
+        'payment_status' => 'failed',
+    ]);
+}
+
+public function refunded()
+{
+    return $this->state(fn () => [
+        'payment_status' => 'refunded',
+    ]);
+}
 
     // دوال States (verified, withOwnerResponse, positive, negative)
     // تأكد من أن هذه الدوال موجودة في ملفك.
