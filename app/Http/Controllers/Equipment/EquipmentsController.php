@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Equipment;
 
 use App\Http\Controllers\Controller;
@@ -6,6 +7,7 @@ use App\Models\AdminSetting;
 use App\Models\Equipment;
 use App\Models\EquipmentCategory;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class EquipmentsController extends Controller
 {
@@ -29,19 +31,22 @@ class EquipmentsController extends Controller
         // $contactEmail    = AdminSetting::where('setting_key', 'contact_email')->first()->setting_value ?? 'rentals@my-domain.net';
         // $siteDescription = AdminSetting::where('setting_key', 'site_description')->first()->setting_value ?? 'منصة تتيح للمستخدمين خدمات من تأجير واستئجار معدات البناء.';
 
-        return view('frontend.equipments', compact('equipments',
-        'categories',
-        // 'contactPhone',
-        // 'officeHours',
-        // 'contactEmail',
-        // 'siteDescription'
-    ));
+        return view('frontend.equipments', compact(
+            'equipments',
+            'categories',
+            // 'contactPhone',
+            // 'officeHours',
+            // 'contactEmail',
+            // 'siteDescription'
+        ));
     }
 
     public function create()
     {
         $categories = EquipmentCategory::active()->get(); // أو جميع الفئات
-        return view('frontend.equipments.create', compact('categories'));
+        $positions = Equipment::POSITION_LABELS; // الحصول على المناطق من موديل Equipment
+
+        return view('frontend.equipments.create', compact('categories', 'positions')); // تمرير $positions إلى الواجهة
     }
 
     public function store(Request $request)
@@ -55,6 +60,8 @@ class EquipmentsController extends Controller
             'monthly_rate'     => 'nullable|numeric',
             'deposit_amount'   => 'nullable|numeric',
             'location_address' => 'required|string|max:255',
+            'position'         => ['required', 'string', Rule::in(array_keys(Equipment::POSITION_LABELS))], // إضافة التحقق لحقل position
+
             'has_gps_tracker'  => 'boolean',
             'images.*'         => 'image|mimes:jpg,jpeg,png|max:2048',
         ]);
