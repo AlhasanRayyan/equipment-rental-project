@@ -14,6 +14,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TrackingController ;
+use App\Http\Controllers\Renter\PaymentController as RenterPaymentController;
+use App\Http\Controllers\Owner\PaymentController as OwnerPaymentController;
+
 
 
 
@@ -135,5 +138,56 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
+
+
+
+
+// ─── مسارات العميل (Renter) ────────────────────────────────────
+Route::middleware(['auth'])->prefix('renter')->name('renter.')->group(function () {
+
+    // عرض صفحة الدفع
+    Route::get('/bookings/{booking}/payment', [RenterPaymentController::class, 'show'])
+        ->name('payments.show');
+
+    // اختيار طريقة الدفع
+    Route::post('/bookings/{booking}/payment/method', [RenterPaymentController::class, 'selectMethod'])
+        ->name('payments.select-method');
+
+    // عرض نموذج رفع الإشعار
+    Route::get('/bookings/{booking}/payment/upload-proof', [RenterPaymentController::class, 'showUploadProof'])
+        ->name('payments.upload-proof');
+
+    // رفع الإشعار
+    Route::post('/bookings/{booking}/payment/submit-proof', [RenterPaymentController::class, 'submitProof'])
+        ->name('payments.submit-proof');
+});
+
+// ─── مسارات المالك (Owner) ─────────────────────────────────────
+Route::middleware(['auth'])->prefix('owner')->name('owner.')->group(function () {
+
+    // قائمة المدفوعات
+    Route::get('/payments', [OwnerPaymentController::class, 'index'])
+        ->name('payments.index');
+
+    // عرض تفاصيل الدفع لحجز
+    Route::get('/payments/{booking}', [OwnerPaymentController::class, 'show'])
+        ->name('payments.show');
+
+    // [كاش] تأكيد استلام المبلغ
+    Route::post('/payments/{booking}/confirm-cash', [OwnerPaymentController::class, 'confirmCashPayment'])
+        ->name('payments.confirm-cash');
+
+    // [تحويل] قبول الإشعار
+    Route::post('/payments/{booking}/approve-proof', [OwnerPaymentController::class, 'approveProof'])
+        ->name('payments.approve-proof');
+
+    // [تحويل] رفض الإشعار
+    Route::post('/payments/{booking}/reject-proof', [OwnerPaymentController::class, 'rejectProof'])
+        ->name('payments.reject-proof');
+
+    // [كاش] تحديث حالة الحجز يدوياً
+    Route::post('/payments/{booking}/update-cash-status', [OwnerPaymentController::class, 'updateCashStatus'])
+        ->name('payments.update-cash-status');
+});
 
 require __DIR__ . '/auth.php';

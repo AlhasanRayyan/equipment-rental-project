@@ -30,7 +30,9 @@ class Booking extends Model
         'booking_status',
         'pickup_location',
         'return_location',
-        'special_requirements'
+        'special_requirements',
+        'payment_method',
+
     ];
 
     protected $casts = [
@@ -63,5 +65,18 @@ class Booking extends Model
     {
         return $this->hasOne(Review::class, 'booking_id');
     }
-    
+
+
+
+    // أضف هاتين الدالتين داخل الكلاس
+
+    public function payment(): HasOne
+    {
+        return $this->hasOne(\App\Models\Payment::class, 'booking_id');
+    }
+
+    public function paymentProof(): HasOne
+    {
+        return $this->hasOne(\App\Models\PaymentProof::class, 'booking_id');
+    }
 }
