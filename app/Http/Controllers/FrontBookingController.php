@@ -54,8 +54,9 @@ class FrontBookingController extends Controller
 
         NotificationService::bookingRequest($booking, $equipment);
 
-      
 
-        return back()->with('success', 'تم إرسال طلب الحجز بنجاح، بانتظار موافقة المالك.');
+
+        return redirect()->route('renter.payments.show', $booking)
+            ->with('success', 'تم إرسال طلب الحجز بنجاح. يرجى اختيار طريقة الدفع.');
     }
 }
