@@ -155,7 +155,7 @@
                                 </li>
                             @endif
                         </ul>
-                        
+
                         {{-- يمكن عرض تقييمات المعدة هنا --}}
                         @if($equipment->total_reviews > 0)
                             <div class="mt-4">
@@ -166,7 +166,7 @@
                         @endif
                     </div>
                 </div>
-                
+
                 {{-- يمكن عرض سجلات التتبع هنا إذا كانت المعدة تحتوي على GPS --}}
                 @if($equipment->has_gps_tracker && $equipment->trackingRecords->count() > 0)
                     <div class="row mt-4">
@@ -178,8 +178,8 @@
                                         <tr>
                                             <th>خط العرض (Latitude)</th>
                                             <th>خط الطول (Longitude)</th>
-                                            <th>السرعة</th>
-                                            <th>مستوى البطارية</th>
+                                            {{-- <th>السرعة</th> --}}
+                                            {{-- <th>مستوى البطارية</th> --}}
                                             <th>الحالة</th>
                                             <th>الوقت</th>
                                         </tr>
@@ -189,8 +189,8 @@
                                             <tr>
                                                 <td>{{ $record->latitude }}</td>
                                                 <td>{{ $record->longitude }}</td>
-                                                <td>{{ number_format($record->speed, 2) }} كم/س</td>
-                                                <td>{{ number_format($record->battery_level, 2) }}%</td>
+                                                {{-- <td>{{ number_format($record->speed, 2) }} كم/س</td> --}}
+                                                {{-- <td>{{ number_format($record->battery_level, 2) }}%</td> --}}
                                                 <td><span class="badge bg-secondary">{{ ucfirst($record->status) }}</span></td>
                                                 <td>{{ $record->created_at->format('Y-m-d H:i:s') }}</td>
                                             </tr>
