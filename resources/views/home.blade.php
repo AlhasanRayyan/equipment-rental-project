@@ -182,6 +182,7 @@
                     </div>
                     <div class="uk-margin-large-top uk-text-center"><a class="uk-button uk-button-default uk-button-large"
                             href="{{ route('categories') }}"><span>المزيد من الفئات</span></a></div>
+                            
                 </div>
             </div>
         </div>

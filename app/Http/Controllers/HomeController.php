@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\AdminSetting;
@@ -69,32 +70,56 @@ class HomeController extends Controller
                 if ($selectedCategory) {
                     $categoryIds = [$selectedCategory->id];
                     $this->getAllChildrenIds($selectedCategory, $categoryIds);
-                    $q->whereIn('category_id', array_unique($categoryIds)); // array_unique لتحسين الأداء وتجنب التكرار
+                    $q->whereIn('category_id', array_unique($categoryIds));
                 }
             })
             ->when($location, fn($q) => $q->where('location_address', 'like', "%{$location}%"))
             ->when($minDailyRate, fn($q) => $q->where('daily_rate', '>=', $minDailyRate))
-            ->when($maxDailyRate, fn($q) => $q->where('daily_rate', '<=', $maxDailyRate)) // **تصحيح الخطأ الإملائي هنا**
+            ->when($maxDailyRate, fn($q) => $q->where('daily_rate', '<=', $maxDailyRate))
             ->where('is_approved_by_admin', true)
             ->where('status', 'available')
             ->with('owner', 'category', 'images')
             ->paginate(12);
 
-        // هذه المتغيرات ضرورية لفلتر البحث في صفحة المعدات
+        // ✅ قسم الاهتمامات
+        $hasInterests = false;
+        $recommendedEquipments = collect();
+
+        if (auth()->check()) {
+            $interestIds = auth()->user()->interests->pluck('id');
+            $hasInterests = $interestIds->isNotEmpty();
+
+            if ($hasInterests) {
+                $allCategoryIds = EquipmentCategory::where(function ($q) use ($interestIds) {
+                    $q->whereIn('id', $interestIds)
+                        ->orWhereIn('parent_id', $interestIds);
+                })->pluck('id');
+
+                $recommendedEquipments = Equipment::query()
+                    ->whereIn('category_id', $allCategoryIds)
+                    ->where('is_approved_by_admin', true)
+                    ->where('status', 'available')
+                    ->with('owner', 'category', 'images')
+                    ->latest()
+                    ->take(6)
+                    ->get();
+            }
+        }
         $equipmentCategories = EquipmentCategory::where('is_active', true)->with('children')->get();
         $locations           = ['غزة', 'خان يونس', 'الوسطى', 'الشمال', 'رفح'];
 
-        // **تصحيح الـ View الراجع**: الآن يشير إلى 'equipments' بدلاً من 'home'
-        // ويمرر جميع المتغيرات اللازمة لتعبئة الفلاتر وعرض النتائج
         return view('frontend.equipments', compact(
             'equipments',
-            'equipmentCategories', // تم تغيير اسم المتغير ليتوافق مع الـ View
+            'equipmentCategories',
             'locations',
             'query',
             'categoryId',
             'location',
             'minDailyRate',
-            'maxDailyRate'
+            'maxDailyRate',
+            'recommendedEquipments', // ✅ أضفناه
+            'hasInterests', // ✅
+
         ));
     }
 
@@ -186,7 +211,6 @@ class HomeController extends Controller
             'equipmentsCount' => $equipmentsCount,
             'bookingsCount'   => $bookingsCount,
         ]);
-
     }
 
     //  تواصل معنا - عرض الصفحة

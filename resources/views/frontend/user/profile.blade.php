@@ -274,7 +274,7 @@
                                     <a href="{{ route('categories') }}">الفئات</a>
                                 </li>
                                 <li class="{{ request()->routeIs('equipments') ? 'uk-active' : '' }}">
-                                    <a href="{{ route('equipments') }}">المعدات</a>
+                                    <a href="{{ route('equipments') }}">موصى به لك</a>
                                 </li>
                                 <li class="{{ request()->routeIs('about') ? 'uk-active' : '' }}">
                                     <a href="{{ route('about') }}">عن الموقع</a>

@@ -13,12 +13,10 @@ use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\TrackingController ;
+use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\Renter\PaymentController as RenterPaymentController;
 use App\Http\Controllers\Owner\PaymentController as OwnerPaymentController;
-
-
-
+use App\Http\Controllers\User\InterestController;
 
 include 'admin.php';
 
@@ -53,8 +51,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/favorites/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle'); // للتبديل من أي صفحة
 
     // ggogle maps
-        Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');
-
+    Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');
 });
 
 // للأسئلة الشائعة
@@ -188,6 +185,12 @@ Route::middleware(['auth'])->prefix('owner')->name('owner.')->group(function () 
     // [كاش] تحديث حالة الحجز يدوياً
     Route::post('/payments/{booking}/update-cash-status', [OwnerPaymentController::class, 'updateCashStatus'])
         ->name('payments.update-cash-status');
+});
+
+
+Route::middleware('auth')->group(function () {
+    Route::get('/interests', [InterestController::class, 'edit'])->name('interests.edit');
+    Route::put('/interests', [InterestController::class, 'update'])->name('interests.update');
 });
 
 require __DIR__ . '/auth.php';

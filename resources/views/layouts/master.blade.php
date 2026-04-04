@@ -297,7 +297,7 @@
                                 <li class="{{ request()->routeIs('categories') ? 'uk-active' : '' }}"><a
                                         href="{{ route('categories') }}">الفئات</a></li>
                                 <li class="{{ request()->routeIs('equipments*') ? 'uk-active' : '' }}"><a
-                                        href="{{ route('equipments') }}">المعدات</a></li>
+                                        href="{{ route('equipments') }}">موصى به لك</a></li>
                                 <li class="{{ request()->routeIs('tracking.*') ? 'uk-active' : '' }}"><a
                                         href="{{ route('tracking.index') }}">تتبع معداتي</a></li>
                                 <li class="{{ request()->routeIs('about') ? 'uk-active' : '' }}"><a

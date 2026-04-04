@@ -264,4 +264,9 @@ class User extends Authenticatable
         }
         return asset('assets/home/img/default-user.png');
     }
+
+    public function interests()
+    {
+        return $this->belongsToMany(EquipmentCategory::class, 'category_user');
+    }
 }

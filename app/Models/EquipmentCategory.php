@@ -83,4 +83,8 @@ class EquipmentCategory extends Model
     {
         $query->whereNull('parent_id');
     }
+    public function interestedUsers()
+    {
+        return $this->belongsToMany(User::class, 'category_user');
+    }
 }

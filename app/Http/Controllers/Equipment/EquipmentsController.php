@@ -16,6 +16,7 @@ class EquipmentsController extends Controller
         $query    = $request->input('query');
         $category = $request->input('category');
 
+        // القسم الأول — كل المعدات
         $equipments = Equipment::query()
             ->when($query, fn($q) => $q->where('name', 'like', "%{$query}%"))
             ->when($category, fn($q) => $q->where('category_id', $category))
@@ -24,20 +25,30 @@ class EquipmentsController extends Controller
             ->with('category', 'owner')
             ->paginate(9);
 
-        $categories = EquipmentCategory::where('is_active', true)->get();
+        // القسم الثاني — بناءً على الاهتمامات
+        $recommendedEquipments = collect();
 
-        // $contactPhone    = AdminSetting::where('setting_key', 'contact_phone')->first()->setting_value ?? '+970 59 723 4892';
-        // $officeHours     = AdminSetting::where('setting_key', 'office_hours')->first()->setting_value ?? 'السبت - الخميس ( 8ص - 6م)';
-        // $contactEmail    = AdminSetting::where('setting_key', 'contact_email')->first()->setting_value ?? 'rentals@my-domain.net';
-        // $siteDescription = AdminSetting::where('setting_key', 'site_description')->first()->setting_value ?? 'منصة تتيح للمستخدمين خدمات من تأجير واستئجار معدات البناء.';
+        if (auth()->check()) {
+            $interestIds = auth()->user()->interests->pluck('id');
+
+            if ($interestIds->isNotEmpty()) {
+                $recommendedEquipments = Equipment::query()
+                    ->whereIn('category_id', $interestIds)
+                    ->where('is_approved_by_admin', true)
+                    ->where('status', 'available')
+                    ->with('category', 'owner')
+                    ->latest()
+                    ->take(6)
+                    ->get();
+            }
+        }
+
+        $categories = EquipmentCategory::where('is_active', true)->get();
 
         return view('frontend.equipments', compact(
             'equipments',
             'categories',
-            // 'contactPhone',
-            // 'officeHours',
-            // 'contactEmail',
-            // 'siteDescription'
+            'recommendedEquipments',
         ));
     }
 
