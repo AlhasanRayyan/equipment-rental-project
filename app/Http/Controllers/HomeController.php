@@ -12,26 +12,55 @@ use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $equipmentCategories = EquipmentCategory::where('is_active', true)->with('children')->get(); // تحميل children هنا
+        $query        = $request->input('query');
+        $categoryId   = $request->input('category');
+        $location     = $request->input('location');
+        $minDailyRate = $request->input('min_daily_rate');
+        $maxDailyRate = $request->input('max_daily_rate');
+
+        $equipmentCategories = EquipmentCategory::where('is_active', true)->with('children')->get();
         $locations           = ['غزة', 'خان يونس', 'الوسطى', 'الشمال', 'رفح'];
+        $featuredCategories  = EquipmentCategory::parents()->active()->inRandomOrder()->take(6)->get();
+        $siteDescription     = AdminSetting::where('setting_key', 'site_description')->first()->setting_value ?? 'منصة تتيح للمستخدمين خدمات من تأجير واستئجار معدات بجميع أنواعها وبأسعار مناسبة';
 
-        $featuredCategories = EquipmentCategory::parents()->active()->inRandomOrder()->take(6)->get();
+        // ✅ نتائج البحث
+        $searchResults = null;
+        $hasSearch = $query || $categoryId || $location || $minDailyRate || $maxDailyRate;
 
-        // $contactPhone    = AdminSetting::where('setting_key', 'contact_phone')->first()->setting_value ?? '+970 59 723 4892';
-        // $officeHours     = AdminSetting::where('setting_key', 'office_hours')->first()->setting_value ?? 'السبت - الخميس ( 8ص - 6م)';
-        // $contactEmail    = AdminSetting::where('setting_key', 'contact_email')->first()->setting_value ?? 'rentals@my-domain.net';
-        $siteDescription = AdminSetting::where('setting_key', 'site_description')->first()->setting_value ?? 'منصة تتيح للمستخدمين خدمات من تأجير واستئجار معدات بجميع أنواعها وبأسعار مناسبة';
+        if ($hasSearch) {
+            $searchResults = Equipment::query()
+                ->when($query, fn($q) => $q->where('name', 'like', "%{$query}%"))
+                ->when($categoryId, function ($q) use ($categoryId) {
+                    $selectedCategory = EquipmentCategory::find($categoryId);
+                    if ($selectedCategory) {
+                        $categoryIds = [$selectedCategory->id];
+                        $this->getAllChildrenIds($selectedCategory, $categoryIds);
+                        $q->whereIn('category_id', array_unique($categoryIds));
+                    }
+                })
+                ->when($location, fn($q) => $q->where('location_address', 'like', "%{$location}%"))
+                ->when($minDailyRate, fn($q) => $q->where('daily_rate', '>=', $minDailyRate))
+                ->when($maxDailyRate, fn($q) => $q->where('daily_rate', '<=', $maxDailyRate))
+                ->where('is_approved_by_admin', true)
+                ->where('status', 'available')
+                ->with('owner', 'category', 'images')
+                ->paginate(12);
+        }
 
         return view('home', compact(
             'equipmentCategories',
             'locations',
             'featuredCategories',
-            // 'contactPhone',
-            // 'officeHours',
-            // 'contactEmail',
-            'siteDescription'
+            'siteDescription',
+            'searchResults',
+            'hasSearch',
+            'query',
+            'categoryId',
+            'location',
+            'minDailyRate',
+            'maxDailyRate',
         ));
     }
 
