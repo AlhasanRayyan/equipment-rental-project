@@ -227,6 +227,7 @@
             border-radius: 3px;
         }
 
+       
         @media (max-width: 450px) {
             .dropdownNot .dropdown-content {
                 right: -150px;
@@ -256,7 +257,8 @@
                 <div class="page-header-bottom__left">
                     <div class="logo">
                         <a class="logo__link" href="{{ route('home') }}">
-                            <img class="logo__img" src="{{ asset('assets/home/img/logo.png') }}" alt="">
+                            <img class="logo__img" src="{{ asset('assets/img/logo.png') }}" width="90"
+                                height="90" alt="">
                         </a>
                     </div>
                 </div>
@@ -669,7 +671,8 @@
                     <div class="uk-margin">
                         <div class="logo">
                             <a class="logo__link" href="{{ route('home') }}">
-                                <img class="logo__img" src="{{ asset('assets/home/img/logo.png') }}" alt="logo">
+                                <img class="logo__img" src="{{ asset('assets/img/logo.png') }}" width="90"
+                                    height="90" alt="logo">
                             </a>
                         </div>
                     </div>

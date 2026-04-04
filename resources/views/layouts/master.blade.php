@@ -189,6 +189,85 @@
         .logout-form {
             margin: 0;
         }
+
+        .page-header-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .page-header-bottom__right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        .user-img {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .uk-navbar-nav {
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+
+        .dropdownNot {
+            margin-top: 0;
+            margin-bottom: 0;
+        }
+
+        .NotificationsIcon {
+            width: 25px;
+            height: 25px;
+            min-width: 25px;
+            display: block;
+        }
+
+     
+
+        .page-header-bottom__right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;    /* لجعلها تبدأ فوراً بعد نهاية الهيدر */
+    right: 0;      /* لمحاذاتها مع طرف الجرس من اليمين */
+    left: auto;
+    background-color: #fff;
+    min-width: 300px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 9999; /* لضمان ظهورها فوق السلايدر والمحتوى */
+    border-radius: 8px;
+    margin-top: 12px; /* مسافة بسيطة تحت الجرس لتبدو أنيقة */
+}
+        .dropdownNot {
+            position: relative;
+            /* هذا هو "المرساة" التي ستثبت القائمة */
+            display: inline-flex;
+            align-items: center;
+        }
+        .dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;    /* لجعلها تبدأ فوراً بعد نهاية الهيدر */
+    right: 0;      /* لمحاذاتها مع طرف الجرس من اليمين */
+    left: auto;
+    background-color: #fff;
+    min-width: 300px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 9999; /* لضمان ظهورها فوق السلايدر والمحتوى */
+    border-radius: 8px;
+    margin-top: 12px; /* مسافة بسيطة تحت الجرس لتبدو أنيقة */
+}
+
     </style>
 
     @stack('styles')
