@@ -36,7 +36,7 @@
                         </td>
 
                         <td class="uk-text-center uk-text-small">
-                            @if($invoice->due_date)
+                            @if ($invoice->due_date)
                                 <span class="{{ $invoice->isOverdue() ? 'uk-text-danger' : '' }}">
                                     {{ $invoice->due_date->format('Y/m/d') }}
                                 </span>
@@ -61,10 +61,10 @@
                         <td class="uk-text-center">
                             @php
                                 $statusMap = [
-                                    'issued'    => ['label' => 'صادرة',   'color' => 'uk-label-warning'],
-                                    'paid'      => ['label' => 'مدفوعة',  'color' => 'uk-label-success'],
-                                    'overdue'   => ['label' => 'متأخرة',  'color' => 'uk-label-danger'],
-                                    'cancelled' => ['label' => 'ملغاة',   'color' => 'uk-label-danger'],
+                                    'issued' => ['label' => 'صادرة', 'color' => 'uk-label-warning'],
+                                    'paid' => ['label' => 'مدفوعة', 'color' => 'uk-label-success'],
+                                    'overdue' => ['label' => 'متأخرة', 'color' => 'uk-label-danger'],
+                                    'cancelled' => ['label' => 'ملغاة', 'color' => 'uk-label-danger'],
                                 ];
                                 $status = $invoice->isOverdue() ? 'overdue' : $invoice->status;
                                 $s = $statusMap[$status] ?? ['label' => $status, 'color' => ''];
@@ -74,16 +74,15 @@
 
                         {{-- تحميل --}}
                         <td class="uk-text-center">
-                            @if($invoice->pdf_url)
-                                <a href="{{ $invoice->pdf_url }}"
-                                   class="uk-button uk-button-default uk-button-small"
-                                   download target="_blank">
+                            @if ($invoice->pdf_url)
+                                <a href="{{ $invoice->pdf_url }}" class="uk-button uk-button-default uk-button-small"
+                                    download target="_blank">
                                     <span data-uk-icon="icon: download; ratio: 0.8"></span>
                                     PDF
                                 </a>
                             @else
-                                <a href="{{ route('admin.invoices.download', $invoice->id) }}"
-                                   class="uk-button uk-button-primary uk-button-small">
+                                <a href="{{ route('user.invoices.download', $invoice->id) }}" {{-- ✅ --}}
+                                    class="uk-button uk-button-primary uk-button-small">
                                     <span data-uk-icon="icon: download; ratio: 0.8"></span>
                                     تحميل
                                 </a>
