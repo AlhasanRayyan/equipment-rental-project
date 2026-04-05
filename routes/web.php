@@ -16,6 +16,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\Renter\PaymentController as RenterPaymentController;
 use App\Http\Controllers\Owner\PaymentController as OwnerPaymentController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\User\InterestController;
 
 include 'admin.php';
@@ -200,5 +201,8 @@ Route::middleware(['auth', 'user'])->group(function () {
 
 
 Route::middleware('auth')->post('/favorites/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+
+Route::middleware('auth')->post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+
 
 require __DIR__ . '/auth.php';

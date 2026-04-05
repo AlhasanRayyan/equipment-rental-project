@@ -79,4 +79,9 @@ class Booking extends Model
     {
         return $this->hasOne(\App\Models\PaymentProof::class, 'booking_id');
     }
+    // في app/Models/Booking.php
+    public function reviews()
+    {
+        return $this->hasMany(\App\Models\Review::class, 'booking_id');
+    }
 }

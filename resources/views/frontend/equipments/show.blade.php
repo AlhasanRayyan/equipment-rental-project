@@ -52,12 +52,10 @@
                                         </div>
 
                                         <div class="uk-margin-top" data-uk-slider>
-                                            <ul
-                                                class="uk-thumbnav uk-slider-items uk-grid uk-grid-small uk-child-width-1-4@m">
+                                            <ul class="uk-thumbnav uk-slider-items uk-grid uk-grid-small uk-child-width-1-4@m">
                                                 @foreach ($equipment->images as $i => $image)
                                                     <li data-uk-slideshow-item="{{ $i }}">
-                                                        <a href="#"><img
-                                                                src="{{ asset('storage/' . $image->image_url) }}"
+                                                        <a href="#"><img src="{{ asset('storage/' . $image->image_url) }}"
                                                                 alt="{{ $equipment->name }}"></a>
                                                     </li>
                                                 @endforeach
@@ -68,6 +66,37 @@
                                     <p>لا توجد صور متاحة لهذه المعدة.</p>
                                 @endif
                             </div>
+
+                            {{-- التقييمات --}}
+                            @php
+                                $reviews = \App\Models\Review::where('equipment_id', $equipment->id)
+                                    ->with('reviewer')
+                                    ->latest()
+                                    ->get();
+                            @endphp
+
+                            @if ($reviews->isNotEmpty())
+                                <div class="uk-margin-large-top">
+                                    <h3>التقييمات ({{ $reviews->count() }})</h3>
+                                    @foreach ($reviews as $review)
+                                        <div class="uk-card uk-card-default uk-card-body uk-margin-small-top">
+                                            <div class="uk-flex uk-flex-between">
+                                                <strong>{{ $review->reviewer->first_name }}
+                                                    {{ $review->reviewer->last_name }}</strong>
+                                                <span class="uk-text-muted uk-text-small">
+                                                    {{ $review->created_at->format('d M Y') }}
+                                                </span>
+                                            </div>
+                                            <div style="color: #f5a623; font-size: 18px;">
+                                                @for ($i = 1; $i <= 5; $i++)
+                                                    {{ $i <= $review->rating_overall ? '★' : '☆' }}
+                                                @endfor
+                                            </div>
+                                            <p>{{ $review->comment }}</p>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
 
                             <div class="equipment-detail__title">{{ $equipment->name }}</div>
                             <div class="equipment-detail__location">
@@ -86,14 +115,12 @@
                                     <div class="uk-h2">معلومات</div>
                                 </div>
                                 <table class="uk-table uk-table-striped">
-                                    {{-- ✅ مشاركة المعدة و QR Code --}}
+                                    {{-- مشاركة المعدة و QR Code --}}
                                     <div class="uk-card uk-card-default uk-card-body uk-margin-medium-top uk-text-center">
                                         <h4 class="uk-heading-line"><span>مشاركة المعدة</span></h4>
 
-                                        {{-- 🔗 رابط المشاركة --}}
                                         <div class="uk-margin">
-                                            <p class="uk-text-small uk-text-muted">يمكنك مشاركة هذه المعدة عبر الرابط
-                                                التالي:</p>
+                                            <p class="uk-text-small uk-text-muted">يمكنك مشاركة هذه المعدة عبر الرابط التالي:</p>
                                             <div class="uk-inline uk-width-expand">
                                                 <input class="uk-input uk-text-center" type="text"
                                                     value="{{ route('equipments.show', $equipment->id) }}" readonly
@@ -103,54 +130,43 @@
                                             </div>
                                         </div>
 
-                                        {{-- 📱 QR Code --}}
                                         <div class="uk-margin">
                                             <p class="uk-text-small uk-text-muted">أو امسح رمز QR لفتح الصفحة مباشرة:</p>
                                             <div class="uk-flex uk-flex-center uk-margin-small-bottom">
                                                 {!! QrCode::size(200)->generate(route('equipments.show', $equipment->id)) !!}
                                             </div>
-
-                                            {{-- زر تحميل QR --}}
                                             <a class="uk-button uk-button-default uk-margin-small-top"
                                                 href="data:image/png;base64,{{ base64_encode(QrCode::format('png')->size(300)->generate(route('equipments.show', $equipment->id))) }}"
                                                 download="equipment-{{ $equipment->id }}.png">
                                                 تحميل رمز QR
                                             </a>
                                         </div>
-                                        {{-- 🔗 أزرار المشاركة --}}
+
                                         <div class="uk-margin">
                                             <p class="uk-text-small uk-text-muted">شارك عبر:</p>
-
                                             <div class="uk-flex uk-flex-center uk-grid-small" data-uk-grid>
                                                 @php
                                                     $shareUrl = urlencode(route('equipments.show', $equipment->id));
-                                                    $shareText = urlencode(
-                                                        'شاهد هذه المعدة على منصة تأجير المعدات: ' . $equipment->name,
-                                                    );
+                                                    $shareText = urlencode('شاهد هذه المعدة على منصة تأجير المعدات: ' . $equipment->name);
                                                 @endphp
-
                                                 <a href="https://wa.me/?text={{ $shareText }}%20{{ $shareUrl }}"
                                                     class="share-btn whatsapp" target="_blank" title="واتساب">
                                                     <i class="fab fa-whatsapp"></i>
                                                 </a>
-
                                                 <a href="https://t.me/share/url?url={{ $shareUrl }}&text={{ $shareText }}"
                                                     class="share-btn telegram" target="_blank" title="تليجرام">
                                                     <i class="fab fa-telegram-plane"></i>
                                                 </a>
-
                                                 <a href="https://www.facebook.com/sharer/sharer.php?u={{ $shareUrl }}"
                                                     class="share-btn facebook" target="_blank" title="فيسبوك">
                                                     <i class="fab fa-facebook-f"></i>
                                                 </a>
-
                                                 <a href="https://twitter.com/intent/tweet?url={{ $shareUrl }}&text={{ $shareText }}"
                                                     class="share-btn twitter" target="_blank" title="تويتر">
                                                     <i class="fab fa-x-twitter"></i>
                                                 </a>
                                             </div>
                                         </div>
-
                                     </div>
 
                                     <tr>
@@ -176,15 +192,13 @@
 
                     <div class="uk-width-1-3@m">
                         <div class="equipment-sidebar">
-                            {{-- ✅ بيانات المالك --}}
+
+                            {{-- بيانات المالك --}}
                             @if ($equipment->owner)
-                                <div
-                                    class="equipment-user uk-card uk-card-default uk-card-body uk-text-center uk-margin-medium-bottom">
+                                <div class="equipment-user uk-card uk-card-default uk-card-body uk-text-center uk-margin-medium-bottom">
                                     <img class="uk-border-circle" src="{{ $equipment->owner->avatar_url }}" width="120"
                                         height="120" alt="{{ $equipment->owner->name }}">
-
                                     <h4 class="uk-margin-small-top">{{ $equipment->owner->name }}</h4>
-
                                     <p>{{ $equipment->owner->description ?? 'مالك المعدات' }}</p>
                                 </div>
                             @endif
@@ -207,24 +221,20 @@
                                                 ({{ $equipment->monthly_rate }}$)</option>
                                         </select>
                                     </div>
-
                                     <div class="uk-margin">
                                         <label>تاريخ البدء</label>
                                         <input class="uk-input" type="date" name="start_date" id="start_date"
                                             required min="{{ date('Y-m-d') }}">
                                     </div>
-
                                     <div class="uk-margin">
                                         <label>تاريخ الإنتهاء</label>
                                         <input class="uk-input" type="date" name="end_date" id="end_date" required
                                             min="{{ date('Y-m-d') }}">
                                     </div>
-
                                     <div class="uk-margin">
                                         <input class="uk-input" type="text" name="pickup_location"
                                             placeholder="عنوان الاستلام">
                                     </div>
-
                                     <div class="uk-margin">
                                         <div class="equipment-order__value">
                                             <span id="rentalDays">المدة بالأيام : -</span>
@@ -235,8 +245,7 @@
                                 <div class="equipment-order-total">
                                     <ul>
                                         <li><span>إجمالي الإيجار</span><span id="rentalTotal">-</span></li>
-                                        <li><span>قيمة الإيداع (تأمين)</span><span>{{ $equipment->deposit_amount }}
-                                                $</span></li>
+                                        <li><span>قيمة الإيداع (تأمين)</span><span>{{ $equipment->deposit_amount }} $</span></li>
                                         <hr>
                                         <li><span>الإجمالي النهائي</span><span id="rentalGrand">-</span></li>
                                     </ul>
@@ -245,12 +254,12 @@
                                         <span>استئجار الآن</span>
                                     </button>
 
-                                    {{-- ✅ زر المفضلة --}}
+                                    {{-- زر المفضلة --}}
                                     @auth
                                         <style>
                                             .fav-btn {
                                                 background: none;
-                                                border: none;
+                                                border: 2px solid #ddd;
                                                 cursor: pointer;
                                                 width: 100%;
                                                 padding: 10px;
@@ -260,59 +269,137 @@
                                                 justify-content: center;
                                                 gap: 8px;
                                                 border-radius: 6px;
-                                                border: 2px solid #ddd;
                                                 transition: all 0.3s;
                                                 font-size: 15px;
                                                 color: #666;
                                             }
-
-                                            .fav-btn:hover {
-                                                border-color: #e63946;
-                                                color: #e63946;
-                                            }
-
-                                            .fav-btn.active {
-                                                border-color: #e63946;
-                                                color: #e63946;
-                                                background: #fff5f5;
-                                            }
-
-                                            .fav-btn svg {
-                                                transition: all 0.3s;
-                                            }
-
-                                            .fav-btn.active svg {
-                                                fill: #e63946;
-                                                stroke: #e63946;
-                                            }
+                                            .fav-btn:hover { border-color: #e63946; color: #e63946; }
+                                            .fav-btn.active { border-color: #e63946; color: #e63946; background: #fff5f5; }
+                                            .fav-btn svg { transition: all 0.3s; }
+                                            .fav-btn.active svg { fill: #e63946; stroke: #e63946; }
                                         </style>
 
                                         <button id="favBtn" onclick="toggleFavorite({{ $equipment->id }})"
                                             class="fav-btn {{ $isFavorite ? 'active' : '' }}" type="button">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                                viewBox="0 0 24 24" fill="{{ $isFavorite ? '#e63946' : 'none' }}"
-                                                stroke="{{ $isFavorite ? '#e63946' : 'currentColor' }}" stroke-width="2"
-                                                id="favSvg">
+                                                viewBox="0 0 24 24"
+                                                fill="{{ $isFavorite ? '#e63946' : 'none' }}"
+                                                stroke="{{ $isFavorite ? '#e63946' : 'currentColor' }}"
+                                                stroke-width="2" id="favSvg">
                                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06
-                                 a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78
-                                 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                                         a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78
+                                                         1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
                                             </svg>
-                                            <span
-                                                id="favText">{{ $isFavorite ? 'إزالة من المفضلة' : 'إضافة للمفضلة' }}</span>
+                                            <span id="favText">{{ $isFavorite ? 'إزالة من المفضلة' : 'إضافة للمفضلة' }}</span>
                                         </button>
                                     @endauth
                                 </div>
                             </form>
 
+                            {{-- فورم التقييم --}}
+                            @auth
+                                @php
+                                    $completedBooking = \App\Models\Booking::where('equipment_id', $equipment->id)
+                                        ->where(function ($q) {
+                                            $q->where('renter_id', auth()->id())
+                                              ->orWhere('owner_id', auth()->id());
+                                        })
+                                        ->where('booking_status', 'completed') // ✅ الاسم الصح
+                                        ->whereDoesntHave('reviews', fn($q) => $q->where('reviewer_id', auth()->id()))
+                                        ->first();
+                                @endphp
+
+                                @if ($completedBooking)
+                                    <div class="uk-card uk-card-default uk-card-body uk-margin-medium-top">
+                                        <h3 class="uk-card-title">أضف تقييمك ⭐</h3>
+
+                                        @if (session('success'))
+                                            <div class="uk-alert-success" data-uk-alert>
+                                                <p>{{ session('success') }}</p>
+                                            </div>
+                                        @endif
+                                        @if (session('error'))
+                                            <div class="uk-alert-danger" data-uk-alert>
+                                                <p>{{ session('error') }}</p>
+                                            </div>
+                                        @endif
+
+                                        <form action="{{ route('reviews.store') }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="booking_id" value="{{ $completedBooking->id }}">
+
+                                            <div class="uk-margin">
+                                                <label class="uk-form-label">التقييم العام</label>
+                                                <div class="star-rating" data-name="rating_overall">
+                                                    @for ($i = 1; $i <= 5; $i++)
+                                                        <span class="star" data-value="{{ $i }}"
+                                                            style="font-size:28px; cursor:pointer; color:#ddd;">★</span>
+                                                    @endfor
+                                                    <input type="hidden" name="rating_overall" id="rating_overall" required>
+                                                </div>
+                                            </div>
+
+                                            @if (auth()->id() === $completedBooking->renter_id)
+                                                <div class="uk-margin">
+                                                    <label class="uk-form-label">تواصل المالك (1-5)</label>
+                                                    <input class="uk-input" type="number" name="owner_communication_rating" min="1" max="5">
+                                                </div>
+                                                <div class="uk-margin">
+                                                    <label class="uk-form-label">حالة المعدة (1-5)</label>
+                                                    <input class="uk-input" type="number" name="equipment_condition_rating" min="1" max="5">
+                                                </div>
+                                            @else
+                                                <div class="uk-margin">
+                                                    <label class="uk-form-label">التزام المستأجر بالمواعيد (1-5)</label>
+                                                    <input class="uk-input" type="number" name="renter_punctuality_rating" min="1" max="5">
+                                                </div>
+                                            @endif
+
+                                            <div class="uk-margin">
+                                                <label class="uk-form-label">تعليق</label>
+                                                <textarea class="uk-textarea" name="comment" rows="3"
+                                                    placeholder="اكتب تعليقك هنا..."></textarea>
+                                            </div>
+
+                                            <button type="submit" class="uk-button uk-button-primary uk-width-1-1">
+                                                إرسال التقييم
+                                            </button>
+                                        </form>
+                                    </div>
+                                @endif
+                            @endauth
 
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </main>
+
     @push('scripts')
+        <script>
+            document.querySelectorAll('.star-rating').forEach(function(container) {
+                const stars = container.querySelectorAll('.star');
+                const input = document.getElementById(container.dataset.name);
+
+                stars.forEach(function(star) {
+                    star.addEventListener('click', function() {
+                        const val = this.dataset.value;
+                        input.value = val;
+                        stars.forEach(s => s.style.color = s.dataset.value <= val ? '#f5a623' : '#ddd');
+                    });
+                    star.addEventListener('mouseover', function() {
+                        const val = this.dataset.value;
+                        stars.forEach(s => s.style.color = s.dataset.value <= val ? '#f5a623' : '#ddd');
+                    });
+                    star.addEventListener('mouseout', function() {
+                        const val = input.value || 0;
+                        stars.forEach(s => s.style.color = s.dataset.value <= val ? '#f5a623' : '#ddd');
+                    });
+                });
+            });
+        </script>
+
         <script>
             function toggleFavorite(equipmentId) {
                 fetch('{{ route('favorites.toggle') }}', {
@@ -321,22 +408,23 @@
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                         },
-                        body: JSON.stringify({
-                            equipment_id: equipmentId
-                        })
+                        body: JSON.stringify({ equipment_id: equipmentId })
                     })
                     .then(r => r.json())
                     .then(data => {
-                        const btn = document.getElementById('favBtn');
+                        const btn  = document.getElementById('favBtn');
                         const text = document.getElementById('favText');
+                        const svg  = document.getElementById('favSvg');
                         if (data.status === 'added') {
+                            btn.classList.add('active');
                             text.innerText = 'إزالة من المفضلة';
-                            btn.classList.add('uk-button-danger');
-                            btn.classList.remove('uk-button-default');
+                            svg.setAttribute('fill', '#e63946');
+                            svg.setAttribute('stroke', '#e63946');
                         } else {
+                            btn.classList.remove('active');
                             text.innerText = 'إضافة للمفضلة';
-                            btn.classList.remove('uk-button-danger');
-                            btn.classList.add('uk-button-default');
+                            svg.setAttribute('fill', 'none');
+                            svg.setAttribute('stroke', 'currentColor');
                         }
                     });
             }
@@ -348,73 +436,25 @@
                 input.select();
                 input.setSelectionRange(0, 99999);
                 navigator.clipboard.writeText(input.value);
-                UIkit.notification({
-                    message: '✅ تم نسخ الرابط بنجاح!',
-                    status: 'success'
-                });
+                UIkit.notification({ message: '✅ تم نسخ الرابط بنجاح!', status: 'success' });
             }
         </script>
 
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const startInput = document.querySelector('[name="start_date"]');
-                const endInput = document.querySelector('[name="end_date"]');
-                const typeSelect = document.querySelector('[name="rental_type"]');
-                const rentalDays = document.getElementById('rentalDays');
-                const rentalTotal = document.getElementById('rentalTotal');
-                const rentalGrand = document.getElementById('rentalGrand');
-
-                function updatePrices() {
-                    if (!startInput.value || !endInput.value || !typeSelect.value) return;
-
-                    const start = new Date(startInput.value);
-                    const end = new Date(endInput.value);
-                    const diff = (end - start) / (1000 * 60 * 60 * 24);
-                    if (diff < 1) return;
-
-                    rentalDays.textContent = `المدة بالأيام: ${diff} يوم`;
-
-                    let rate = 0;
-                    switch (typeSelect.value) {
-                        case 'daily':
-                            rate = {{ $equipment->daily_rate ?? 0 }};
-                            break;
-                        case 'weekly':
-                            rate = {{ $equipment->weekly_rate ?? 0 }};
-                            break;
-                        case 'monthly':
-                            rate = {{ $equipment->monthly_rate ?? 0 }};
-                            break;
-                    }
-
-                    const total = rate * (typeSelect.value === 'daily' ? diff : typeSelect.value === 'weekly' ? diff /
-                        7 : diff / 30);
-                    const deposit = {{ $equipment->deposit_amount ?? 0 }};
-                    rentalTotal.textContent = `$${total.toFixed(2)}`;
-                    rentalGrand.textContent = `$${(total + deposit).toFixed(2)}`;
-                }
-
-                startInput.addEventListener('change', updatePrices);
-                endInput.addEventListener('change', updatePrices);
-                typeSelect.addEventListener('change', updatePrices);
-            });
-        </script>
-        <script>
             const startDateInput = document.getElementById('start_date');
-            const endDateInput = document.getElementById('end_date');
-            const rateSelect = document.getElementById('rental_rate_type');
-            const deposit = {{ $equipment->deposit_amount ?? 0 }};
+            const endDateInput   = document.getElementById('end_date');
+            const rateSelect     = document.getElementById('rental_rate_type');
+            const deposit        = {{ $equipment->deposit_amount ?? 0 }};
 
             function calculatePrice() {
                 const start = new Date(startDateInput.value);
-                const end = new Date(endDateInput.value);
-                const rate = parseFloat(rateSelect.options[rateSelect.selectedIndex]?.getAttribute('data-price') || 0);
+                const end   = new Date(endDateInput.value);
+                const rate  = parseFloat(rateSelect.options[rateSelect.selectedIndex]?.getAttribute('data-price') || 0);
 
                 if (start && end && end > start && rate > 0) {
-                    const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-                    const totalRent = days * rate;
-
-                    document.getElementById('rentalDays').innerText = "المدة بالأيام : " + days;
+                    const days       = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+                    const totalRent  = days * rate;
+                    document.getElementById('rentalDays').innerText  = "المدة بالأيام : " + days;
                     document.getElementById('rentalTotal').innerText = totalRent.toFixed(2) + " $";
                     document.getElementById('rentalGrand').innerText = (totalRent + deposit).toFixed(2) + " $";
                 }
@@ -425,5 +465,4 @@
             rateSelect.addEventListener('change', calculatePrice);
         </script>
     @endpush
-
 @endsection
