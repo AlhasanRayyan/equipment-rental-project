@@ -28,8 +28,6 @@ class EquipmentTracking extends Model
         'equipment_id',
         'latitude',
         'longitude',
-        'speed',
-        'battery_level',
         'status',
         'start_time',
         'end_time',
@@ -45,8 +43,6 @@ class EquipmentTracking extends Model
     protected $casts = [
         'latitude' => 'decimal:7', // 10, 7
         'longitude' => 'decimal:7', // 10, 7
-        'speed' => 'decimal:2',     // 6, 2
-        'battery_level' => 'decimal:2', // 5, 2
         'status' => 'string', // Enum in DB, treated as string
         'start_time' => 'datetime',
         'end_time' => 'datetime',
@@ -69,10 +65,10 @@ class EquipmentTracking extends Model
      * Determine if the battery level is low (e.g., below 20%).
      * +isLowBattery() bool
      */
-    public function isLowBattery(): bool
-    {
-        return $this->battery_level !== null && $this->battery_level <= 20;
-    }
+    // public function isLowBattery(): bool
+    // {
+    //     return $this->battery_level !== null && $this->battery_level <= 20;
+    // }
 
     /**
      * Calculate the distance from the last known location. (Requires previous entry context)
