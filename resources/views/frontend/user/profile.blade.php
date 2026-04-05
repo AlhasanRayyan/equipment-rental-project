@@ -338,7 +338,7 @@
                             <img src="{{ $user
                                 ? ($user->profile_picture_url
                                     ? asset('storage/' . $user->profile_picture_url)
-                                    : asset('assets/home/img/admin.jpeg'))
+                                    : asset('assets/home/img/guest.png'))
                                 : asset('assets/home/img/guest.png') }}"
                                 alt="User" class="user-img" id="userBtn">
 
@@ -422,7 +422,7 @@
                                         $user->id !== 0
                                             ? ($user->profile_picture_url
                                                 ? asset('storage/' . $user->profile_picture_url)
-                                                : asset('assets/home/img/admin.jpeg'))
+                                                : asset('assets/home/img/guest.png'))
                                             : asset('assets/home/img/guest.png'); //  صورة افتراضية عند عدم تسجيل الدخول
                                 @endphp
 

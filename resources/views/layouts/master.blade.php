@@ -386,7 +386,7 @@
                                     $user = Auth::user();
                                 @endphp
 
-                                <img src="{{ $user ? ($user->profile_picture_url ? asset('storage/' . $user->profile_picture_url) : asset('assets/home/img/admin.jpeg')) : asset('assets/home/img/guest.png') }}"
+                                <img src="{{ $user ? ($user->profile_picture_url ? asset('storage/' . $user->profile_picture_url) : asset('assets/home/img/guest.png')) : asset('assets/home/img/guest.png') }}"
                                     alt="User" class="user-img" id="userBtn">
 
                                 <div class="dropdown-content" id="dropdownMenu">
