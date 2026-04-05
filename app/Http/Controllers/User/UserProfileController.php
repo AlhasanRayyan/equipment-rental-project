@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
@@ -108,7 +109,7 @@ class UserProfileController extends Controller
             case 'favorites':
                 $favorites = $user->favorites()->with('equipment')->get();
                 return view('frontend.user.sections.favorites', compact('favorites'));
-
+                
             case 'invoices':
                 $invoices = $user->invoices;
                 return view('frontend.user.sections.invoices', compact('invoices'));
@@ -131,12 +132,11 @@ class UserProfileController extends Controller
         // نسلك الحل حاليا
         // مؤقتًا: عرض أول مستخدم في قاعدة البيانات
         // $user = User::first();
-    $user = Auth::user();
+        $user = Auth::user();
 
         if (! $user) {
             // abort(404, 'لا يوجد مستخدم في قاعدة البيانات.');
             return redirect()->route('home')->with('error', 'يجب تسجيل الدخول لتعديل الملف الشخصي.');
-
         }
         // لما نعمل صفحة تسجيل دخول برجعها
 
@@ -188,7 +188,6 @@ class UserProfileController extends Controller
         $user->description        = $request->description;
         $user->save();
         return redirect()->route('profile.show', $user->id)->with('success', 'تم تحديث بياناتك بنجاح');
-
     }
 
     /**

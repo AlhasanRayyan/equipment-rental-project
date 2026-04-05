@@ -244,6 +244,63 @@
                                     <button class="uk-button uk-button-large uk-width-1-1" type="submit">
                                         <span>استئجار الآن</span>
                                     </button>
+
+                                    {{-- ✅ زر المفضلة --}}
+                                    @auth
+                                        <style>
+                                            .fav-btn {
+                                                background: none;
+                                                border: none;
+                                                cursor: pointer;
+                                                width: 100%;
+                                                padding: 10px;
+                                                margin-top: 10px;
+                                                display: flex;
+                                                align-items: center;
+                                                justify-content: center;
+                                                gap: 8px;
+                                                border-radius: 6px;
+                                                border: 2px solid #ddd;
+                                                transition: all 0.3s;
+                                                font-size: 15px;
+                                                color: #666;
+                                            }
+
+                                            .fav-btn:hover {
+                                                border-color: #e63946;
+                                                color: #e63946;
+                                            }
+
+                                            .fav-btn.active {
+                                                border-color: #e63946;
+                                                color: #e63946;
+                                                background: #fff5f5;
+                                            }
+
+                                            .fav-btn svg {
+                                                transition: all 0.3s;
+                                            }
+
+                                            .fav-btn.active svg {
+                                                fill: #e63946;
+                                                stroke: #e63946;
+                                            }
+                                        </style>
+
+                                        <button id="favBtn" onclick="toggleFavorite({{ $equipment->id }})"
+                                            class="fav-btn {{ $isFavorite ? 'active' : '' }}" type="button">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                viewBox="0 0 24 24" fill="{{ $isFavorite ? '#e63946' : 'none' }}"
+                                                stroke="{{ $isFavorite ? '#e63946' : 'currentColor' }}" stroke-width="2"
+                                                id="favSvg">
+                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06
+                                 a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78
+                                 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                                            </svg>
+                                            <span
+                                                id="favText">{{ $isFavorite ? 'إزالة من المفضلة' : 'إضافة للمفضلة' }}</span>
+                                        </button>
+                                    @endauth
                                 </div>
                             </form>
 
@@ -256,6 +313,35 @@
         </div>
     </main>
     @push('scripts')
+        <script>
+            function toggleFavorite(equipmentId) {
+                fetch('{{ route('favorites.toggle') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            equipment_id: equipmentId
+                        })
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        const btn = document.getElementById('favBtn');
+                        const text = document.getElementById('favText');
+                        if (data.status === 'added') {
+                            text.innerText = 'إزالة من المفضلة';
+                            btn.classList.add('uk-button-danger');
+                            btn.classList.remove('uk-button-default');
+                        } else {
+                            text.innerText = 'إضافة للمفضلة';
+                            btn.classList.remove('uk-button-danger');
+                            btn.classList.add('uk-button-default');
+                        }
+                    });
+            }
+        </script>
+
         <script>
             function copyEquipmentLink() {
                 const input = document.getElementById('equipmentLink');

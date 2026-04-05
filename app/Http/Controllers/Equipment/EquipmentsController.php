@@ -131,6 +131,13 @@ class EquipmentsController extends Controller
     {
         $equipment = Equipment::with(['images', 'owner', 'category'])->findOrFail($id);
 
-        return view('frontend.equipments.show', compact('equipment'));
+        $isFavorite = false;
+        if (auth()->check()) {
+            $isFavorite = \App\Models\UserFavorite::where('user_id', auth()->id())
+                ->where('equipment_id', $id)
+                ->exists();
+        }
+
+        return view('frontend.equipments.show', compact('equipment', 'isFavorite'));
     }
 }

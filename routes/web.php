@@ -197,4 +197,8 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'user'])->group(function () {
     Route::get('/invoices/{invoice}/download', [App\Http\Controllers\User\InvoiceController::class, 'download'])->name('user.invoices.download');
 });
+
+
+Route::middleware('auth')->post('/favorites/toggle', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
+
 require __DIR__ . '/auth.php';
