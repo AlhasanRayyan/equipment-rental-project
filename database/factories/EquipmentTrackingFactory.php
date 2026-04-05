@@ -35,8 +35,6 @@ class EquipmentTrackingFactory extends Factory
             'equipment_id' => $equipment->id,
             'latitude' => $this->faker->latitude(),
             'longitude' => $this->faker->longitude(),
-            'speed' => $this->faker->randomFloat(2, 0, 100),
-            'battery_level' => $this->faker->randomFloat(2, 0, 100),
             'status' => $this->faker->randomElement(['online', 'offline', 'moving', 'idle']),
             'created_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
             'updated_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
@@ -89,22 +87,22 @@ class EquipmentTrackingFactory extends Factory
     /**
      * Indicate a low battery level.
      */
-    public function lowBattery(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'battery_level' => $this->faker->randomFloat(2, 5, 15),
-        ]);
-    }
+    // public function lowBattery(): static
+    // {
+    //     return $this->state(fn (array $attributes) => [
+    //         'battery_level' => $this->faker->randomFloat(2, 5, 15),
+    //     ]);
+    // }
 
-    /**
-     * Indicate full battery level.
-     */
-    public function fullBattery(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'battery_level' => $this->faker->randomFloat(2, 90, 100),
-        ]);
-    }
+    // /**
+    //  * Indicate full battery level.
+    //  */
+    // public function fullBattery(): static
+    // {
+    //     return $this->state(fn (array $attributes) => [
+    //         'battery_level' => $this->faker->randomFloat(2, 90, 100),
+    //     ]);
+    // }
 
     /**
      * Attach tracking record to a specific equipment.

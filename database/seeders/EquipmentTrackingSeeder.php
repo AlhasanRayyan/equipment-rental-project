@@ -78,8 +78,6 @@ class EquipmentTrackingSeeder extends Seeder
                     ->create([
                         'latitude' => $lat,
                         'longitude' => $lng,
-                        'speed' => $speed,
-                        'battery_level' => $batteryLevel,
                         'status' => $status,
                         'created_at' => $currentDate->copy()->addMinutes(rand(20, 120)),
                         'updated_at' => $currentDate->copy()->addMinutes(rand(20, 120)),
