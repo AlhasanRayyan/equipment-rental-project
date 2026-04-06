@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Services\NotificationService;
 
 class RegisteredUserController extends Controller
 {
@@ -55,6 +56,17 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
+        NotificationService::systemAlert(
+            $user,
+            'مرحبًا بك في المنصة',
+            'تم إنشاء حسابك بنجاح. يمكنك الآن استئجار المعدات أو عرض معداتك للتأجير.',
+            null,
+            [
+                'registered_at' => now()->toDateTimeString(),
+            ]
+        );
+
 
         return redirect(RouteServiceProvider::HOME);
     }

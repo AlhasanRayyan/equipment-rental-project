@@ -11,7 +11,6 @@ use App\Http\Controllers\User\UserProfileController;
 use App\Models\Conversation;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\Renter\PaymentController as RenterPaymentController;
@@ -84,29 +83,6 @@ Route::middleware('auth')->group(function () {
         return view('chat.index');
     })->name('chat.index');
 
-    Route::get('read-notify', function () {
-        return view('dashboard.read_notify');
-    })->name('read_notify');
-
-    Route::put('notifications/{id}/read', function ($id) {
-        $n = Auth::user()->notifications()->findOrFail($id);
-        $n->markAsRead();
-        return back();
-    })->name('notifications.read');
-
-
-    Route::delete('delete-notify/{id}', function ($id) {
-        $n = Auth::user()->notifications()->findOrFail($id);
-        $n->delete();
-        return back();
-    })->name('delete');
-
-    Route::get('read-all-notify', function () {
-        Auth::user()->unreadNotifications->markAsRead();
-        return back();
-    })->name('readall');
-
-
     // صفحة إشعارات المستخدم (Front)
     Route::get('/my-notifications', [NotificationController::class, 'index'])->name('front.notifications.index');
 
@@ -119,6 +95,7 @@ Route::middleware('auth')->group(function () {
     // تعليم الكل كمقروء
     Route::put('/my-notifications/read-all', [NotificationController::class, 'readAll'])->name('front.notifications.readall');
 });
+
 
 
 Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])->name('google.login');

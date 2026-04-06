@@ -264,8 +264,8 @@
                                         <strong>الإشعارات</strong>
 
                                         {{--  قراءة الكل أيقونة --}}
-                                        <a href="{{ route('readall') }}" class="btn btn-sm btn-outline-primary"
-                                            title="تعليم الكل كمقروء">
+                                        <a href="{{ route('admin.notifications.readall') }}"
+                                            class="btn btn-sm btn-outline-primary" title="تعليم الكل كمقروء">
                                             <i class="fas fa-check-double"></i>
                                         </a>
                                     </div>
@@ -273,23 +273,24 @@
 
                                 @forelse(($latestNotifications ?? collect()) as $n)
                                     @php
-                                        $kind = $n->data['kind'] ?? 'system_alert';
-                                        $ui = $notifUI[$kind] ?? [
-                                            'icon' => 'fas fa-bell',
-                                            'class' => 'text-dark',
-                                            'label' => 'تنبيه',
-                                        ];
+                                        $kind = $notification->data['kind'] ?? 'system_alert';
+                                        $ui = $notifUI[$kind] ?? ['icon' => 'fas fa-bell', 'class' => 'text-dark'];
 
                                         $meta = [
-                                            'booking_id' => $n->data['booking_id'] ?? null,
-                                            'equipment_id' => $n->data['equipment_id'] ?? null,
-                                            'conversation_id' => $n->data['conversation_id'] ?? null,
-                                            'message_id' => $n->data['message_id'] ?? null,
-                                            'lat' => $n->data['lat'] ?? null,
-                                            'lng' => $n->data['lng'] ?? null,
-                                            'speed' => $n->data['speed'] ?? null,
-                                            'distance_km' => $n->data['distance_km'] ?? null,
-                                            'battery_level' => $n->data['battery_level'] ?? null,
+                                            'booking_id' => $notification->data['booking_id'] ?? null,
+                                            'equipment_id' => $notification->data['equipment_id'] ?? null,
+                                            'conversation_id' => $notification->data['conversation_id'] ?? null,
+                                            'message_id' => $notification->data['message_id'] ?? null,
+                                            'owner_id' => $notification->data['owner_id'] ?? null,
+                                            'renter_id' => $notification->data['renter_id'] ?? null,
+                                            'lat' => $notification->data['lat'] ?? null,
+                                            'lng' => $notification->data['lng'] ?? null,
+                                            'distance_km' => $notification->data['distance_km'] ?? null,
+                                            'amount' => $notification->data['amount'] ?? null,
+                                            'reason' => $notification->data['reason'] ?? null,
+                                            'start_date' => $notification->data['start_date'] ?? null,
+                                            'login_at' => $notification->data['login_at'] ?? null,
+                                            'registered_at' => $notification->data['registered_at'] ?? null,
                                         ];
                                     @endphp
 
@@ -321,7 +322,7 @@
                                 @endforelse
 
                                 <a class="dropdown-item text-center small text-primary py-2"
-                                    href="{{ route('read_notify') }}">
+                                    href="{{ route('admin.notifications.index') }}">
                                     عرض كل الإشعارات
                                 </a>
                             </div>
@@ -391,7 +392,7 @@
             bookingCancel: @json(route('admin.bookings.cancel', ['booking' => '__ID__'])),
         };
     </script>
-    <script>
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('notifModal');
 
@@ -475,6 +476,99 @@
             document.addEventListener('click', function(e) {
                 const a = e.target.closest('.notif-item');
                 if (!a) return;
+                const dd = bootstrap.Dropdown.getInstance(document.getElementById('notifDropdown'));
+                if (dd) dd.hide();
+            });
+        });
+    </script> --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('notifModal');
+            if (!modal) return;
+
+            const iconEl = document.getElementById('notifModalIcon');
+            const titleEl = document.getElementById('notifModalTitle');
+            const labelEl = document.getElementById('notifModalLabel');
+            const msgEl = document.getElementById('notifModalMessage');
+            const timeEl = document.getElementById('notifModalTime');
+            const kindEl = document.getElementById('notifModalKind');
+
+            const extraWrap = document.getElementById('notifExtraWrap');
+            const metaEl = document.getElementById('notifModalMeta');
+
+            const markForm = document.getElementById('markAsReadForm');
+            const delForm = document.getElementById('deleteNotifForm');
+            const confirmForm = document.getElementById('bookingConfirmForm');
+            const cancelForm = document.getElementById('bookingCancelForm');
+
+            modal.addEventListener('show.bs.modal', function(event) {
+                const btn = event.relatedTarget;
+                if (!btn) return;
+
+                const id = btn.getAttribute('data-id');
+                const kind = btn.getAttribute('data-kind') || 'system_alert';
+                const icon = btn.getAttribute('data-icon') || 'fas fa-bell';
+                const color = btn.getAttribute('data-color') || 'text-dark';
+                const label = btn.getAttribute('data-label') || '';
+                const title = btn.getAttribute('data-title') || 'إشعار';
+                const message = btn.getAttribute('data-message') || '';
+                const time = btn.getAttribute('data-time') || '';
+                const meta = JSON.parse(btn.getAttribute('data-meta') || '{}');
+
+                iconEl.className = `${icon} ${color}`;
+                titleEl.textContent = title;
+                labelEl.textContent = label;
+                labelEl.style.display = label ? '' : 'none';
+
+                msgEl.textContent = message;
+                timeEl.textContent = time;
+                kindEl.textContent = kind;
+
+                markForm.action = `{{ url('admin/notifications') }}/${id}/read`;
+                delForm.action = `{{ url('admin/notifications') }}/${id}`;
+
+                const lines = [];
+                if (meta.booking_id) lines.push(`رقم الحجز: ${meta.booking_id}`);
+                if (meta.equipment_id) lines.push(`رقم المعدة: ${meta.equipment_id}`);
+                if (meta.conversation_id) lines.push(`رقم المحادثة: ${meta.conversation_id}`);
+                if (meta.message_id) lines.push(`رقم الرسالة: ${meta.message_id}`);
+                if (meta.owner_id) lines.push(`رقم المؤجر: ${meta.owner_id}`);
+                if (meta.renter_id) lines.push(`رقم المستأجر: ${meta.renter_id}`);
+                if (meta.amount) lines.push(`المبلغ: ${meta.amount}`);
+                if (meta.reason) lines.push(`السبب: ${meta.reason}`);
+                if (meta.distance_km) lines.push(`المسافة: ${Number(meta.distance_km).toFixed(3)} كم`);
+                if (meta.lat && meta.lng) lines.push(`الموقع: (${meta.lat}, ${meta.lng})`);
+                if (meta.start_date) lines.push(`موعد البداية: ${meta.start_date}`);
+                if (meta.login_at) lines.push(`وقت تسجيل الدخول: ${meta.login_at}`);
+                if (meta.registered_at) lines.push(`وقت إنشاء الحساب: ${meta.registered_at}`);
+
+                if (lines.length) {
+                    metaEl.innerHTML = '<ul class="mb-0">' + lines.map(x => `<li>${x}</li>`).join('') +
+                        '</ul>';
+                    extraWrap.style.display = '';
+                } else {
+                    metaEl.innerHTML = '';
+                    extraWrap.style.display = 'none';
+                }
+
+                if (kind === 'booking_request' && meta.booking_id) {
+                    confirmForm.classList.remove('d-none');
+                    cancelForm.classList.remove('d-none');
+
+                    confirmForm.action = window.routes.bookingConfirm.replace('__ID__', meta.booking_id);
+                    cancelForm.action = window.routes.bookingCancel.replace('__ID__', meta.booking_id);
+                } else {
+                    confirmForm.classList.add('d-none');
+                    cancelForm.classList.add('d-none');
+                    confirmForm.action = '';
+                    cancelForm.action = '';
+                }
+            });
+
+            document.addEventListener('click', function(e) {
+                const a = e.target.closest('.notif-item');
+                if (!a) return;
+
                 const dd = bootstrap.Dropdown.getInstance(document.getElementById('notifDropdown'));
                 if (dd) dd.hide();
             });

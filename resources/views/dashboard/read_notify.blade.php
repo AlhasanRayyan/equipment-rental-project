@@ -1,11 +1,81 @@
 @extends('layouts.app')
 
 @section('title', 'Notification | ' . config('app.name'))
+
 @section('styles')
     <style>
         button {
             background-color: transparent;
             border: none;
+        }
+
+        .notif-item {
+            cursor: pointer;
+        }
+
+        .notif-item:hover {
+            background-color: #f8f9fc;
+        }
+
+        .notif-modal {
+            border: 0;
+            border-radius: 16px;
+            box-shadow: 0 0.5rem 1.5rem rgba(58, 59, 69, 0.2);
+            overflow: hidden;
+        }
+
+        .notif-modal__icon-wrap {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #f8f9fc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .notif-modal__icon-wrap i {
+            font-size: 1.1rem;
+        }
+
+        .notif-modal__message {
+            background: #f8f9fc;
+            border: 1px solid #e3e6f0;
+            border-radius: 12px;
+            padding: 1rem;
+            line-height: 1.9;
+            color: #3a3b45;
+            font-weight: 500;
+        }
+
+        .notif-modal__meta {
+            background: #f8f9fc;
+            border: 1px solid #e3e6f0;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .notif-modal__meta ul {
+            margin: 0;
+            padding-right: 1rem;
+        }
+
+        .notif-modal__meta li {
+            margin-bottom: .35rem;
+        }
+
+        .notif-modal__kind {
+            background: #f3f6ff;
+            color: #4e73df;
+            border-radius: 999px;
+            padding: .35rem .75rem;
+            font-size: .8rem;
+        }
+
+        .list-group-item {
+            border-right: 0;
+            border-left: 0;
         }
     </style>
 @endsection
@@ -17,7 +87,7 @@
                 الإشعارات غير المقروءة ({{ auth()->user()->unreadNotifications->count() }})
             </h5>
 
-            <a class="btn btn-sm btn-outline-primary" href="{{ route('readall') }}">
+            <a class="btn btn-sm btn-outline-primary" href="{{ route('admin.notifications.readall') }}">
                 <i class="fas fa-check-double"></i>
 
                 تعليم الكل كمقروء
@@ -88,8 +158,8 @@
                                         <button type="button" class="btn btn-secondary"
                                             data-bs-dismiss="modal">إلغاء</button>
 
-                                        <form action="{{ route('delete', $notification->id) }}" method="POST"
-                                            class="m-0">
+                                        <form action="{{ route('admin.notifications.destroy', $notification->id) }}"
+                                            method="POST" class="m-0">
                                             @csrf
                                             @method('DELETE')
                                             <button class="btn btn-danger"> <i class="fas fa-trash"></i>
@@ -105,60 +175,57 @@
                 @endforelse
             </div>
 
+
+            {{-- مودال الادمن للاشعارات --}}
             <div class="modal fade" id="notifModal" tabindex="-1" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content text-end" dir="rtl">
+                    <div class="modal-content text-end notif-modal" dir="rtl">
 
-                        <div class="modal-header">
-                            <div class="d-flex align-items-center gap-2">
-                                <i id="notifModalIcon" class="fas fa-bell text-dark"></i>
-                                <div>
-                                    <h5 class="modal-title mb-0" id="notifModalTitle">إشعار</h5>
-                                    <small class="text-muted" id="notifModalLabel"></small>
+                        <div class="modal-header border-0 pb-2">
+                            <div class="d-flex align-items-center gap-3 w-100">
+                                <div class="notif-modal__icon-wrap">
+                                    <i id="notifModalIcon" class="fas fa-bell text-dark"></i>
                                 </div>
+
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        <h5 class="modal-title mb-0 fw-bold" id="notifModalTitle">إشعار</h5>
+                                        <span id="notifModalLabel"
+                                            class="badge rounded-pill text-bg-light border px-3 py-2"></span>
+                                    </div>
+                                    <small class="text-muted d-block mt-1" id="notifModalTime"></small>
+                                </div>
+
+                                <button type="button" class="btn-close ms-0" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
                             </div>
                         </div>
 
-                        <div class="modal-body">
-                            <div class="p-3 rounded border bg-light">
-                                <div class="mb-2" id="notifModalMessage"></div>
-                                <div class="d-flex justify-content-between small text-muted">
-                                    <span><i class="far fa-clock"></i> <span id="notifModalTime"></span></span>
-                                    <span><i class="fas fa-tag"></i> <span id="notifModalKind"></span></span>
-                                </div>
-                            </div>
+                        <div class="modal-body pt-2">
+                            <div class="notif-modal__message" id="notifModalMessage"></div>
 
-                            <div class="mt-3" id="notifExtraWrap" style="display:none;">
-                                <h6 class="mb-2">تفاصيل إضافية</h6>
+                            <div class="notif-modal__meta mt-3" id="notifExtraWrap" style="display:none;">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="fas fa-circle-info text-secondary"></i>
+                                    <strong class="small">تفاصيل إضافية</strong>
+                                </div>
                                 <div class="small text-muted" id="notifModalMeta"></div>
                             </div>
+
+                            <div class="mt-3">
+                                <span class="small text-muted me-2">النوع:</span>
+                                <code id="notifModalKind" class="notif-modal__kind">system_alert</code>
+                            </div>
                         </div>
 
-                        <div class="modal-footer d-flex justify-content-between align-items-center">
+                        <div
+                            class="modal-footer border-0 pt-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
                             <div class="d-flex gap-2">
-                                {{-- تظهر فقط لطلب الحجز --}}
-                                {{-- <form id="bookingConfirmForm" method="POST" class="m-0 d-none">
-                                    @csrf
-                                    @method('PUT')
-                                    <button type="submit" class="btn btn-success" title="موافقة">
-                                        <i class="fas fa-check"></i> موافقة
-
-                                    </button>
-                                </form>
-
-                                <form id="bookingCancelForm" method="POST" class="m-0 d-none">
-                                    @csrf
-                                    @method('PUT')
-                                    <input type="hidden" name="reason" value="تم الرفض من الإشعارات">
-                                    <button type="submit" class="btn btn-danger" title="رفض">
-                                        <i class="fas fa-times"></i> رفض
-
-                                    </button>
-                                </form> --}}
                                 <form id="bookingConfirmForm" method="POST" class="m-0 d-none">
                                     @csrf
                                     <button type="submit" class="btn btn-success" title="موافقة">
-                                        <i class="fas fa-check"></i> موافقة
+                                        <i class="fas fa-check"></i>
+                                        موافقة
                                     </button>
                                 </form>
 
@@ -166,7 +233,8 @@
                                     @csrf
                                     <input type="hidden" name="reason" value="تم الرفض من الإشعارات">
                                     <button type="submit" class="btn btn-danger" title="رفض">
-                                        <i class="fas fa-times"></i> رفض
+                                        <i class="fas fa-times"></i>
+                                        رفض
                                     </button>
                                 </form>
                             </div>

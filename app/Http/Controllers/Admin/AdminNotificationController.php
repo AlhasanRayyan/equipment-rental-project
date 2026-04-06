@@ -1,19 +1,20 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
-class NotificationController extends Controller
+class AdminNotificationController extends Controller
 {
     public function index()
     {
         $notifications = Auth::user()
             ->notifications()
             ->latest()
-            ->paginate(10);
+            ->paginate(15);
 
-        return view('frontend.notifications.index', compact('notifications'));
+        return view('dashboard.read_notify', compact('notifications'));
     }
 
     public function read($id)
@@ -21,7 +22,7 @@ class NotificationController extends Controller
         $notification = Auth::user()->notifications()->findOrFail($id);
         $notification->markAsRead();
 
-        return back();
+        return back()->with('success', 'تم تعليم الإشعار كمقروء');
     }
 
     public function destroy($id)
@@ -29,13 +30,13 @@ class NotificationController extends Controller
         $notification = Auth::user()->notifications()->findOrFail($id);
         $notification->delete();
 
-        return back();
+        return back()->with('success', 'تم حذف الإشعار');
     }
 
     public function readAll()
     {
         Auth::user()->unreadNotifications->markAsRead();
 
-        return back();
+        return back()->with('success', 'تم تعليم جميع الإشعارات كمقروءة');
     }
 }

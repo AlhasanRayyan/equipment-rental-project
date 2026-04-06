@@ -15,10 +15,10 @@ class NotificationService
         return User::where('role', 'admin')->get();
     }
 
-    public static function toAdmins(AppAlertNotification $n): void
+    public static function toAdmins(AppAlertNotification $notification): void
     {
         foreach (self::admins() as $admin) {
-            $admin->notify($n);
+            $admin->notify($notification);
         }
     }
 
@@ -27,6 +27,8 @@ class NotificationService
 
 
     //  booking_request (owner + admins)
+    // إشعار للمؤجر + الأدمن عند وصول طلب حجز جديد
+
     public static function bookingRequest(Booking $booking, Equipment $equipment): void
     {
         // owner
@@ -55,6 +57,8 @@ class NotificationService
     }
 
     //  booking_confirmed (renter + admins)
+    // إشعار للمستأجر + الأدمن عند تأكيد الحجز
+
     public static function bookingConfirmed(Booking $booking, Equipment $equipment): void
     {
         // renter
@@ -81,47 +85,125 @@ class NotificationService
     }
 
     //  booking_cancelled (owner + renter + admins)
+    // إشعار للطرفين + الأدمن عند إلغاء الحجز
+    // الإلغاء عندك يغطي الرفض/الإلغاء معًا
+
     public static function bookingCancelled(Booking $booking, Equipment $equipment, ?string $reason = null): void
     {
         $reasonText = $reason ? " (السبب: {$reason})" : "";
 
-        // renter
         $booking->renter?->notify(new AppAlertNotification(
             kind: 'booking_cancelled',
             title: 'تم إلغاء الحجز',
             message: "تم إلغاء الحجز #{$booking->id} للمعدة: {$equipment->name}{$reasonText}",
             meta: [
-                'booking_id' => $booking->id,
+                'booking_id'   => $booking->id,
                 'equipment_id' => $equipment->id,
-                'reason' => $reason,
+                'owner_id'     => $equipment->owner_id,
+                'renter_id'    => $booking->renter_id,
+                'reason'       => $reason,
             ]
         ));
 
-        // owner
         $equipment->owner?->notify(new AppAlertNotification(
             kind: 'booking_cancelled',
             title: 'تم إلغاء حجز على معدتك',
             message: "تم إلغاء الحجز #{$booking->id} على المعدة: {$equipment->name}{$reasonText}",
             meta: [
-                'booking_id' => $booking->id,
+                'booking_id'   => $booking->id,
                 'equipment_id' => $equipment->id,
-                'reason' => $reason,
+                'owner_id'     => $equipment->owner_id,
+                'renter_id'    => $booking->renter_id,
+                'reason'       => $reason,
             ]
         ));
 
-        // admins
         self::toAdmins(new AppAlertNotification(
             kind: 'booking_cancelled',
             title: 'إلغاء حجز',
             message: "تم إلغاء الحجز #{$booking->id}{$reasonText}",
             meta: [
-                'booking_id' => $booking->id,
+                'booking_id'   => $booking->id,
                 'equipment_id' => $equipment->id,
-                'reason' => $reason,
+                'owner_id'     => $equipment->owner_id,
+                'renter_id'    => $booking->renter_id,
+                'reason'       => $reason,
             ]
         ));
     }
 
+    // إشعار للطرفين عند انتهاء الحجز
+    public static function bookingCompleted(Booking $booking, Equipment $equipment): void
+    {
+        $booking->renter?->notify(new AppAlertNotification(
+            kind: 'booking_confirmed',
+            title: 'انتهى الحجز',
+            message: "انتهى الحجز #{$booking->id} للمعدة: {$equipment->name}",
+            meta: [
+                'booking_id'   => $booking->id,
+                'equipment_id' => $equipment->id,
+            ]
+        ));
+
+        $equipment->owner?->notify(new AppAlertNotification(
+            kind: 'booking_confirmed',
+            title: 'تم إنهاء حجز على معدتك',
+            message: "تم إنهاء الحجز #{$booking->id} على المعدة: {$equipment->name}",
+            meta: [
+                'booking_id'   => $booking->id,
+                'equipment_id' => $equipment->id,
+            ]
+        ));
+
+        self::toAdmins(new AppAlertNotification(
+            kind: 'booking_confirmed',
+            title: 'انتهاء حجز',
+            message: "انتهى الحجز #{$booking->id}",
+            meta: [
+                'booking_id'   => $booking->id,
+                'equipment_id' => $equipment->id,
+            ]
+        ));
+    }
+
+    // إشعار للمستأجر عند اقتراب موعد الحجز
+    public static function bookingStartingSoon(Booking $booking, Equipment $equipment): void
+    {
+        $booking->renter?->notify(new AppAlertNotification(
+            kind: 'booking_confirmed',
+            title: 'اقتراب موعد الحجز',
+            message: "اقترب موعد الحجز #{$booking->id} للمعدة: {$equipment->name}",
+            meta: [
+                'booking_id'   => $booking->id,
+                'equipment_id' => $equipment->id,
+                'start_date'   => $booking->start_date ?? null,
+            ]
+        ));
+    }
+
+
+    // عند إضافة معدة جديدة
+    public static function equipmentCreated(Equipment $equipment): void
+    {
+        $equipment->owner?->notify(new AppAlertNotification(
+            kind: 'system_alert',
+            title: 'تمت إضافة المعدة بنجاح',
+            message: "تمت إضافة المعدة: {$equipment->name} بنجاح وأصبحت ضمن معداتك.",
+            meta: [
+                'equipment_id' => $equipment->id,
+            ]
+        ));
+
+        self::toAdmins(new AppAlertNotification(
+            kind: 'system_alert',
+            title: 'تمت إضافة معدة جديدة',
+            message: "تمت إضافة معدة جديدة: {$equipment->name} (رقم #{$equipment->id})",
+            meta: [
+                'equipment_id' => $equipment->id,
+                'owner_id'     => $equipment->owner_id,
+            ]
+        ));
+    }
 
     // Chat
 
@@ -144,7 +226,7 @@ class NotificationService
     // GPS
 
     //  equipment_moved (owner + admins)
-    public static function equipmentMoved(Equipment $equipment, float $distanceKm, float $lat, float $lng, float $speed): void
+    public static function equipmentMoved(Equipment $equipment, float $distanceKm, float $lat, float $lng): void
     {
         // owner
         $equipment->owner?->notify(new AppAlertNotification(
@@ -156,7 +238,6 @@ class NotificationService
                 'distance_km' => $distanceKm,
                 'lat' => $lat,
                 'lng' => $lng,
-                'speed' => $speed,
             ]
         ));
 
@@ -170,7 +251,6 @@ class NotificationService
                 'distance_km' => $distanceKm,
                 'lat' => $lat,
                 'lng' => $lng,
-                'speed' => $speed,
             ]
         ));
     }
@@ -180,6 +260,8 @@ class NotificationService
 
 
     // payment_received (renter + owner + admins)
+    // تم استلام/اعتماد الدفعة
+
     public static function paymentReceived(Booking $booking, Equipment $equipment, float $amount): void
     {
         // renter
@@ -215,6 +297,74 @@ class NotificationService
                 'booking_id' => $booking->id,
                 'equipment_id' => $equipment->id,
                 'amount' => $amount,
+            ]
+        ));
+    }
+    // رفع وثيقة الدفع
+    public static function paymentProofSubmitted(Booking $booking, Equipment $equipment): void
+    {
+        $equipment->owner?->notify(new AppAlertNotification(
+            kind: 'payment_received',
+            title: 'تم رفع وثيقة الدفع',
+            message: "قام المستأجر برفع وثيقة دفع للحجز #{$booking->id} للمعدة: {$equipment->name}",
+            meta: [
+                'booking_id'   => $booking->id,
+                'equipment_id' => $equipment->id,
+                'renter_id'    => $booking->renter_id,
+            ]
+        ));
+
+        self::toAdmins(new AppAlertNotification(
+            kind: 'payment_received',
+            title: 'تم رفع وثيقة دفع',
+            message: "تم رفع وثيقة دفع للحجز #{$booking->id}",
+            meta: [
+                'booking_id'   => $booking->id,
+                'equipment_id' => $equipment->id,
+                'renter_id'    => $booking->renter_id,
+            ]
+        ));
+    }
+
+    // قبول وثيقة الدفع
+    public static function paymentApproved(Booking $booking, Equipment $equipment, float $amount): void
+    {
+        $booking->renter?->notify(new AppAlertNotification(
+            kind: 'payment_received',
+            title: 'تم قبول وثيقة الدفع',
+            message: "تم قبول وثيقة الدفع للحجز #{$booking->id} للمعدة: {$equipment->name} بقيمة {$amount}",
+            meta: [
+                'booking_id'   => $booking->id,
+                'equipment_id' => $equipment->id,
+                'amount'       => $amount,
+            ]
+        ));
+    }
+
+    // رفض وثيقة الدفع
+    public static function paymentRejected(Booking $booking, Equipment $equipment, ?string $reason = null): void
+    {
+        $reasonText = $reason ? " (السبب: {$reason})" : "";
+
+        $booking->renter?->notify(new AppAlertNotification(
+            kind: 'payment_failed',
+            title: 'تم رفض وثيقة الدفع',
+            message: "تم رفض وثيقة الدفع للحجز #{$booking->id}{$reasonText}",
+            meta: [
+                'booking_id'   => $booking->id,
+                'equipment_id' => $equipment->id,
+                'reason'       => $reason,
+            ]
+        ));
+
+        self::toAdmins(new AppAlertNotification(
+            kind: 'payment_failed',
+            title: 'تم رفض وثيقة دفع',
+            message: "تم رفض وثيقة الدفع للحجز #{$booking->id}{$reasonText}",
+            meta: [
+                'booking_id'   => $booking->id,
+                'equipment_id' => $equipment->id,
+                'reason'       => $reason,
             ]
         ));
     }
@@ -276,6 +426,35 @@ class NotificationService
                 'equipment_id' => $equipment->id,
                 'amount' => $amount,
             ]
+        ));
+    }
+    // إشعار للمستأجر أن طلبه تم إرساله
+    public static function bookingCreatedByRenter(Booking $booking, Equipment $equipment): void
+    {
+        $booking->renter?->notify(new AppAlertNotification(
+            kind: 'booking_request',
+            title: 'تم إرسال طلب الحجز',
+            message: "تم إرسال طلب الحجز #{$booking->id} للمعدة: {$equipment->name} وهو الآن بانتظار موافقة المالك.",
+            meta: [
+                'booking_id' => $booking->id,
+                'equipment_id' => $equipment->id,
+            ]
+        ));
+    }
+
+    public static function systemAlert(
+        User $user,
+        string $title,
+        string $message,
+        ?string $url = null,
+        array $meta = []
+    ): void {
+        $user->notify(new AppAlertNotification(
+            kind: 'system_alert',
+            title: $title,
+            message: $message,
+            url: $url,
+            meta: $meta
         ));
     }
 }

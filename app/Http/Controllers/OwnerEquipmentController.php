@@ -34,8 +34,8 @@ class OwnerEquipmentController extends Controller
 
     public function edit($id)
     {
- $equipment = Equipment::with('images')->findOrFail($id);
+        $equipment = Equipment::with('images')->findOrFail($id);
         $categories = EquipmentCategory::all();
-          return view('frontend.equipments.edit', compact('equipment' , 'categories'));
+        return view('frontend.equipments.edit', compact('equipment', 'categories'));
     }
 }

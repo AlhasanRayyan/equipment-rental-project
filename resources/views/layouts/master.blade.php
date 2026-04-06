@@ -27,6 +27,7 @@
     <style>
         .notif-item-btn {
             cursor: pointer;
+
         }
 
         .is-unread {
@@ -83,6 +84,7 @@
             color: #333;
         }
 
+        /*
         .notif-badge {
             position: absolute;
             top: -5px;
@@ -93,17 +95,18 @@
             padding: 2px 6px;
             font-size: 10px;
             display: none;
-            /* تظهر عند وجود إشعارات */
+            /* تظهر عند وجود إشعارات *
         }
 
-        .user-img {
+        */
+        /* .user-img {
             width: 40px;
             height: 40px;
             border-radius: 50%;
             cursor: pointer;
             object-fit: cover;
             border: 2px solid #eee;
-        }
+        } */
 
         .dropdown-content {
             display: none;
@@ -179,11 +182,33 @@
             background: #f9f9f9;
         }
 
-        .notif-item-empty {
+        /* .notif-item-empty {
             padding: 20px;
             text-align: center;
             color: #888;
             display: none;
+        } */
+
+        .notif-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #dc3545;
+            color: #fff;
+            border-radius: 999px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 6px;
+            font-size: 10px;
+            line-height: 18px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .notif-item-empty {
+            padding: 20px;
+            text-align: center;
+            color: #888;
         }
 
         .logout-form {
@@ -204,11 +229,13 @@
         }
 
         .user-img {
-            width: 40px;
-            height: 40px;
-            min-width: 40px;
+            width: 50px;
+            height: 50px;
+            min-width: 50px;
             border-radius: 50%;
             object-fit: cover;
+            border: 2px solid #eee;
+
         }
 
         .uk-navbar-nav {
@@ -228,46 +255,93 @@
             display: block;
         }
 
-     
+
 
         .page-header-bottom__right {
             display: flex;
             align-items: center;
             gap: 15px;
         }
-.dropdown-content {
-    display: none;
-    position: absolute;
-    top: 100%;    /* لجعلها تبدأ فوراً بعد نهاية الهيدر */
-    right: 0;      /* لمحاذاتها مع طرف الجرس من اليمين */
-    left: auto;
-    background-color: #fff;
-    min-width: 300px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 9999; /* لضمان ظهورها فوق السلايدر والمحتوى */
-    border-radius: 8px;
-    margin-top: 12px; /* مسافة بسيطة تحت الجرس لتبدو أنيقة */
-}
+
+        /* .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: -150px;
+            left: auto;
+            background-color: #fff;
+            min-width: 300px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+     */
         .dropdownNot {
             position: relative;
             /* هذا هو "المرساة" التي ستثبت القائمة */
             display: inline-flex;
             align-items: center;
         }
+
         .dropdown-content {
-    display: none;
-    position: absolute;
-    top: 100%;    /* لجعلها تبدأ فوراً بعد نهاية الهيدر */
-    right: 0;      /* لمحاذاتها مع طرف الجرس من اليمين */
-    left: auto;
-    background-color: #fff;
-    min-width: 300px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 9999; /* لضمان ظهورها فوق السلايدر والمحتوى */
-    border-radius: 8px;
-    margin-top: 12px; /* مسافة بسيطة تحت الجرس لتبدو أنيقة */
+            display: none;
+            position: absolute;
+            top: 100%;
+            /* لجعلها تبدأ فوراً بعد نهاية الهيدر */
+            right: -150px;
+            /* لمحاذاتها مع طرف الجرس من اليمين */
+            left: auto;
+            background-color: #fff;
+            min-width: 300px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            /* لضمان ظهورها فوق السلايدر والمحتوى */
+            border-radius: 8px;
+            margin-top: 12px;
+            /* مسافة بسيطة تحت الجرس لتبدو أنيقة */
+        }
+
+        #userNotifModal .modal-content {
+    animation: notifModalPop .18s ease;
 }
 
+#userNotifModal .btn {
+    transition: .2s ease;
+}
+
+#userNotifModal .btn:hover {
+    transform: translateY(-1px);
+}
+
+#userNotifModal #userNotifModalMeta ul {
+    margin: 0;
+    padding-right: 1rem;
+}
+
+#userNotifModal #userNotifModalMeta li {
+    margin-bottom: 6px;
+}
+
+#userNotifModal .btn-close {
+    box-shadow: none !important;
+    opacity: .7;
+}
+
+#userNotifModal .btn-close:hover {
+    opacity: 1;
+}
+
+@keyframes notifModalPop {
+    from {
+        opacity: 0;
+        transform: translateY(8px) scale(.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
     </style>
 
     @stack('styles')
@@ -313,6 +387,66 @@
                                 @php
                                     $unreadCount = auth()->user()->unreadNotifications()->count();
                                     $latest = auth()->user()->notifications()->latest()->take(5)->get();
+
+                                    $notifUI = [
+                                        'booking_request' => [
+                                            'icon' => 'fas fa-calendar-plus',
+                                            'class' => 'text-primary',
+                                            'label' => 'حجز',
+                                        ],
+                                        'booking_confirmed' => [
+                                            'icon' => 'fas fa-check-circle',
+                                            'class' => 'text-success',
+                                            'label' => 'حجز',
+                                        ],
+                                        'booking_cancelled' => [
+                                            'icon' => 'fas fa-times-circle',
+                                            'class' => 'text-danger',
+                                            'label' => 'حجز',
+                                        ],
+                                        'new_message' => [
+                                            'icon' => 'fas fa-envelope',
+                                            'class' => 'text-info',
+                                            'label' => 'رسائل',
+                                        ],
+                                        'payment_received' => [
+                                            'icon' => 'fas fa-money-bill-wave',
+                                            'class' => 'text-success',
+                                            'label' => 'دفع',
+                                        ],
+                                        'payment_failed' => [
+                                            'icon' => 'fas fa-exclamation-triangle',
+                                            'class' => 'text-warning',
+                                            'label' => 'دفع',
+                                        ],
+                                        'refund_issued' => [
+                                            'icon' => 'fas fa-undo',
+                                            'class' => 'text-secondary',
+                                            'label' => 'دفع',
+                                        ],
+                                        'equipment_moved' => [
+                                            'icon' => 'fas fa-location-arrow',
+                                            'class' => 'text-danger',
+                                            'label' => 'GPS',
+                                        ],
+                                        'system_alert' => [
+                                            'icon' => 'fas fa-bell',
+                                            'class' => 'text-dark',
+                                            'label' => 'تنبيه',
+                                        ],
+                                    ];
+
+                                    $titles = [
+                                        'booking_request' => 'طلب حجز جديد',
+                                        'booking_confirmed' => 'تم تأكيد الحجز',
+                                        'booking_cancelled' => 'تم إلغاء الحجز',
+                                        'new_message' => 'رسالة جديدة',
+                                        'payment_received' => 'تم استلام الدفع',
+                                        'payment_failed' => 'فشل الدفع',
+                                        'refund_issued' => 'تم إصدار استرداد',
+                                        'equipment_moved' => 'تحذير حركة',
+                                        'system_alert' => 'إشعار',
+                                    ];
                                 @endphp
 
                                 <div class="dropdownNot">
@@ -580,70 +714,103 @@
 
     {{-- User Notifications Modal (Front) --}}
     <div class="modal fade" id="userNotifModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content text-end" dir="rtl">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg overflow-hidden" dir="rtl"
+                style="border-radius: 22px; background: #fff;">
 
-                <div class="modal-header">
-                    <div class="d-flex align-items-center gap-3">
-                        <div class="rounded-circle d-flex align-items-center justify-content-center"
-                            style="width:44px;height:44px;background:#f1f3f5;">
-                            <i id="userNotifModalIcon" class="fas fa-bell text-dark" style="font-size:18px;"></i>
+                {{-- Header --}}
+                <div class="modal-header border-0 pb-0 px-4 pt-4">
+                    <div class="d-flex align-items-start gap-3 w-100">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                            style="width: 58px; height: 58px; background: linear-gradient(135deg, #f8f9fa, #eef2f7); box-shadow: inset 0 1px 0 rgba(255,255,255,.8);">
+                            <i id="userNotifModalIcon" class="fas fa-bell text-dark" style="font-size: 22px;"></i>
                         </div>
 
                         <div class="flex-grow-1">
-                            <div class="d-flex align-items-center gap-2">
-                                <h5 class="modal-title mb-0" id="userNotifModalTitle">إشعار</h5>
-                                <span id="userNotifModalLabel" class="badge bg-light text-dark border"></span>
+                            <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                                <h5 class="modal-title mb-0 fw-bold" id="userNotifModalTitle"
+                                    style="font-size: 1.2rem; color: #1f2937;">
+                                    إشعار
+                                </h5>
+
+                                <span id="userNotifModalLabel" class="badge rounded-pill px-3 py-2 border"
+                                    style="background: #f8f9fa; color: #374151; font-size: .78rem;">
+                                </span>
                             </div>
-                            <small class="text-muted d-block" id="userNotifModalTime"></small>
+
+                            <small id="userNotifModalTime" class="d-block" style="color:#6b7280;"></small>
                         </div>
-                    </div>
 
-                    <button type="button" class="btn-close ms-0" data-bs-dismiss="modal"
-                        aria-label="Close"></button>
-                </div>
-
-                <div class="modal-body">
-                    <div id="userNotifModalMessage" class="mb-3"></div>
-
-                    <div id="userNotifExtraWrap" class="border rounded p-3 bg-light" style="display:none;">
-                        <div class="d-flex align-items-center gap-2 mb-2">
-                            <i class="fas fa-info-circle text-secondary"></i>
-                            <strong class="small">تفاصيل</strong>
-                        </div>
-                        <div id="userNotifModalMeta" class="small text-muted"></div>
-                    </div>
-
-                    <div class="mt-3 small text-muted">
-                        <span class="me-2">نوع:</span>
-                        <code id="userNotifModalKind">system_alert</code>
+                        <button type="button" class="btn-close ms-0 me-auto shadow-none" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
                     </div>
                 </div>
 
-                <div class="modal-footer d-flex justify-content-between align-items-center">
-                    <div class="d-flex gap-2">
-                        {{-- تعليم كمقروء --}}
-                        <form id="userMarkAsReadForm" method="POST" class="m-0">
-                            @csrf
-                            @method('PUT')
-                            <button type="submit" class="btn btn-outline-primary" title="تعليم كمقروء">
-                                <i class="fas fa-check-double"></i>
-                            </button>
-                        </form>
+                {{-- Divider --}}
+                <div class="px-4 mt-3">
+                    <div style="height:1px; background: linear-gradient(to left, transparent, #e5e7eb, transparent);">
+                    </div>
+                </div>
 
+                {{-- Body --}}
+                <div class="modal-body px-4 py-4">
+
+                    <div id="userNotifModalMessage" class="mb-4"
+                        style="font-size: 1.05rem; line-height: 2; color: #374151; font-weight: 500;">
+                    </div>
+
+                    <div id="userNotifExtraWrap" class="border-0 rounded-4 p-3 mb-3"
+                        style="display:none; background: #f8fafc; box-shadow: inset 0 0 0 1px #e5e7eb;">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center"
+                                style="width: 32px; height: 32px; background: #eef2ff;">
+                                <i class="fas fa-info-circle" style="color:#4f46e5;"></i>
+                            </div>
+                            <strong class="small" style="color:#111827;">تفاصيل الإشعار</strong>
+                        </div>
+
+                        <div id="userNotifModalMeta" class="small" style="color:#6b7280; line-height:1.9;"></div>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="small fw-semibold" style="color:#6b7280;">نوع الإشعار:</span>
+                        <code id="userNotifModalKind" class="px-3 py-2 rounded-pill"
+                            style="background:#f3f4f6; color:#be123c; font-size:.82rem;">
+                            system_alert
+                        </code>
+                    </div>
+                </div>
+
+                {{-- Footer --}}
+                <div
+                    class="modal-footer border-0 px-4 pb-4 pt-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <button type="button" class="btn px-4 py-2 rounded-pill" data-bs-dismiss="modal"
+                        style="background:#6b7280; color:#fff; border:none; min-width:110px;">
+                        <i class="fas fa-times ms-1"></i>
+                        إغلاق
+                    </button>
+
+                    <div class="d-flex align-items-center gap-2">
                         {{-- حذف --}}
                         <form id="userDeleteNotifForm" method="POST" class="m-0">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="btn btn-outline-danger" title="حذف">
+                            <button type="submit" class="btn px-3 py-2 rounded-pill" title="حذف"
+                                style="border:1px solid #fecaca; background:#fff1f2; color:#dc2626; min-width:50px;">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </form>
-                    </div>
 
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" title="إغلاق">
-                        <i class="fas fa-times"></i>
-                    </button>
+                        {{-- تعليم كمقروء --}}
+                        <form id="userMarkAsReadForm" method="POST" class="m-0">
+                            @csrf
+                            @method('PUT')
+                            <button type="submit" class="btn px-3 py-2 rounded-pill" title="تعليم كمقروء"
+                                style="border:1px solid #bfdbfe; background:#eff6ff; color:#2563eb; min-width:50px;">
+                                <i class="fas fa-check-double"></i>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -652,7 +819,7 @@
     <script src="{{ asset('assets/home/js/libs.js') }}"></script>
     <script src="{{ asset('assets/home/js/main.js') }}"></script>
 
-    <script>
+    {{-- <script>
         // كود تشغيل القوائم المنسدلة عند النقر
         document.addEventListener('click', function(event) {
             const userBtn = document.getElementById('userBtn');
@@ -678,7 +845,7 @@
         });
     </script>
 
-    {{-- لفتح واغلاق المودال --}}
+    {{-- لفتح واغلاق المودال --}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const btn = document.getElementById('userBtnNot');
@@ -695,8 +862,44 @@
                 menu.classList.remove('show');
             });
         });
-    </script>
+    </script> --}}
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const userBtn = document.getElementById('userBtn');
+            const userMenu = document.getElementById('dropdownMenu');
+            const notifBtn = document.getElementById('userBtnNot');
+            const notifMenu = document.getElementById('dropdownMenuNot');
+
+            document.addEventListener('click', function(event) {
+                const clickedUserBtn = userBtn && userBtn.contains(event.target);
+                const clickedUserMenu = userMenu && userMenu.contains(event.target);
+                const clickedNotifBtn = notifBtn && notifBtn.contains(event.target);
+                const clickedNotifMenu = notifMenu && notifMenu.contains(event.target);
+
+                if (clickedUserBtn) {
+                    userMenu?.classList.toggle('show');
+                    notifMenu?.classList.remove('show');
+                    return;
+                }
+
+                if (clickedNotifBtn) {
+                    notifMenu?.classList.toggle('show');
+                    userMenu?.classList.remove('show');
+                    return;
+                }
+
+                if (!clickedUserMenu) {
+                    userMenu?.classList.remove('show');
+                }
+
+                if (!clickedNotifMenu) {
+                    notifMenu?.classList.remove('show');
+                }
+            });
+        });
+    </script>
+
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('userNotifModal');
             if (!modal) return;
@@ -747,8 +950,8 @@
                 if (meta.equipment_id) lines.push(`رقم المعدة: ${meta.equipment_id}`);
                 if (meta.conversation_id) lines.push(`رقم المحادثة: ${meta.conversation_id}`);
                 if (meta.distance_km) lines.push(`المسافة: ${Number(meta.distance_km).toFixed(3)} كم`);
-                if (meta.speed) lines.push(`السرعة: ${meta.speed}`);
-                if (meta.battery_level) lines.push(`البطارية: ${meta.battery_level}%`);
+                // if (meta.speed) lines.push(`السرعة: ${meta.speed}`);
+                // if (meta.battery_level) lines.push(`البطارية: ${meta.battery_level}%`);
                 if (meta.lat && meta.lng) lines.push(`الموقع: (${meta.lat}, ${meta.lng})`);
 
                 if (lines.length) {
@@ -770,12 +973,83 @@
                 if (menu) menu.classList.remove('show');
             });
         });
-    </script>
+    </script> --}}
 
 
     {{-- مودال اليوزر العادي
  --}}
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('userNotifModal');
+            if (!modal) return;
+
+            const iconEl = document.getElementById('userNotifModalIcon');
+            const titleEl = document.getElementById('userNotifModalTitle');
+            const labelEl = document.getElementById('userNotifModalLabel');
+            const msgEl = document.getElementById('userNotifModalMessage');
+            const timeEl = document.getElementById('userNotifModalTime');
+            const kindEl = document.getElementById('userNotifModalKind');
+
+            const extraWrap = document.getElementById('userNotifExtraWrap');
+            const metaEl = document.getElementById('userNotifModalMeta');
+
+            const markForm = document.getElementById('userMarkAsReadForm');
+            const delForm = document.getElementById('userDeleteNotifForm');
+
+            modal.addEventListener('show.bs.modal', function(event) {
+                const btn = event.relatedTarget;
+                if (!btn) return;
+
+                const id = btn.getAttribute('data-id');
+                const kind = btn.getAttribute('data-kind') || 'system_alert';
+                const icon = btn.getAttribute('data-icon') || 'fas fa-bell';
+                const color = btn.getAttribute('data-color') || 'text-dark';
+                const label = btn.getAttribute('data-label') || '';
+                const title = btn.getAttribute('data-title') || 'إشعار';
+                const message = btn.getAttribute('data-message') || '';
+                const time = btn.getAttribute('data-time') || '';
+                const meta = JSON.parse(btn.getAttribute('data-meta') || '{}');
+
+                iconEl.className = `${icon} ${color}`;
+                titleEl.textContent = title;
+                labelEl.textContent = label;
+                labelEl.style.display = label ? '' : 'none';
+
+                msgEl.textContent = message;
+                timeEl.textContent = time;
+                kindEl.textContent = kind;
+
+                markForm.action = `{{ url('my-notifications') }}/${id}/read`;
+                delForm.action = `{{ url('my-notifications') }}/${id}`;
+
+                const lines = [];
+
+                if (meta.booking_id) lines.push(`رقم الحجز: ${meta.booking_id}`);
+                if (meta.equipment_id) lines.push(`رقم المعدة: ${meta.equipment_id}`);
+                if (meta.conversation_id) lines.push(`رقم المحادثة: ${meta.conversation_id}`);
+                if (meta.amount) lines.push(`المبلغ: ${meta.amount}`);
+                if (meta.reason) lines.push(`السبب: ${meta.reason}`);
+                if (meta.distance_km) lines.push(`المسافة: ${Number(meta.distance_km).toFixed(3)} كم`);
+                if (meta.lat && meta.lng) lines.push(`الموقع: (${meta.lat}, ${meta.lng})`);
+                if (meta.login_at) lines.push(`وقت تسجيل الدخول: ${meta.login_at}`);
+                if (meta.registered_at) lines.push(`وقت إنشاء الحساب: ${meta.registered_at}`);
+                if (meta.start_date) lines.push(`موعد البداية: ${meta.start_date}`);
+
+                if (lines.length) {
+                    metaEl.innerHTML = '<ul class="mb-0 ps-3">' + lines.map(x => `<li>${x}</li>`).join('') +
+                        '</ul>';
+                    extraWrap.style.display = '';
+                } else {
+                    metaEl.innerHTML = '';
+                    extraWrap.style.display = 'none';
+                }
+
+                const notifMenu = document.getElementById('dropdownMenuNot');
+                if (notifMenu) notifMenu.classList.remove('show');
+            });
+        });
+    </script>
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('userNotifModal');
             if (!modal) return;
@@ -825,8 +1099,8 @@
                 if (meta.equipment_id) lines.push(`رقم المعدة: ${meta.equipment_id}`);
                 if (meta.conversation_id) lines.push(`رقم المحادثة: ${meta.conversation_id}`);
                 if (meta.distance_km) lines.push(`المسافة: ${Number(meta.distance_km).toFixed(3)} كم`);
-                if (meta.speed) lines.push(`السرعة: ${meta.speed}`);
-                if (meta.battery_level) lines.push(`البطارية: ${meta.battery_level}%`);
+                // if (meta.speed) lines.push(`السرعة: ${meta.speed}`);
+                // if (meta.battery_level) lines.push(`البطارية: ${meta.battery_level}%`);
                 if (meta.lat && meta.lng) lines.push(`الموقع: (${meta.lat}, ${meta.lng})`);
 
                 if (lines.length) {
@@ -839,7 +1113,7 @@
                 }
             });
         });
-    </script>
+    </script> --}}
 
     @stack('scripts')
 </body>

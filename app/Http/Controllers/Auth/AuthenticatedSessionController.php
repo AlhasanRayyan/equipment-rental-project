@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -7,6 +8,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\NotificationService;
 use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
@@ -36,10 +38,24 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerate();
         $user = Auth::user();
 
-        // ⭐ تحديث وقت آخر تسجيل دخول
+        //  تحديث وقت آخر تسجيل دخول
         $user->update([
             'last_login_at' => now(),
         ]);
+
+        // إشعار تسجيل دخول ناجح للمستخدم العادي فقط
+        if ($user && $user->role !== 'admin') {
+            NotificationService::systemAlert(
+                $user,
+                'تسجيل دخول ناجح',
+                'تم تسجيل دخولك إلى حسابك بنجاح.',
+                null,
+                [
+                    'login_at' => now()->toDateTimeString(),
+                ]
+            );
+        }
+
         //  لو جاي من رابط فيه redirect (زي login?redirect=equipments.create)
         if ($request->has('redirect')) {
             return redirect()->route($request->redirect);

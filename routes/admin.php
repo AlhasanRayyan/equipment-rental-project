@@ -9,13 +9,45 @@ use App\Http\Controllers\Admin\EquipmentController;
 use App\Http\Controllers\Admin\InvoiceController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\TrackingController;
+use App\Http\Controllers\Admin\AdminNotificationController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
 
     // مسار لوحة التحكم الرئيسية (لوحة تحكم المشرف)
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');
+
+
+    // notification Admin
+    // Route::get('read-notify', function () {
+    //     return view('dashboard.read_notify');
+    // })->name('read_notify');
+
+    // Route::put('notifications/{id}/read', function ($id) {
+    //     $n = Auth::user()->notifications()->findOrFail($id);
+    //     $n->markAsRead();
+    //     return back();
+    // })->name('notifications.read');
+
+
+    // Route::delete('delete-notify/{id}', function ($id) {
+    //     $n = Auth::user()->notifications()->findOrFail($id);
+    //     $n->delete();
+    //     return back();
+    // })->name('delete');
+
+    // Route::get('read-all-notify', function () {
+    //     Auth::user()->unreadNotifications->markAsRead();
+    //     return back();
+    // })->name('readall');
+    Route::get('notifications', [AdminNotificationController::class, 'index'])->name('notifications.index');
+    Route::put('notifications/{id}/read', [AdminNotificationController::class, 'read'])->name('notifications.read');
+    Route::delete('notifications/{id}', [AdminNotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::put('notifications/read-all', [AdminNotificationController::class, 'readAll'])->name('notifications.readall');
+
 
     // مسارات إدارة المستخدمين
     Route::prefix('users')->name('users.')->group(function () {
@@ -36,7 +68,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
         Route::delete('/trash/{id}/force-delete', [UserController::class, 'forceDelete'])->name('forceDelete');
         Route::delete('/trash/force-delete-all', [UserController::class, 'forceDeleteAll'])->name('forceDeleteAll');
-
     });
 
     // مسارات إدارة المعدات (مراجعة الإعلانات والموافقة)
@@ -58,7 +89,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/restore-all', [EquipmentController::class, 'restoreAll'])->name('restoreAll');
         Route::delete('/{id}/force-delete', [EquipmentController::class, 'forceDelete'])->name('forceDelete');
         Route::delete('/force-delete-all', [EquipmentController::class, 'forceDeleteAll'])->name('forceDeleteAll');
-
     });
 
     // مسارات إدارة الشكاوى والاستفسارات
@@ -116,9 +146,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/restore-all', [EquipmentCategoryController::class, 'restoreAll'])->name('restoreAll');
         Route::delete('/{id}/force-delete', [EquipmentCategoryController::class, 'forceDelete'])->name('forceDelete');
         Route::delete('/force-delete-all', [EquipmentCategoryController::class, 'forceDeleteAll'])->name('forceDeleteAll');
-
     });
-// ادارة الحجوزات
+    // ادارة الحجوزات
     Route::prefix('bookings')->name('bookings.')->group(function () {
         Route::get('/', [BookingController::class, 'index'])->name('index');
         // لازم يكون قبل رابط التفاصيل عشان ما يعطيني ايررورر 404 انتبهي
@@ -146,5 +175,4 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/{invoice}', [InvoiceController::class, 'show'])->name('show');
         Route::get('/{invoice}/download', [InvoiceController::class, 'download'])->name('download');
     });
-
 });

@@ -81,7 +81,7 @@
 </div>
 
 {{-- المودال --}}
-<div class="modal fade" id="userNotifModal" tabindex="-1" aria-hidden="true">
+{{-- <div class="modal fade" id="userNotifModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-end" dir="rtl">
 
@@ -95,13 +95,13 @@
                     <div class="flex-grow-1">
                         <div class="d-flex align-items-center gap-2">
                             <h5 class="modal-title mb-0" id="userNotifModalTitle">إشعار</h5>
-                            {{-- <span id="userNotifModalLabel" class="badge bg-light text-dark border"></span> --}}
+                            {{-- <span id="userNotifModalLabel" class="badge bg-light text-dark border"></span> --}
                         </div>
                         <small class="text-muted d-block" id="userNotifModalTime"></small>
                     </div>
                 </div>
 
-                {{-- <button type="button" class="btn-close ms-0" data-bs-dismiss="modal" aria-label="Close"></button> --}}
+                {{-- <button type="button" class="btn-close ms-0" data-bs-dismiss="modal" aria-label="Close"></button> --}
             </div>
 
             <div class="modal-body">
@@ -146,6 +146,6 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 
 @endsection

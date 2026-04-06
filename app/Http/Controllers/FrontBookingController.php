@@ -53,6 +53,7 @@ class FrontBookingController extends Controller
         ]);
 
         NotificationService::bookingRequest($booking, $equipment);
+        NotificationService::bookingCreatedByRenter($booking, $equipment);
 
 
 
