@@ -35,7 +35,7 @@ class EquipmentTrackingFactory extends Factory
             'equipment_id' => $equipment->id,
             'latitude' => $this->faker->latitude(),
             'longitude' => $this->faker->longitude(),
-            'status' => $this->faker->randomElement(['online', 'offline', 'moving', 'idle']),
+            'status' => $this->faker->randomElement(['moving', 'idle']),
             'created_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
             'updated_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
         ];
@@ -44,23 +44,23 @@ class EquipmentTrackingFactory extends Factory
     /**
      * Indicate that the device is online.
      */
-    public function online(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'online',
-        ]);
-    }
+    // public function online(): static
+    // {
+    //     return $this->state(fn (array $attributes) => [
+    //         'status' => 'online',
+    //     ]);
+    // }
 
     /**
      * Indicate that the device is offline.
      */
-    public function offline(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'status' => 'offline',
-            'speed' => 0.00,
-        ]);
-    }
+    // public function offline(): static
+    // {
+    //     return $this->state(fn (array $attributes) => [
+    //         'status' => 'offline',
+    //         'speed' => 0.00,
+    //     ]);
+    // }
 
     /**
      * Indicate that the device is moving.
@@ -69,7 +69,7 @@ class EquipmentTrackingFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => 'moving',
-            'speed' => $this->faker->randomFloat(2, 1, 80),
+            // 'speed' => $this->faker->randomFloat(2, 1, 80),
         ]);
     }
 
@@ -80,7 +80,7 @@ class EquipmentTrackingFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => 'idle',
-            'speed' => 0.00,
+            // 'speed' => 0.00,
         ]);
     }
 

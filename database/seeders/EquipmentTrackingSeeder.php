@@ -45,9 +45,9 @@ class EquipmentTrackingSeeder extends Seeder
             $baseLat = $basePoint['lat'];
             $baseLng = $basePoint['lng'];
 
-            $batteryLevel = $faker->randomFloat(2, 45, 100);
+            // $batteryLevel = $faker->randomFloat(2, 45, 100);
 
-            $statuses = ['online', 'moving', 'idle', 'offline'];
+            $statuses = ['moving', 'idle'];
 
             $currentDate = Carbon::now()->subDays(rand(1, 10));
 
@@ -60,18 +60,18 @@ class EquipmentTrackingSeeder extends Seeder
                 $lat = max(31.20, min(31.70, $lat));
                 $lng = max(34.20, min(34.60, $lng));
 
-                $speed = match ($status) {
-                    'moving' => $faker->randomFloat(2, 10, 80),
-                    'online' => $faker->randomFloat(2, 0, 10),
-                    'idle' => 0,
-                    'offline' => 0,
-                    default => 0,
-                };
+                // $speed = match ($status) {
+                //     'moving' => $faker->randomFloat(2, 10, 80),
+                //     // 'online' => $faker->randomFloat(2, 0, 10),
+                //     'idle' => 0,
+                //     // 'offline' => 0,
+                //     default => 0,
+                // };
 
-                $batteryLevel -= $faker->randomFloat(2, 0.3, 2.5);
-                if ($batteryLevel < 5) {
-                    $batteryLevel = $faker->randomFloat(2, 20, 90);
-                }
+                // $batteryLevel -= $faker->randomFloat(2, 0.3, 2.5);
+                // if ($batteryLevel < 5) {
+                //     $batteryLevel = $faker->randomFloat(2, 20, 90);
+                // }
 
                 EquipmentTracking::factory()
                     ->forEquipment($equipment)

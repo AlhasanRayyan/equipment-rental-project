@@ -276,10 +276,10 @@
                     <h2 class="mb-0">تتبع معداتي</h2>
 
                     <div class="d-flex flex-wrap gap-2 align-items-center">
-                        <label class="filter-chip">
+                        {{-- <label class="filter-chip">
                             <input type="checkbox" class="status-filter" value="online" checked>
                             <span><i class="fas fa-circle text-success"></i> متصل</span>
-                        </label>
+                        </label> --}}
 
                         <label class="filter-chip">
                             <input type="checkbox" class="status-filter" value="moving" checked>
@@ -291,10 +291,10 @@
                             <span><i class="fas fa-circle text-warning"></i> متوقف</span>
                         </label>
 
-                        <label class="filter-chip">
+                        {{-- <label class="filter-chip">
                             <input type="checkbox" class="status-filter" value="offline" checked>
                             <span><i class="fas fa-circle text-secondary"></i> غير متصل</span>
-                        </label>
+                        </label> --}}
 
                         <button type="button" class="btn btn-sm btn-dark rounded-pill px-3" id="showAllStatuses">
                             الكل
@@ -364,30 +364,30 @@
                 user-select: none;
             }
 
-            .filter-chip input:checked + span {
+            .filter-chip input:checked+span {
                 border-width: 2px;
                 font-weight: 600;
             }
 
-            .filter-chip input[value="online"]:checked + span {
-                background: rgba(25, 135, 84, 0.1);
-                border-color: #198754;
-            }
+            /* .filter-chip input[value="online"]:checked + span {
+                    background: rgba(25, 135, 84, 0.1);
+                    border-color: #198754;
+                } */
 
-            .filter-chip input[value="moving"]:checked + span {
+            .filter-chip input[value="moving"]:checked+span {
                 background: rgba(220, 53, 69, 0.1);
                 border-color: #dc3545;
             }
 
-            .filter-chip input[value="idle"]:checked + span {
+            .filter-chip input[value="idle"]:checked+span {
                 background: rgba(255, 193, 7, 0.15);
                 border-color: #ffc107;
             }
 
-            .filter-chip input[value="offline"]:checked + span {
-                background: rgba(108, 117, 125, 0.1);
-                border-color: #6c757d;
-            }
+            /* .filter-chip input[value="offline"]:checked + span {
+                    background: rgba(108, 117, 125, 0.1);
+                    border-color: #6c757d;
+                } */
         </style>
 
         <script>
@@ -438,21 +438,13 @@
                         color: '#dc3545',
                         badge: 'bg-danger'
                     },
-                    online: {
-                        label: 'متصل',
-                        color: '#198754',
-                        badge: 'bg-success'
-                    },
+
                     idle: {
                         label: 'متوقف',
                         color: '#ffc107',
                         badge: 'bg-warning text-dark'
                     },
-                    offline: {
-                        label: 'غير متصل',
-                        color: '#6c757d',
-                        badge: 'bg-secondary'
-                    }
+                   
                 };
 
                 const markers = [];

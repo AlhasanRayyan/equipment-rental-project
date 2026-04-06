@@ -18,7 +18,7 @@ return new class extends Migration
             $table->decimal('longitude', 10, 7);
             $table->decimal('speed', 6, 2)->default(0.00); // e.g., km/h or mph
             $table->decimal('battery_level', 5, 2)->nullable(); // e.g., percentage 0-100
-            $table->enum('status', ['online', 'offline', 'moving', 'idle'])->default('online');
+            $table->enum('status', ['moving', 'idle'])->default('idle');
             $table->timestamps(); // created_at (timestamp), updated_at
         });
     }

@@ -58,7 +58,7 @@ class EquipmentTracking extends Model
      */
     public function isOnline(): bool
     {
-        return $this->status === 'online' || $this->status === 'moving' || $this->status === 'idle';
+        return $this->status === 'moving' || $this->status === 'idle';
     }
 
     /**
