@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
 
 <head>
     <meta charset="utf-8">
@@ -303,45 +303,63 @@
         }
 
         #userNotifModal .modal-content {
-    animation: notifModalPop .18s ease;
-}
+            animation: notifModalPop .18s ease;
+        }
 
-#userNotifModal .btn {
-    transition: .2s ease;
-}
+        #userNotifModal .btn {
+            transition: .2s ease;
+        }
 
-#userNotifModal .btn:hover {
-    transform: translateY(-1px);
-}
+        #userNotifModal .btn:hover {
+            transform: translateY(-1px);
+        }
 
-#userNotifModal #userNotifModalMeta ul {
-    margin: 0;
-    padding-right: 1rem;
-}
+        #userNotifModal #userNotifModalMeta ul {
+            margin: 0;
+            padding-right: 1rem;
+        }
 
-#userNotifModal #userNotifModalMeta li {
-    margin-bottom: 6px;
-}
+        #userNotifModal #userNotifModalMeta li {
+            margin-bottom: 6px;
+        }
 
-#userNotifModal .btn-close {
-    box-shadow: none !important;
-    opacity: .7;
-}
+        #userNotifModal .btn-close {
+            box-shadow: none !important;
+            opacity: .7;
+        }
 
-#userNotifModal .btn-close:hover {
-    opacity: 1;
-}
+        #userNotifModal .btn-close:hover {
+            opacity: 1;
+        }
 
-@keyframes notifModalPop {
-    from {
-        opacity: 0;
-        transform: translateY(8px) scale(.98);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
+        @keyframes notifModalPop {
+            from {
+                opacity: 0;
+                transform: translateY(8px) scale(.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+
+        .lang-btn {
+            color: inherit;
+            /* نفس لون العناصر */
+            font-weight: normal;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* نفس تأثير الهوفر */
+        .lang-btn:hover {
+            color: #f0b90b;
+            /* نفس اللون الأصفر تبع الـ active عندك */
+        }
     </style>
 
     @stack('styles')
@@ -365,20 +383,28 @@
                 <div class="page-header-bottom__right">
                     <nav class="uk-navbar-container uk-navbar-transparent" data-uk-navbar>
                         <div class="nav-overlay uk-visible@l List">
+
                             <ul class="uk-navbar-nav">
-                                <li class="{{ request()->routeIs('home') ? 'uk-active' : '' }}"><a
-                                        href="{{ route('home') }}">الصفحة الرئيسية</a></li>
-                                <li class="{{ request()->routeIs('categories') ? 'uk-active' : '' }}"><a
-                                        href="{{ route('categories') }}">الفئات</a></li>
-                                <li class="{{ request()->routeIs('equipments*') ? 'uk-active' : '' }}"><a
-                                        href="{{ route('equipments') }}">موصى به لك</a></li>
-                                <li class="{{ request()->routeIs('tracking.*') ? 'uk-active' : '' }}"><a
-                                        href="{{ route('tracking.index') }}">تتبع معداتي</a></li>
-                                <li class="{{ request()->routeIs('about') ? 'uk-active' : '' }}"><a
-                                        href="{{ route('about') }}">عن المنصة</a></li>
-                                <li class="{{ request()->routeIs('contact') ? 'uk-active' : '' }}"><a
-                                        href="{{ route('contact') }}">تواصل معنا</a></li>
+                                <li class="{{ request()->routeIs('home') ? 'uk-active' : '' }}">
+                                    <a href="{{ route('home') }}">{{ __('app.home') }}</a>
+                                </li>
+                                <li class="{{ request()->routeIs('categories') ? 'uk-active' : '' }}">
+                                    <a href="{{ route('categories') }}">{{ __('app.categories') }}</a>
+                                </li>
+                                <li class="{{ request()->routeIs('equipments*') ? 'uk-active' : '' }}">
+                                    <a href="{{ route('equipments') }}">{{ __('app.equipments') }}</a>
+                                </li>
+                                <li class="{{ request()->routeIs('tracking.*') ? 'uk-active' : '' }}">
+                                    <a href="{{ route('tracking.index') }}">{{ __('app.track_equipment') }}</a>
+                                </li>
+                                <li class="{{ request()->routeIs('about') ? 'uk-active' : '' }}">
+                                    <a href="{{ route('about') }}">{{ __('app.about') }}</a>
+                                </li>
+                                <li class="{{ request()->routeIs('contact') ? 'uk-active' : '' }}">
+                                    <a href="{{ route('contact') }}">{{ __('app.contact') }}</a>
+                                </li>
                             </ul>
+
                         </div>
 
                         <!-- بداية التعديل: استبدال login-link بالكود الجديد -->
@@ -514,6 +540,17 @@
                                 </div>
                             @endauth
 
+                            <div class="lang-switcher">
+                                <a href="{{ route('language.switch', app()->getLocale() === 'ar' ? 'en' : 'ar') }}"
+                                    class="lang-btn">
+                                    <span>🌐</span>
+                                    <span>
+                                        {{ app()->getLocale() === 'ar' ? 'English' : 'العربية' }}
+                                    </span>
+                                </a>
+                            </div>
+
+
                             <!-- قائمة المستخدم -->
                             <div class="dropdown">
                                 @php
@@ -524,23 +561,29 @@
                                     alt="User" class="user-img" id="userBtn">
 
                                 <div class="dropdown-content" id="dropdownMenu">
+
                                     @if ($user)
-                                        <a href="{{ route('profile.show', $user->id) }}"><i class="fas fa-user"></i>
-                                            الملف الشخصي</a>
-                                        <a href="{{ route('profile.edit', $user->id) }}"><i class="fas fa-edit"></i>
-                                            تحديث البيانات</a>
+                                        <a href="{{ route('profile.show', $user->id) }}">
+                                            <i class="fas fa-user"></i> {{ __('app.profile') }}
+                                        </a>
+                                        <a href="{{ route('profile.edit', $user->id) }}">
+                                            <i class="fas fa-edit"></i> {{ __('app.edit_profile') }}
+                                        </a>
                                         <form action="{{ route('logout') }}" method="POST" class="logout-form">
                                             @csrf
                                             <button type="submit" class="dropdown-link">
-                                                <i class="fas fa-sign-out-alt"></i> تسجيل خروج
+                                                <i class="fas fa-sign-out-alt"></i> {{ __('app.logout') }}
                                             </button>
                                         </form>
                                     @else
-                                        <a href="{{ route('login') }}"><i class="fas fa-sign-in-alt"></i> تسجيل
-                                            دخول</a>
-                                        <a href="{{ route('register') }}"><i class="fas fa-user-plus"></i> إنشاء
-                                            حساب</a>
+                                        <a href="{{ route('login') }}">
+                                            <i class="fas fa-sign-in-alt"></i> {{ __('app.login') }}
+                                        </a>
+                                        <a href="{{ route('register') }}">
+                                            <i class="fas fa-user-plus"></i> {{ __('app.register') }}
+                                        </a>
                                     @endif
+
                                 </div>
                             </div>
                         </div>
@@ -551,6 +594,7 @@
                                 data-uk-toggle="target: .nav-overlay; animation: uk-animation-fade"
                                 href="#"></a>
                         </div>
+
 
                         <div class="nav-overlay uk-navbar-left uk-flex-1" hidden>
                             <div class="uk-navbar-item uk-width-expand">
@@ -585,9 +629,9 @@
 
                         {{-- القسم الأول --}}
                         <div class="uk-flex-first@l">
-                            <div class="title">عن المنصة</div>
+                            <div class="title">{{ __('footer.about_platform') }}</div>
                             <p>
-                                منصة تتيح للمستخدمين خدمات من تأجير واستئجار معدات البناء بجميع أنواعها وبأسعار مناسبة.
+                                {{ __('footer.platform_description') }}
                             </p>
                             <ul class="social-list">
                                 <li class="social-list__item"><a class="social-list__link" href="#"><i
@@ -605,15 +649,15 @@
 
                         {{-- القسم الثاني --}}
                         <div class="uk-flex-last@l">
-                            <div class="title">معلومات التواصل</div>
+                            <div class="title">{{ __('footer.contact_info') }}</div>
                             <ul class="contacts-list">
                                 <li class="contacts-list-item">
                                     <div class="contacts-list-item__icon">
                                         <img src="{{ asset('assets/home/img/icons/ico-phone24.svg') }}" data-uk-svg
-                                            alt="For Rental Support">
+                                            alt="{{ __('footer.support') }}">
                                     </div>
                                     <div class="contacts-list-item__desc">
-                                        <div class="contacts-list-item__label">الدعم الفني</div>
+                                        <div class="contacts-list-item__label">{{ __('footer.support') }}</div>
                                         <div class="contacts-list-item__content">
                                             <a href="tel:+970597234892">+970 59 723 4892</a>
                                         </div>
@@ -623,21 +667,22 @@
                                 <li class="contacts-list-item">
                                     <div class="contacts-list-item__icon">
                                         <img src="{{ asset('assets/home/img/icons/ico-timer.svg') }}" data-uk-svg
-                                            alt="The Office Hours">
+                                            alt="{{ __('footer.office_hours') }}">
                                     </div>
                                     <div class="contacts-list-item__desc">
-                                        <div class="contacts-list-item__label">ساعات العمل</div>
-                                        <div class="contacts-list-item__content">السبت - الخميس (8ص - 6م)</div>
+                                        <div class="contacts-list-item__label">{{ __('footer.office_hours') }}</div>
+                                        <div class="contacts-list-item__content">{{ __('footer.office_hours_value') }}
+                                        </div>
                                     </div>
                                 </li>
 
                                 <li class="contacts-list-item">
                                     <div class="contacts-list-item__icon">
                                         <img src="{{ asset('assets/home/img/icons/ico-mail.svg') }}" data-uk-svg
-                                            alt="Send Us Email">
+                                            alt="{{ __('footer.email_us') }}">
                                     </div>
                                     <div class="contacts-list-item__desc">
-                                        <div class="contacts-list-item__label">راسلنا على الإيميل</div>
+                                        <div class="contacts-list-item__label">{{ __('footer.email_us') }}</div>
                                         <div class="contacts-list-item__content">
                                             <a href="mailto:rentals@my-domain.net">rentals@my-domain.net</a>
                                         </div>
@@ -648,23 +693,23 @@
 
                         {{-- القسم الثالث --}}
                         <div>
-                            <div class="title">روابط مفيدة</div>
+                            <div class="title">{{ __('footer.useful_links') }}</div>
                             <ul class="uk-nav uk-list-disc">
-                                <li><a href="{{ route('home') }}">الصفحة الرئيسية</a></li>
-                                <li><a href="{{ route('categories') }}">الفئات</a></li>
-                                <li><a href="{{ route('equipments') }}">المعدات</a></li>
-                                <li><a href="{{ route('contact') }}">تواصل معنا</a></li>
-                                <li><a href="{{ route('about') }}">عن المنصة</a></li>
+                                <li><a href="{{ route('home') }}">{{ __('footer.home') }}</a></li>
+                                <li><a href="{{ route('categories') }}">{{ __('footer.categories') }}</a></li>
+                                <li><a href="{{ route('equipments') }}">{{ __('footer.equipments') }}</a></li>
+                                <li><a href="{{ route('contact') }}">{{ __('footer.contact') }}</a></li>
+                                <li><a href="{{ route('about') }}">{{ __('footer.about') }}</a></li>
                             </ul>
                         </div>
 
                         {{-- القسم الرابع --}}
                         <div>
-                            <div class="title">اكتشف المنصة</div>
+                            <div class="title">{{ __('footer.discover_platform') }}</div>
                             <ul class="uk-nav uk-list-disc">
-                                <li><a href="{{ route('register') }}">إنشاء حساب</a></li>
-                                <li><a href="{{ route('login') }}">تسجيل دخول</a></li>
-                                <li><a href="{{ route('faq') }}">اقرأ الأسئلة الشائعة</a></li>
+                                <li><a href="{{ route('register') }}">{{ __('footer.register') }}</a></li>
+                                <li><a href="{{ route('login') }}">{{ __('footer.login') }}</a></li>
+                                <li><a href="{{ route('faq') }}">{{ __('footer.faq') }}</a></li>
                             </ul>
                         </div>
 
@@ -673,12 +718,12 @@
 
                 {{-- الفوتر السفلي --}}
                 <div class="page-footer-bottom">
-                    <span>(c) 2025 SPCER - تأجير معدات البناء. جميع الحقوق محفوظة</span>
+                    <span>{{ __('footer.copyright', ['year' => '2025']) }}</span>
                 </div>
 
                 <a class="totop-link" href="#top" data-uk-scroll>
                     <img src="{{ asset('assets/home/img/icons/ico-totop.svg') }}" alt="totop">
-                    <span>العودة للأعلى</span>
+                    <span>{{ __('footer.back_to_top') }}</span>
                 </a>
             </div>
 
@@ -698,17 +743,16 @@
 
                     <div class="uk-margin">
                         <ul class="uk-nav-default uk-nav-parent-icon" data-uk-nav>
-                            <li><a href="{{ route('home') }}">الصفحة الرئيسية</a></li>
-                            <li><a href="{{ route('categories') }}">الفئات</a></li>
-                            <li><a href="{{ route('equipments') }}">المعدات</a></li>
-                            <li><a href="{{ route('about') }}">عن المنصة</a></li>
-                            <li><a href="{{ route('contact') }}">تواصل معنا</a></li>
+                            <li><a href="{{ route('home') }}">{{ __('footer.home') }}</a></li>
+                            <li><a href="{{ route('categories') }}">{{ __('footer.categories') }}</a></li>
+                            <li><a href="{{ route('equipments') }}">{{ __('footer.equipments') }}</a></li>
+                            <li><a href="{{ route('about') }}">{{ __('footer.about') }}</a></li>
+                            <li><a href="{{ route('contact') }}">{{ __('footer.contact') }}</a></li>
                         </ul>
                     </div>
                 </div>
             </div>
         </footer>
-
         <!-- end footer html  -->
     </div>
 

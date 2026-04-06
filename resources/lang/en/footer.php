@@ -1,0 +1,22 @@
+<?php
+return [
+    'about_platform' => 'About the Platform',
+    'platform_description' => 'A platform that provides users with construction equipment rental services of all types at reasonable prices.',
+    'contact_info' => 'Contact Information',
+    'support' => 'Technical Support',
+    'office_hours' => 'Office Hours',
+    'office_hours_value' => 'Sat - Thu (8am - 6pm)',
+    'email_us' => 'Email Us',
+    'useful_links' => 'Useful Links',
+    'home' => 'Home',
+    'categories' => 'Categories',
+    'equipments' => 'Equipments',
+    'contact' => 'Contact Us',
+    'about' => 'About',
+    'discover_platform' => 'Discover the Platform',
+    'register' => 'Register',
+    'login' => 'Login',
+    'faq' => 'FAQ',
+    'copyright' => '(c) :year SPCER - Construction Equipment Rental. All rights reserved',
+    'back_to_top' => 'Back to Top',
+];

@@ -6,6 +6,7 @@ use App\Http\Controllers\Equipment\EquipmentsController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\FrontBookingController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\OwnerEquipmentController;
 use App\Http\Controllers\User\UserProfileController;
 use App\Models\Conversation;
@@ -181,5 +182,6 @@ Route::middleware('auth')->post('/favorites/toggle', [FavoriteController::class,
 
 Route::middleware('auth')->post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
+Route::get('/language/{locale}', [LanguageController::class, 'switch'])->name('language.switch');
 
 require __DIR__ . '/auth.php';
