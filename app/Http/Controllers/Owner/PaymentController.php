@@ -10,6 +10,7 @@ use App\Notifications\PaymentStatusUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\NotificationService;
 
 class PaymentController extends Controller
 {
@@ -27,7 +28,7 @@ class PaymentController extends Controller
                 // فلترة حسب حالة الدفع
                 match ($status) {
                     'awaiting_cash'     => $q->where('payment_method', 'cash')
-                                           ->whereIn('booking_status', ['confirmed', 'pending']),
+                        ->whereIn('booking_status', ['confirmed', 'pending']),
                     'proof_pending'     => $q->whereHas('paymentProof', fn($p) => $p->where('review_status', 'pending')),
                     'proof_approved'    => $q->whereHas('paymentProof', fn($p) => $p->where('review_status', 'approved')),
                     'proof_rejected'    => $q->whereHas('paymentProof', fn($p) => $p->where('review_status', 'rejected')),
@@ -80,9 +81,13 @@ class PaymentController extends Controller
                 'confirmed_at'   => now(),
             ]);
         });
+        $booking->load(['equipment', 'renter']);
 
+        NotificationService::paymentApproved($booking, $booking->equipment, (float) $booking->total_cost);
+        NotificationService::paymentReceived($booking, $booking->equipment, (float) $booking->total_cost);
+        NotificationService::bookingConfirmed($booking, $booking->equipment);
         // إشعار العميل
-        $booking->renter->notify(new PaymentStatusUpdated($booking, 'cash_confirmed'));
+        // $booking->renter->notify(new PaymentStatusUpdated($booking, 'cash_confirmed'));
 
         return back()->with('success', 'تم تأكيد استلام المبلغ النقدي وتحديث حالة الحجز.');
     }
@@ -120,7 +125,13 @@ class PaymentController extends Controller
         });
 
         // إشعار العميل
-        $booking->renter->notify(new PaymentStatusUpdated($booking, 'transfer_approved'));
+        // $booking->renter->notify(new PaymentStatusUpdated($booking, 'transfer_approved'));
+
+        $booking->load(['equipment', 'renter']);
+
+        NotificationService::paymentApproved($booking, $booking->equipment, (float) $booking->total_cost);
+        NotificationService::paymentReceived($booking, $booking->equipment, (float) $booking->total_cost);
+        NotificationService::bookingConfirmed($booking, $booking->equipment);
 
         return back()->with('success', 'تم قبول إشعار التحويل وتأكيد الحجز بنجاح.');
     }
@@ -163,7 +174,10 @@ class PaymentController extends Controller
         });
 
         // إشعار العميل مع سبب الرفض
-        $booking->renter->notify(new PaymentStatusUpdated($booking, 'transfer_rejected', $request->rejection_reason));
+        // $booking->renter->notify(new PaymentStatusUpdated($booking, 'transfer_rejected', $request->rejection_reason));
+
+        $booking->load(['equipment', 'renter']);
+        NotificationService::paymentRejected($booking, $booking->equipment, $request->rejection_reason);
 
         return back()->with('success', 'تم رفض إشعار التحويل وإشعار العميل بالسبب.');
     }
@@ -192,7 +206,17 @@ class PaymentController extends Controller
         $booking->update($updates);
 
         // إشعار العميل
-        $booking->renter->notify(new PaymentStatusUpdated($booking, 'status_changed_' . $request->booking_status));
+        // $booking->renter->notify(new PaymentStatusUpdated($booking, 'status_changed_' . $request->booking_status));
+
+        $booking->load(['equipment', 'renter']);
+
+        if ($request->booking_status === 'confirmed') {
+            NotificationService::bookingConfirmed($booking, $booking->equipment);
+        } elseif ($request->booking_status === 'cancelled') {
+            NotificationService::bookingCancelled($booking, $booking->equipment, $request->reason ?? null);
+        } elseif ($request->booking_status === 'completed') {
+            NotificationService::bookingCompleted($booking, $booking->equipment);
+        }
 
         return back()->with('success', 'تم تحديث حالة الحجز بنجاح.');
     }

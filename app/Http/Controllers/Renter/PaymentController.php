@@ -7,12 +7,13 @@ use App\Models\Booking;
 use App\Models\Payment;
 use App\Models\PaymentProof;
 use App\Notifications\PaymentProofSubmitted;
-use App\Notifications\PaymentStatusUpdated;
+// use App\Notifications\PaymentStatusUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Storage;
+// use Illuminate\Support\Facades\Notification;
+// use Illuminate\Support\Facades\Storage;
+use App\Services\NotificationService;
 
 class PaymentController extends Controller
 {
@@ -65,14 +66,17 @@ class PaymentController extends Controller
 
         if ($request->payment_method_type === 'cash') {
             // دفع كاش: أبلغ المالك أن العميل اختار الكاش
-            $this->notifyOwnerCashPayment($booking, $payment);
+            // $this->notifyOwnerCashPayment($booking, $payment);
+
+            $booking->load(['equipment.owner']);
+            NotificationService::cashPaymentSelected($booking, $booking->equipment);
 
             return redirect()->route('renter.payments.show', $booking)
                 ->with('success', 'تم اختيار طريقة الدفع النقدي. سيتم التواصل معك لترتيب عملية الاستلام.');
         }
 
         // تحويل بنكي/محفظة: اعرض نموذج رفع الإشعار
-        return redirect()->route('renter.payments.upload-proof', $booking);
+        return redirect()->route('renter.payments.upload-proof', $booking)->with('success', 'تم اختيار طريقة الدفع النقدي. سيتم التواصل معك لترتيب عملية الاستلام.');
     }
 
     /**
@@ -151,7 +155,11 @@ class PaymentController extends Controller
         });
 
         // إشعار للمالك
-        $this->notifyOwnerProofSubmitted($booking);
+        // $this->notifyOwnerProofSubmitted($booking);
+
+        $booking->load(['equipment', 'renter', 'payment', 'paymentProof']);
+
+        NotificationService::paymentProofSubmitted($booking, $booking->equipment);
 
         return redirect()->route('renter.payments.show', $booking)
             ->with('success', 'تم رفع إشعار التحويل بنجاح. سيتم مراجعته من قبل المالك قريباً.');
@@ -159,20 +167,21 @@ class PaymentController extends Controller
 
     // ─── Private Helpers ─────────────────────────────────────────
 
-    private function notifyOwnerCashPayment(Booking $booking, Payment $payment): void
-    {
-        $owner = $booking->equipment->owner;
-        if ($owner) {
-            $owner->notify(new PaymentProofSubmitted($booking, $payment, null, 'cash'));
-        }
-    }
+    // private function notifyOwnerCashPayment(Booking $booking, Payment $payment): void
+    // {
+    //     $owner = $booking->equipment->owner;
+    //     if ($owner) {
+    //         $owner->notify(new PaymentProofSubmitted($booking, $payment, null, 'cash'));
+    //     }
+    // }
 
-    private function notifyOwnerProofSubmitted(Booking $booking): void
-    {
-        $booking->load(['equipment.owner', 'paymentProof', 'payment']);
-        $owner = $booking->equipment->owner;
-        if ($owner) {
-            $owner->notify(new PaymentProofSubmitted($booking, $booking->payment, $booking->paymentProof));
-        }
+    // private function notifyOwnerProofSubmitted(Booking $booking): void
+    // {
+    //     $booking->load(['equipment.owner', 'paymentProof', 'payment']);
+    //     $owner = $booking->equipment->owner;
+    //     if ($owner) {
+    //         $owner->notify(new PaymentProofSubmitted($booking, $booking->payment, $booking->paymentProof));
+    //     }
+    // }
+
     }
-}

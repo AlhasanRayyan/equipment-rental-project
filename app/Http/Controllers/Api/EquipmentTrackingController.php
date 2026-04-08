@@ -29,10 +29,7 @@ class EquipmentTrackingController extends Controller
             'equipment_id'  => 'required|exists:equipment,id', // يجب أن يكون المعدّة موجودة في جدول equipment
             'latitude'      => 'required|numeric|between:-90,90',
             'longitude'     => 'required|numeric|between:-180,180',
-            'speed'         => 'nullable|numeric|min:0',
-            'battery_level' => 'nullable|numeric|between:0,100',
             'status'        => 'required|string|in:online,offline,moving,idle', // حسب الـ Enum عندك
-
             'start_time'    => 'nullable|date',
             'end_time'      => 'nullable|date|after_or_equal:start_time',
             'duration'      => 'nullable|numeric|min:0',
@@ -55,8 +52,6 @@ class EquipmentTrackingController extends Controller
                 'equipment_id'  => $request->equipment_id,
                 'latitude'      => $request->latitude,
                 'longitude'     => $request->longitude,
-                'speed'         => $request->speed ?? 0,
-                'battery_level' => $request->battery_level,
                 'status'        => $request->status,
                 'start_time'    => $request->start_time,
                 'end_time'      => $request->end_time,
@@ -76,7 +71,6 @@ class EquipmentTrackingController extends Controller
                         equipmentId: (int)$request->equipment_id,
                         latitude: (float)$tracking->latitude,
                         longitude: (float)$tracking->longitude,
-                        speed: (float)($tracking->speed ?? 0),
                         distanceKm: (float)$distanceKm
                     );
                 }
@@ -99,7 +93,7 @@ class EquipmentTrackingController extends Controller
     /**
      * إرسال إشعار عند الحركة + cooldown لمنع التكرار
      */
-    private function notifyIfNotSpam(int $equipmentId, float $latitude, float $longitude, float $speed, float $distanceKm): void
+    private function notifyIfNotSpam(int $equipmentId, float $latitude, float $longitude, float $distanceKm): void
     {
         $equipment = Equipment::with('owner')->find($equipmentId);
         if (!$equipment || !$equipment->owner) return;
@@ -119,7 +113,6 @@ class EquipmentTrackingController extends Controller
             distanceKm: $distanceKm,
             lat: $latitude,
             lng: $longitude,
-            speed: $speed
         );
     }
 

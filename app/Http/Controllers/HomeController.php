@@ -25,7 +25,7 @@ class HomeController extends Controller
         $featuredCategories  = EquipmentCategory::parents()->active()->inRandomOrder()->take(6)->get();
         $siteDescription     = AdminSetting::where('setting_key', 'site_description')->first()->setting_value ?? 'منصة تتيح للمستخدمين خدمات من تأجير واستئجار معدات بجميع أنواعها وبأسعار مناسبة';
 
-        // ✅ نتائج البحث
+        //  نتائج البحث
         $searchResults = null;
         $hasSearch = $query || $categoryId || $location || $minDailyRate || $maxDailyRate;
 

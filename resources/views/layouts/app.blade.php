@@ -255,7 +255,9 @@
                                     <span class="badge bg-danger badge-counter">{{ $unreadCount }}</span>
                                 @endif
                             </a>
-
+                            @php
+                                $latestNotifications = auth()->user()->notifications()->latest()->take(5)->get();
+                            @endphp
                             <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in notif-dropdown"
                                 aria-labelledby="notifDropdown" style="min-width: 340px;">
 
@@ -273,24 +275,24 @@
 
                                 @forelse(($latestNotifications ?? collect()) as $n)
                                     @php
-                                        $kind = $notification->data['kind'] ?? 'system_alert';
+                                        $kind = $n->data['kind'] ?? 'system_alert';
                                         $ui = $notifUI[$kind] ?? ['icon' => 'fas fa-bell', 'class' => 'text-dark'];
 
                                         $meta = [
-                                            'booking_id' => $notification->data['booking_id'] ?? null,
-                                            'equipment_id' => $notification->data['equipment_id'] ?? null,
-                                            'conversation_id' => $notification->data['conversation_id'] ?? null,
-                                            'message_id' => $notification->data['message_id'] ?? null,
-                                            'owner_id' => $notification->data['owner_id'] ?? null,
-                                            'renter_id' => $notification->data['renter_id'] ?? null,
-                                            'lat' => $notification->data['lat'] ?? null,
-                                            'lng' => $notification->data['lng'] ?? null,
-                                            'distance_km' => $notification->data['distance_km'] ?? null,
-                                            'amount' => $notification->data['amount'] ?? null,
-                                            'reason' => $notification->data['reason'] ?? null,
-                                            'start_date' => $notification->data['start_date'] ?? null,
-                                            'login_at' => $notification->data['login_at'] ?? null,
-                                            'registered_at' => $notification->data['registered_at'] ?? null,
+                                            'booking_id' => $n->data['booking_id'] ?? null,
+                                            'equipment_id' => $n->data['equipment_id'] ?? null,
+                                            'conversation_id' => $n->data['conversation_id'] ?? null,
+                                            'message_id' => $n->data['message_id'] ?? null,
+                                            'owner_id' => $n->data['owner_id'] ?? null,
+                                            'renter_id' => $n->data['renter_id'] ?? null,
+                                            'lat' => $n->data['lat'] ?? null,
+                                            'lng' => $n->data['lng'] ?? null,
+                                            'distance_km' => $n->data['distance_km'] ?? null,
+                                            'amount' => $n->data['amount'] ?? null,
+                                            'reason' => $n->data['reason'] ?? null,
+                                            'start_date' => $n->data['start_date'] ?? null,
+                                            'login_at' => $n->data['login_at'] ?? null,
+                                            'registered_at' => $n->data['registered_at'] ?? null,
                                         ];
                                     @endphp
 
@@ -482,6 +484,95 @@
         });
     </script> --}}
     <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('notifModal');
+        if (!modal) return;
+
+        const iconEl = document.getElementById('notifModalIcon');
+        const titleEl = document.getElementById('notifModalTitle');
+        const labelEl = document.getElementById('notifModalLabel');
+        const msgEl = document.getElementById('notifModalMessage');
+        const timeEl = document.getElementById('notifModalTime');
+
+        const extraWrap = document.getElementById('notifExtraWrap');
+        const metaEl = document.getElementById('notifModalMeta');
+
+        const markForm = document.getElementById('markAsReadForm');
+        const delForm = document.getElementById('deleteNotifForm');
+        const confirmForm = document.getElementById('bookingConfirmForm');
+        const cancelForm = document.getElementById('bookingCancelForm');
+
+        modal.addEventListener('show.bs.modal', function(event) {
+            const btn = event.relatedTarget;
+            if (!btn) return;
+
+            const id = btn.getAttribute('data-id');
+            const kind = btn.getAttribute('data-kind') || 'system_alert';
+            const icon = btn.getAttribute('data-icon') || 'fas fa-bell';
+            const color = btn.getAttribute('data-color') || 'text-dark';
+            const label = btn.getAttribute('data-label') || '';
+            const title = btn.getAttribute('data-title') || 'إشعار';
+            const message = btn.getAttribute('data-message') || '';
+            const time = btn.getAttribute('data-time') || '';
+            const meta = JSON.parse(btn.getAttribute('data-meta') || '{}');
+
+            iconEl.className = `${icon} ${color}`;
+            titleEl.textContent = title;
+            labelEl.textContent = label;
+            labelEl.style.display = label ? '' : 'none';
+
+            msgEl.textContent = message;
+            timeEl.textContent = time;
+
+            markForm.action = `{{ url('admin/notifications') }}/${id}/read`;
+            delForm.action = `{{ url('admin/notifications') }}/${id}`;
+
+            const lines = [];
+            if (meta.equipment_name) lines.push(`المعدة: ${meta.equipment_name}`);
+            if (meta.renter_name) lines.push(`المستأجر: ${meta.renter_name}`);
+            if (meta.owner_name) lines.push(`المؤجر: ${meta.owner_name}`);
+            if (meta.sender_name) lines.push(`المرسل: ${meta.sender_name}`);
+            if (meta.amount) lines.push(`المبلغ: ${meta.amount}`);
+            if (meta.reason) lines.push(`السبب: ${meta.reason}`);
+            if (meta.start_date) lines.push(`موعد البداية: ${meta.start_date}`);
+            if (meta.end_date) lines.push(`موعد النهاية: ${meta.end_date}`);
+            if (meta.distance_km) lines.push(`المسافة: ${Number(meta.distance_km).toFixed(3)} كم`);
+            if (meta.location_text) lines.push(`الموقع: ${meta.location_text}`);
+            if (meta.login_at) lines.push(`وقت تسجيل الدخول: ${meta.login_at}`);
+            if (meta.registered_at) lines.push(`وقت إنشاء الحساب: ${meta.registered_at}`);
+
+            if (lines.length) {
+                metaEl.innerHTML = '<ul class="mb-0">' + lines.map(x => `<li>${x}</li>`).join('') + '</ul>';
+                extraWrap.style.display = '';
+            } else {
+                metaEl.innerHTML = '';
+                extraWrap.style.display = 'none';
+            }
+
+            if (kind === 'booking_request' && meta.booking_id) {
+                confirmForm.classList.remove('d-none');
+                cancelForm.classList.remove('d-none');
+
+                confirmForm.action = window.routes.bookingConfirm.replace('__ID__', meta.booking_id);
+                cancelForm.action = window.routes.bookingCancel.replace('__ID__', meta.booking_id);
+            } else {
+                confirmForm.classList.add('d-none');
+                cancelForm.classList.add('d-none');
+                confirmForm.action = '';
+                cancelForm.action = '';
+            }
+        });
+
+        document.addEventListener('click', function(e) {
+            const a = e.target.closest('.notif-item');
+            if (!a) return;
+
+            const dd = bootstrap.Dropdown.getInstance(document.getElementById('notifDropdown'));
+            if (dd) dd.hide();
+        });
+    });
+</script>
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('notifModal');
             if (!modal) return;
@@ -491,7 +582,7 @@
             const labelEl = document.getElementById('notifModalLabel');
             const msgEl = document.getElementById('notifModalMessage');
             const timeEl = document.getElementById('notifModalTime');
-            const kindEl = document.getElementById('notifModalKind');
+            // const kindEl = document.getElementById('notifModalKind');
 
             const extraWrap = document.getElementById('notifExtraWrap');
             const metaEl = document.getElementById('notifModalMeta');
@@ -522,7 +613,7 @@
 
                 msgEl.textContent = message;
                 timeEl.textContent = time;
-                kindEl.textContent = kind;
+                // kindEl.textContent = kind;
 
                 markForm.action = `{{ url('admin/notifications') }}/${id}/read`;
                 delForm.action = `{{ url('admin/notifications') }}/${id}`;
@@ -573,7 +664,7 @@
                 if (dd) dd.hide();
             });
         });
-    </script>
+    </script> --}}
     @stack('scripts')
 </body>
 

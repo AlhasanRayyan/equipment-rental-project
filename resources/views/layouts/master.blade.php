@@ -816,13 +816,13 @@
                         <div id="userNotifModalMeta" class="small" style="color:#6b7280; line-height:1.9;"></div>
                     </div>
 
-                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                    {{-- <div class="d-flex align-items-center gap-2 flex-wrap">
                         <span class="small fw-semibold" style="color:#6b7280;">نوع الإشعار:</span>
                         <code id="userNotifModalKind" class="px-3 py-2 rounded-pill"
                             style="background:#f3f4f6; color:#be123c; font-size:.82rem;">
                             system_alert
                         </code>
-                    </div>
+                    </div> --}}
                 </div>
 
                 {{-- Footer --}}
@@ -1022,7 +1022,7 @@
 
     {{-- مودال اليوزر العادي
  --}}
-    <script>
+    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('userNotifModal');
             if (!modal) return;
@@ -1032,7 +1032,7 @@
             const labelEl = document.getElementById('userNotifModalLabel');
             const msgEl = document.getElementById('userNotifModalMessage');
             const timeEl = document.getElementById('userNotifModalTime');
-            const kindEl = document.getElementById('userNotifModalKind');
+            // const kindEl = document.getElementById('userNotifModalKind');
 
             const extraWrap = document.getElementById('userNotifExtraWrap');
             const metaEl = document.getElementById('userNotifModalMeta');
@@ -1061,7 +1061,7 @@
 
                 msgEl.textContent = message;
                 timeEl.textContent = time;
-                kindEl.textContent = kind;
+                // kindEl.textContent = kind;
 
                 markForm.action = `{{ url('my-notifications') }}/${id}/read`;
                 delForm.action = `{{ url('my-notifications') }}/${id}`;
@@ -1078,6 +1078,75 @@
                 if (meta.login_at) lines.push(`وقت تسجيل الدخول: ${meta.login_at}`);
                 if (meta.registered_at) lines.push(`وقت إنشاء الحساب: ${meta.registered_at}`);
                 if (meta.start_date) lines.push(`موعد البداية: ${meta.start_date}`);
+
+                if (lines.length) {
+                    metaEl.innerHTML = '<ul class="mb-0 ps-3">' + lines.map(x => `<li>${x}</li>`).join('') +
+                        '</ul>';
+                    extraWrap.style.display = '';
+                } else {
+                    metaEl.innerHTML = '';
+                    extraWrap.style.display = 'none';
+                }
+
+                const notifMenu = document.getElementById('dropdownMenuNot');
+                if (notifMenu) notifMenu.classList.remove('show');
+            });
+        });
+    </script> --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('userNotifModal');
+            if (!modal) return;
+
+            const iconEl = document.getElementById('userNotifModalIcon');
+            const titleEl = document.getElementById('userNotifModalTitle');
+            const labelEl = document.getElementById('userNotifModalLabel');
+            const msgEl = document.getElementById('userNotifModalMessage');
+            const timeEl = document.getElementById('userNotifModalTime');
+
+            const extraWrap = document.getElementById('userNotifExtraWrap');
+            const metaEl = document.getElementById('userNotifModalMeta');
+
+            const markForm = document.getElementById('userMarkAsReadForm');
+            const delForm = document.getElementById('userDeleteNotifForm');
+
+            modal.addEventListener('show.bs.modal', function(event) {
+                const btn = event.relatedTarget;
+                if (!btn) return;
+
+                const id = btn.getAttribute('data-id');
+                const icon = btn.getAttribute('data-icon') || 'fas fa-bell';
+                const color = btn.getAttribute('data-color') || 'text-dark';
+                const label = btn.getAttribute('data-label') || '';
+                const title = btn.getAttribute('data-title') || 'إشعار';
+                const message = btn.getAttribute('data-message') || '';
+                const time = btn.getAttribute('data-time') || '';
+                const meta = JSON.parse(btn.getAttribute('data-meta') || '{}');
+
+                iconEl.className = `${icon} ${color}`;
+                titleEl.textContent = title;
+                labelEl.textContent = label;
+                labelEl.style.display = label ? '' : 'none';
+
+                msgEl.textContent = message;
+                timeEl.textContent = time;
+
+                markForm.action = `{{ url('my-notifications') }}/${id}/read`;
+                delForm.action = `{{ url('my-notifications') }}/${id}`;
+
+                const lines = [];
+                if (meta.equipment_name) lines.push(`المعدة: ${meta.equipment_name}`);
+                if (meta.renter_name) lines.push(`المستأجر: ${meta.renter_name}`);
+                if (meta.owner_name) lines.push(`المؤجر: ${meta.owner_name}`);
+                if (meta.sender_name) lines.push(`المرسل: ${meta.sender_name}`);
+                if (meta.amount) lines.push(`المبلغ: ${meta.amount}`);
+                if (meta.reason) lines.push(`السبب: ${meta.reason}`);
+                if (meta.start_date) lines.push(`موعد البداية: ${meta.start_date}`);
+                if (meta.end_date) lines.push(`موعد النهاية: ${meta.end_date}`);
+                if (meta.distance_km) lines.push(`المسافة: ${Number(meta.distance_km).toFixed(3)} كم`);
+                if (meta.location_text) lines.push(`الموقع: ${meta.location_text}`);
+                if (meta.login_at) lines.push(`وقت تسجيل الدخول: ${meta.login_at}`);
+                if (meta.registered_at) lines.push(`وقت إنشاء الحساب: ${meta.registered_at}`);
 
                 if (lines.length) {
                     metaEl.innerHTML = '<ul class="mb-0 ps-3">' + lines.map(x => `<li>${x}</li>`).join('') +

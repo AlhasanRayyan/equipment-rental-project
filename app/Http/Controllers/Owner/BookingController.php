@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\NotificationService;
 
 class BookingController extends Controller
 {
@@ -37,6 +38,7 @@ class BookingController extends Controller
             'booking_status' => 'confirmed',
             'confirmed_at' => now()
         ]);
+    NotificationService::bookingConfirmed($booking, $booking->equipment);
 
         return back()->with('success', 'تم تأكيد الحجز بنجاح.');
     }
@@ -50,6 +52,7 @@ class BookingController extends Controller
             'cancelled_at' => now(),
             'cancellation_reason' => $request->reason
         ]);
+    NotificationService::bookingCancelled($booking, $booking->equipment, $request->reason);
 
         return back()->with('success', 'تم إلغاء الحجز.');
     }

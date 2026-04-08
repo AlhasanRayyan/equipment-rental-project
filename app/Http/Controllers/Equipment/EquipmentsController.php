@@ -8,6 +8,8 @@ use App\Models\Equipment;
 use App\Models\EquipmentCategory;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Services\NotificationService;
+
 
 class EquipmentsController extends Controller
 {
@@ -78,6 +80,10 @@ class EquipmentsController extends Controller
         ]);
 
         $equipment = Equipment::create($data + ['owner_id' => auth()->id(), 'status' => 'available']);
+
+        $equipment->load('owner');
+
+NotificationService::equipmentCreated($equipment);
 
         // حفظ الصور
         if ($request->hasFile('images')) {

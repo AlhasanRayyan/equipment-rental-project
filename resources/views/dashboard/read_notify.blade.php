@@ -211,11 +211,11 @@
                                 </div>
                                 <div class="small text-muted" id="notifModalMeta"></div>
                             </div>
-
+{{--
                             <div class="mt-3">
                                 <span class="small text-muted me-2">النوع:</span>
                                 <code id="notifModalKind" class="notif-modal__kind">system_alert</code>
-                            </div>
+                            </div> --}}
                         </div>
 
                         <div

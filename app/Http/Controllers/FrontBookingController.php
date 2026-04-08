@@ -6,8 +6,8 @@ use App\Models\Booking;
 use App\Models\Equipment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Notifications\AppAlertNotification;
-use App\Models\User;
+// use App\Notifications\AppAlertNotification;
+// use App\Models\User;
 use App\Services\NotificationService;
 
 
