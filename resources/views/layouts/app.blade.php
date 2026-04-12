@@ -230,6 +230,20 @@
             justify-content: flex-start;
             gap: .5rem;
         }
+
+        .notif-dropdown {
+    min-width: 360px;
+    max-width: 420px;
+    padding-top: 0;
+    padding-bottom: 0;
+    overflow: hidden;
+}
+
+.notif-dropdown-scroll {
+    max-height: 250px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
     </style>
     @yield('styles')
 </head>
@@ -245,83 +259,97 @@
                     </button>
                     <ul class="navbar-nav ms-auto">
 
+
                         <li class="nav-item dropdown me-3 d-flex align-items-center">
                             <a class="nav-link dropdown-toggle position-relative d-flex align-items-center"
                                 href="#" id="notifDropdown" role="button" data-bs-toggle="dropdown"
                                 aria-expanded="false">
                                 <i class="fas fa-bell fa-lg text-gray-600"></i>
 
-                                @if (($unreadCount ?? 0) > 0)
+                                @if ($unreadCount > 0)
                                     <span class="badge bg-danger badge-counter">{{ $unreadCount }}</span>
                                 @endif
                             </a>
-                            @php
-                                $latestNotifications = auth()->user()->notifications()->latest()->take(5)->get();
-                            @endphp
+
                             <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in notif-dropdown"
-                                aria-labelledby="notifDropdown" style="min-width: 340px;">
+                                aria-labelledby="notifDropdown">
 
                                 <div class="px-3 py-2 border-bottom">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <strong>الإشعارات</strong>
 
-                                        {{--  قراءة الكل أيقونة --}}
-                                        <a href="{{ route('admin.notifications.readall') }}"
-                                            class="btn btn-sm btn-outline-primary" title="تعليم الكل كمقروء">
-                                            <i class="fas fa-check-double"></i>
-                                        </a>
+                                        <form action="{{ route('admin.notifications.readall') }}" method="POST"
+                                            class="m-0">
+                                            @csrf
+                                            @method('PUT')
+                                            <button class="btn btn-sm btn-outline-primary" type="submit"
+                                                title="تعليم الكل كمقروء">
+                                                <i class="fas fa-check-double"></i>
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
 
-                                @forelse(($latestNotifications ?? collect()) as $n)
+                                <div class="notif-dropdown-scroll">
                                     @php
-                                        $kind = $n->data['kind'] ?? 'system_alert';
-                                        $ui = $notifUI[$kind] ?? ['icon' => 'fas fa-bell', 'class' => 'text-dark'];
+    $latestNotifications = auth()->user()->notifications()->latest()->get();
+@endphp
+                                    @forelse($latestNotifications as $n)
+                                        @php
+                                            $kind = $n->data['kind'] ?? 'system_alert';
+                                            $ui = $notifUI[$kind] ?? [
+                                                'icon' => 'fas fa-bell',
+                                                'class' => 'text-dark',
+                                                'label' => 'تنبيه',
+                                            ];
 
-                                        $meta = [
-                                            'booking_id' => $n->data['booking_id'] ?? null,
-                                            'equipment_id' => $n->data['equipment_id'] ?? null,
-                                            'conversation_id' => $n->data['conversation_id'] ?? null,
-                                            'message_id' => $n->data['message_id'] ?? null,
-                                            'owner_id' => $n->data['owner_id'] ?? null,
-                                            'renter_id' => $n->data['renter_id'] ?? null,
-                                            'lat' => $n->data['lat'] ?? null,
-                                            'lng' => $n->data['lng'] ?? null,
-                                            'distance_km' => $n->data['distance_km'] ?? null,
-                                            'amount' => $n->data['amount'] ?? null,
-                                            'reason' => $n->data['reason'] ?? null,
-                                            'start_date' => $n->data['start_date'] ?? null,
-                                            'login_at' => $n->data['login_at'] ?? null,
-                                            'registered_at' => $n->data['registered_at'] ?? null,
-                                        ];
-                                    @endphp
+                                            $meta = [
+                                                'booking_id' => $n->data['booking_id'] ?? null,
+                                                'equipment_name' => $n->data['equipment_name'] ?? null,
+                                                'renter_name' => $n->data['renter_name'] ?? null,
+                                                'owner_name' => $n->data['owner_name'] ?? null,
+                                                'sender_name' => $n->data['sender_name'] ?? null,
+                                                'amount' => $n->data['amount'] ?? null,
+                                                'reason' => $n->data['reason'] ?? null,
+                                                'start_date' => $n->data['start_date'] ?? null,
+                                                'end_date' => $n->data['end_date'] ?? null,
+                                                'distance_km' => $n->data['distance_km'] ?? null,
+                                                'location_text' => $n->data['location_text'] ?? null,
+                                                'login_at' => $n->data['login_at'] ?? null,
+                                                'registered_at' => $n->data['registered_at'] ?? null,
+                                            ];
+                                        @endphp
 
-                                    <a href="#"
-                                        class="dropdown-item py-2 {{ $n->read_at ? 'text-muted' : 'fw-bold' }} notif-item"
-                                        data-bs-toggle="modal" data-bs-target="#notifModal"
-                                        data-id="{{ $n->id }}" data-kind="{{ $kind }}"
-                                        data-icon="{{ $ui['icon'] }}" data-color="{{ $ui['class'] }}"
-                                        data-label="{{ $ui['label'] }}"
-                                        data-title="{{ $n->data['title'] ?? ($titles[$kind] ?? $ui['label']) }}"
-                                        data-message="{{ $n->data['data'] ?? '' }}"
-                                        data-time="{{ optional($n->created_at)->diffForHumans() }}"
-                                        data-meta='@json($meta)'>
-                                        <div class="d-flex align-items-start gap-2">
-                                            <i class="{{ $ui['icon'] }} {{ $ui['class'] }} mt-1"></i>
-                                            <div class="text-end">
-                                                <div class="small">
-                                                    {{ $titles[$kind] ?? ($n->data['title'] ?? 'إشعار') }}
+                                        <a href="#"
+                                            class="dropdown-item py-2 {{ $n->read_at ? 'text-muted' : 'fw-bold' }} notif-item"
+                                            data-bs-toggle="modal" data-bs-target="#notifModal"
+                                            data-id="{{ $n->id }}" data-kind="{{ $kind }}"
+                                            data-icon="{{ $ui['icon'] }}" data-color="{{ $ui['class'] }}"
+                                            data-label="{{ $ui['label'] }}"
+                                            data-title="{{ $n->data['title'] ?? ($titles[$kind] ?? $ui['label']) }}"
+                                            data-message="{{ $n->data['data'] ?? '' }}"
+                                            data-time="{{ optional($n->created_at)->diffForHumans() }}"
+                                            data-url="{{ $n->data['url'] ?? '' }}"
+                                            data-meta='@json($meta)'>
+
+                                            <div class="d-flex align-items-start gap-2">
+                                                <i class="{{ $ui['icon'] }} {{ $ui['class'] }} mt-1"></i>
+                                                <div class="text-end">
+                                                    <div class="small">
+                                                        {{ $n->data['title'] ?? ($titles[$kind] ?? 'إشعار') }}
+                                                    </div>
+                                                    <small class="text-muted d-block">
+                                                        {{ optional($n->created_at)->diffForHumans() }}
+                                                    </small>
                                                 </div>
-                                                <small
-                                                    class="text-muted d-block">{{ optional($n->created_at)->diffForHumans() }}</small>
                                             </div>
-                                        </div>
-                                    </a>
-                                    <div class="dropdown-divider my-0"></div>
+                                        </a>
 
-                                @empty
-                                    <div class="dropdown-item text-muted py-3">لا يوجد إشعارات</div>
-                                @endforelse
+                                        <div class="dropdown-divider my-0"></div>
+                                    @empty
+                                        <div class="dropdown-item text-muted py-3">لا يوجد إشعارات</div>
+                                    @endforelse
+                                </div>
 
                                 <a class="dropdown-item text-center small text-primary py-2"
                                     href="{{ route('admin.notifications.index') }}">
@@ -330,6 +358,100 @@
                             </div>
                         </li>
 
+                        {{-- مودال الادمن للاشعارات --}}
+                        <div class="modal fade" id="notifModal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content text-end notif-modal" dir="rtl">
+
+                                    <div class="modal-header border-0 pb-2">
+                                        <div class="d-flex align-items-center gap-3 w-100">
+                                            <div class="notif-modal__icon-wrap">
+                                                <i id="notifModalIcon" class="fas fa-bell text-dark"></i>
+                                            </div>
+
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                    <h5 class="modal-title mb-0 fw-bold" id="notifModalTitle">إشعار</h5>
+                                                    <span id="notifModalLabel"
+                                                        class="badge rounded-pill text-bg-light border px-3 py-2"></span>
+                                                </div>
+                                                <small class="text-muted d-block mt-1" id="notifModalTime"></small>
+                                            </div>
+
+                                            <button type="button" class="btn-close ms-0" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-body pt-2">
+                                        <div class="notif-modal__message" id="notifModalMessage"></div>
+
+                                        <div class="notif-modal__meta mt-3" id="notifExtraWrap" style="display:none;">
+                                            <div class="d-flex align-items-center gap-2 mb-2">
+                                                <i class="fas fa-circle-info text-secondary"></i>
+                                                <strong class="small">تفاصيل إضافية</strong>
+                                            </div>
+                                            <div class="small text-muted" id="notifModalMeta"></div>
+                                        </div>
+
+                                    </div>
+
+                                    <div
+                                        class="modal-footer border-0 pt-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
+
+                                        <div class="d-flex gap-2">
+                                            <a id="notifDetailsLink" href="#"
+                                                class="btn btn-outline-secondary d-none">
+                                                <i class="fas fa-eye"></i>
+                                                عرض التفاصيل
+                                            </a>
+                                            <form id="bookingConfirmForm" method="POST" class="m-0 d-none">
+                                                @csrf
+                                                <button type="submit" class="btn btn-success" title="موافقة">
+                                                    <i class="fas fa-check"></i>
+                                                    موافقة
+                                                </button>
+                                            </form>
+
+                                            <form id="bookingCancelForm" method="POST" class="m-0 d-none">
+                                                @csrf
+                                                <input type="hidden" name="reason" value="تم الرفض من الإشعارات">
+                                                <button type="submit" class="btn btn-danger" title="رفض">
+                                                    <i class="fas fa-times"></i>
+                                                    رفض
+                                                </button>
+                                            </form>
+                                        </div>
+
+                                        <div class="d-flex gap-2">
+                                            <form id="markAsReadForm" method="POST" class="m-0">
+                                                @csrf
+                                                @method('PUT')
+                                                <button type="submit" class="btn btn-outline-primary"
+                                                    title="تعليم كمقروء">
+                                                    <i class="fas fa-check-double"></i>
+                                                </button>
+                                            </form>
+
+                                            <form id="deleteNotifForm" method="POST" class="m-0">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-outline-danger"
+                                                    title="حذف الإشعار">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                                title="إغلاق">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -347,7 +469,8 @@
                                     <i class="fas fa-sign-out-alt fa-sm fa-fw ms-2 text-gray-400"></i>
                                     تسجيل الخروج
                                 </a>
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                                    class="d-none">
                                     @csrf</form>
                             </div>
                         </li>
@@ -394,185 +517,8 @@
             bookingCancel: @json(route('admin.bookings.cancel', ['booking' => '__ID__'])),
         };
     </script>
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('notifModal');
 
-            const iconEl = document.getElementById('notifModalIcon');
-            const titleEl = document.getElementById('notifModalTitle');
-            const labelEl = document.getElementById('notifModalLabel');
-            const msgEl = document.getElementById('notifModalMessage');
-            const timeEl = document.getElementById('notifModalTime');
-            const kindEl = document.getElementById('notifModalKind');
-
-            const extraWrap = document.getElementById('notifExtraWrap');
-            const metaEl = document.getElementById('notifModalMeta');
-
-            const markForm = document.getElementById('markAsReadForm');
-            const delForm = document.getElementById('deleteNotifForm');
-            const confirmForm = document.getElementById('bookingConfirmForm');
-            const cancelForm = document.getElementById('bookingCancelForm');
-
-            modal.addEventListener('show.bs.modal', function(event) {
-                const btn = event.relatedTarget;
-
-                const id = btn.getAttribute('data-id');
-                const kind = btn.getAttribute('data-kind') || 'system_alert';
-                const icon = btn.getAttribute('data-icon') || 'fas fa-bell';
-                const color = btn.getAttribute('data-color') || 'text-dark';
-                const label = btn.getAttribute('data-label') || '';
-                const title = btn.getAttribute('data-title') || 'إشعار';
-                const message = btn.getAttribute('data-message') || '';
-                const time = btn.getAttribute('data-time') || '';
-                const meta = JSON.parse(btn.getAttribute('data-meta') || '{}');
-
-                iconEl.className = `${icon} ${color}`;
-                titleEl.textContent = title;
-                labelEl.textContent = label;
-
-                msgEl.textContent = message;
-                timeEl.textContent = time;
-                kindEl.textContent = kind;
-
-                // routes: read/delete
-                markForm.action = `{{ url('notifications') }}/${id}/read`;
-                delForm.action = `{{ url('notifications') }}/${id}`;
-
-                // تفاصيل إضافية
-                const lines = [];
-                if (meta.booking_id) lines.push(`رقم الحجز: ${meta.booking_id}`);
-                if (meta.equipment_id) lines.push(`رقم المعدة: ${meta.equipment_id}`);
-                if (meta.conversation_id) lines.push(`رقم المحادثة: ${meta.conversation_id}`);
-                if (meta.distance_km) lines.push(`المسافة: ${Number(meta.distance_km).toFixed(3)} كم`);
-                if (meta.speed) lines.push(`السرعة: ${meta.speed}`);
-                if (meta.battery_level) lines.push(`البطارية: ${meta.battery_level}%`);
-                if (meta.lat && meta.lng) lines.push(`الموقع: (${meta.lat}, ${meta.lng})`);
-
-                if (lines.length) {
-                    metaEl.innerHTML = '<ul class="mb-0">' + lines.map(x => `<li>${x}</li>`).join('') +
-                        '</ul>';
-                    extraWrap.style.display = '';
-                } else {
-                    metaEl.innerHTML = '';
-                    extraWrap.style.display = 'none';
-                }
-
-                // booking actions فقط لطلب الحجز
-                if (kind === 'booking_request' && meta.booking_id) {
-                    confirmForm.classList.remove('d-none');
-                    cancelForm.classList.remove('d-none');
-
-                    // confirmForm.action = `{{ url('admin/bookings') }}/${meta.booking_id}/confirm`;
-                    // cancelForm.action = `{{ url('admin/bookings') }}/${meta.booking_id}/cancel`;
-                    confirmForm.action = window.routes.bookingConfirm.replace('__ID__', meta.booking_id);
-                    cancelForm.action = window.routes.bookingCancel.replace('__ID__', meta.booking_id);
-                } else {
-                    confirmForm.classList.add('d-none');
-                    cancelForm.classList.add('d-none');
-                    confirmForm.action = '';
-                    cancelForm.action = '';
-                }
-            });
-
-            // سكّر dropdown قبل فتح المودال
-            document.addEventListener('click', function(e) {
-                const a = e.target.closest('.notif-item');
-                if (!a) return;
-                const dd = bootstrap.Dropdown.getInstance(document.getElementById('notifDropdown'));
-                if (dd) dd.hide();
-            });
-        });
-    </script> --}}
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const modal = document.getElementById('notifModal');
-        if (!modal) return;
-
-        const iconEl = document.getElementById('notifModalIcon');
-        const titleEl = document.getElementById('notifModalTitle');
-        const labelEl = document.getElementById('notifModalLabel');
-        const msgEl = document.getElementById('notifModalMessage');
-        const timeEl = document.getElementById('notifModalTime');
-
-        const extraWrap = document.getElementById('notifExtraWrap');
-        const metaEl = document.getElementById('notifModalMeta');
-
-        const markForm = document.getElementById('markAsReadForm');
-        const delForm = document.getElementById('deleteNotifForm');
-        const confirmForm = document.getElementById('bookingConfirmForm');
-        const cancelForm = document.getElementById('bookingCancelForm');
-
-        modal.addEventListener('show.bs.modal', function(event) {
-            const btn = event.relatedTarget;
-            if (!btn) return;
-
-            const id = btn.getAttribute('data-id');
-            const kind = btn.getAttribute('data-kind') || 'system_alert';
-            const icon = btn.getAttribute('data-icon') || 'fas fa-bell';
-            const color = btn.getAttribute('data-color') || 'text-dark';
-            const label = btn.getAttribute('data-label') || '';
-            const title = btn.getAttribute('data-title') || 'إشعار';
-            const message = btn.getAttribute('data-message') || '';
-            const time = btn.getAttribute('data-time') || '';
-            const meta = JSON.parse(btn.getAttribute('data-meta') || '{}');
-
-            iconEl.className = `${icon} ${color}`;
-            titleEl.textContent = title;
-            labelEl.textContent = label;
-            labelEl.style.display = label ? '' : 'none';
-
-            msgEl.textContent = message;
-            timeEl.textContent = time;
-
-            markForm.action = `{{ url('admin/notifications') }}/${id}/read`;
-            delForm.action = `{{ url('admin/notifications') }}/${id}`;
-
-            const lines = [];
-            if (meta.equipment_name) lines.push(`المعدة: ${meta.equipment_name}`);
-            if (meta.renter_name) lines.push(`المستأجر: ${meta.renter_name}`);
-            if (meta.owner_name) lines.push(`المؤجر: ${meta.owner_name}`);
-            if (meta.sender_name) lines.push(`المرسل: ${meta.sender_name}`);
-            if (meta.amount) lines.push(`المبلغ: ${meta.amount}`);
-            if (meta.reason) lines.push(`السبب: ${meta.reason}`);
-            if (meta.start_date) lines.push(`موعد البداية: ${meta.start_date}`);
-            if (meta.end_date) lines.push(`موعد النهاية: ${meta.end_date}`);
-            if (meta.distance_km) lines.push(`المسافة: ${Number(meta.distance_km).toFixed(3)} كم`);
-            if (meta.location_text) lines.push(`الموقع: ${meta.location_text}`);
-            if (meta.login_at) lines.push(`وقت تسجيل الدخول: ${meta.login_at}`);
-            if (meta.registered_at) lines.push(`وقت إنشاء الحساب: ${meta.registered_at}`);
-
-            if (lines.length) {
-                metaEl.innerHTML = '<ul class="mb-0">' + lines.map(x => `<li>${x}</li>`).join('') + '</ul>';
-                extraWrap.style.display = '';
-            } else {
-                metaEl.innerHTML = '';
-                extraWrap.style.display = 'none';
-            }
-
-            if (kind === 'booking_request' && meta.booking_id) {
-                confirmForm.classList.remove('d-none');
-                cancelForm.classList.remove('d-none');
-
-                confirmForm.action = window.routes.bookingConfirm.replace('__ID__', meta.booking_id);
-                cancelForm.action = window.routes.bookingCancel.replace('__ID__', meta.booking_id);
-            } else {
-                confirmForm.classList.add('d-none');
-                cancelForm.classList.add('d-none');
-                confirmForm.action = '';
-                cancelForm.action = '';
-            }
-        });
-
-        document.addEventListener('click', function(e) {
-            const a = e.target.closest('.notif-item');
-            if (!a) return;
-
-            const dd = bootstrap.Dropdown.getInstance(document.getElementById('notifDropdown'));
-            if (dd) dd.hide();
-        });
-    });
-</script>
-    {{-- <script>
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('notifModal');
             if (!modal) return;
@@ -582,7 +528,6 @@
             const labelEl = document.getElementById('notifModalLabel');
             const msgEl = document.getElementById('notifModalMessage');
             const timeEl = document.getElementById('notifModalTime');
-            // const kindEl = document.getElementById('notifModalKind');
 
             const extraWrap = document.getElementById('notifExtraWrap');
             const metaEl = document.getElementById('notifModalMeta');
@@ -591,6 +536,7 @@
             const delForm = document.getElementById('deleteNotifForm');
             const confirmForm = document.getElementById('bookingConfirmForm');
             const cancelForm = document.getElementById('bookingCancelForm');
+            const detailsLink = document.getElementById('notifDetailsLink');
 
             modal.addEventListener('show.bs.modal', function(event) {
                 const btn = event.relatedTarget;
@@ -604,6 +550,7 @@
                 const title = btn.getAttribute('data-title') || 'إشعار';
                 const message = btn.getAttribute('data-message') || '';
                 const time = btn.getAttribute('data-time') || '';
+                const url = btn.getAttribute('data-url') || '';
                 const meta = JSON.parse(btn.getAttribute('data-meta') || '{}');
 
                 iconEl.className = `${icon} ${color}`;
@@ -613,23 +560,29 @@
 
                 msgEl.textContent = message;
                 timeEl.textContent = time;
-                // kindEl.textContent = kind;
 
                 markForm.action = `{{ url('admin/notifications') }}/${id}/read`;
                 delForm.action = `{{ url('admin/notifications') }}/${id}`;
 
+                if (url) {
+                    detailsLink.href = url;
+                    detailsLink.classList.remove('d-none');
+                } else {
+                    detailsLink.href = '#';
+                    detailsLink.classList.add('d-none');
+                }
+
                 const lines = [];
-                if (meta.booking_id) lines.push(`رقم الحجز: ${meta.booking_id}`);
-                if (meta.equipment_id) lines.push(`رقم المعدة: ${meta.equipment_id}`);
-                if (meta.conversation_id) lines.push(`رقم المحادثة: ${meta.conversation_id}`);
-                if (meta.message_id) lines.push(`رقم الرسالة: ${meta.message_id}`);
-                if (meta.owner_id) lines.push(`رقم المؤجر: ${meta.owner_id}`);
-                if (meta.renter_id) lines.push(`رقم المستأجر: ${meta.renter_id}`);
+                if (meta.equipment_name) lines.push(`المعدة: ${meta.equipment_name}`);
+                if (meta.renter_name) lines.push(`المستأجر: ${meta.renter_name}`);
+                if (meta.owner_name) lines.push(`المؤجر: ${meta.owner_name}`);
+                if (meta.sender_name) lines.push(`المرسل: ${meta.sender_name}`);
                 if (meta.amount) lines.push(`المبلغ: ${meta.amount}`);
                 if (meta.reason) lines.push(`السبب: ${meta.reason}`);
-                if (meta.distance_km) lines.push(`المسافة: ${Number(meta.distance_km).toFixed(3)} كم`);
-                if (meta.lat && meta.lng) lines.push(`الموقع: (${meta.lat}, ${meta.lng})`);
                 if (meta.start_date) lines.push(`موعد البداية: ${meta.start_date}`);
+                if (meta.end_date) lines.push(`موعد النهاية: ${meta.end_date}`);
+                if (meta.distance_km) lines.push(`المسافة: ${Number(meta.distance_km).toFixed(3)} كم`);
+                if (meta.location_text) lines.push(`الموقع: ${meta.location_text}`);
                 if (meta.login_at) lines.push(`وقت تسجيل الدخول: ${meta.login_at}`);
                 if (meta.registered_at) lines.push(`وقت إنشاء الحساب: ${meta.registered_at}`);
 
@@ -664,7 +617,7 @@
                 if (dd) dd.hide();
             });
         });
-    </script> --}}
+    </script>
     @stack('scripts')
 </body>
 

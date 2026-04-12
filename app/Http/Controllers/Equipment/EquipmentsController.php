@@ -83,7 +83,9 @@ class EquipmentsController extends Controller
 
         $equipment->load('owner');
 
-NotificationService::equipmentCreated($equipment);
+        NotificationService::equipmentCreatedForOwner($equipment);
+        NotificationService::equipmentPublished($equipment);
+        // NotificationService::equipmentCreated($equipment);
 
         // حفظ الصور
         if ($request->hasFile('images')) {

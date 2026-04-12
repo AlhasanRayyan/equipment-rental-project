@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
 
         Paginator::useBootstrapFive();
 
-        // ✅ Composer للـ notifications (يوصل للـ navbar + صفحة الاشعارات)
+        //  Composer للـ notifications (يوصل للـ navbar + صفحة الاشعارات)
         View::composer(['layouts.app', 'dashboard.read_notify'], function ($view) {
 
             $notifUI = [

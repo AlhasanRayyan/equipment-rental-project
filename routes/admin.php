@@ -20,29 +20,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');
 
-
-    // notification Admin
-    // Route::get('read-notify', function () {
-    //     return view('dashboard.read_notify');
-    // })->name('read_notify');
-
-    // Route::put('notifications/{id}/read', function ($id) {
-    //     $n = Auth::user()->notifications()->findOrFail($id);
-    //     $n->markAsRead();
-    //     return back();
-    // })->name('notifications.read');
-
-
-    // Route::delete('delete-notify/{id}', function ($id) {
-    //     $n = Auth::user()->notifications()->findOrFail($id);
-    //     $n->delete();
-    //     return back();
-    // })->name('delete');
-
-    // Route::get('read-all-notify', function () {
-    //     Auth::user()->unreadNotifications->markAsRead();
-    //     return back();
-    // })->name('readall');
     Route::get('notifications', [AdminNotificationController::class, 'index'])->name('notifications.index');
     Route::put('notifications/{id}/read', [AdminNotificationController::class, 'read'])->name('notifications.read');
     Route::delete('notifications/{id}', [AdminNotificationController::class, 'destroy'])->name('notifications.destroy');

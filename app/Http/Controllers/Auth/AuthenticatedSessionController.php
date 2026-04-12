@@ -44,6 +44,7 @@ class AuthenticatedSessionController extends Controller
         ]);
 
         // إشعار تسجيل دخول ناجح للمستخدم العادي فقط
+        //  لو بدي الادمن  if ($user) {
         if ($user && $user->role !== 'admin') {
             NotificationService::systemAlert(
                 $user,

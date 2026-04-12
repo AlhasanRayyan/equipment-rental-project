@@ -12,182 +12,207 @@ class NotificationSeeder extends Seeder
 {
     public function run(): void
     {
-        if (User::count() === 0) {
-            $this->call(UserSeeder::class);
-        }
-
-        if (Equipment::count() === 0) {
-            $this->call(EquipmentSeeder::class);
-        }
-
-        if (Booking::count() === 0) {
-            $this->call(BookingSeeder::class);
-        }
-
         $users = User::all();
-        $bookings = Booking::with(['renter', 'owner', 'equipment'])->get();
-        $equipments = Equipment::with('owner')->get();
         $admins = User::where('role', 'admin')->get();
+        $bookings = Booking::with(['renter', 'owner', 'equipment.owner'])->get();
+        $equipments = Equipment::with('owner')->get();
 
-        $kinds = [
-            'booking_request',
-            'booking_confirmed',
-            'booking_cancelled',
-            'payment_received',
-            'payment_failed',
-            'refund_issued',
-            'new_message',
-            'equipment_moved',
-            'system_alert',
-        ];
-
-        $titles = [
-            'booking_request'   => 'طلب حجز جديد',
-            'booking_confirmed' => 'تم تأكيد الحجز',
-            'booking_cancelled' => 'تم إلغاء الحجز',
-            'payment_received'  => 'تم استلام الدفع',
-            'payment_failed'    => 'فشل الدفع',
-            'refund_issued'     => 'تم إصدار استرداد',
-            'new_message'       => 'رسالة جديدة',
-            'equipment_moved'   => 'تحذير حركة',
-            'system_alert'      => 'إشعار',
-        ];
-
-        /*
-        |--------------------------------------------------------------------------
-        | إشعارات عامة تجريبية لكل مستخدم
-        |--------------------------------------------------------------------------
-        */
-        foreach ($users as $user) {
-            $count = rand(2, 5);
-
-            for ($i = 0; $i < $count; $i++) {
-                $kind = $kinds[array_rand($kinds)];
-
-                $meta = [];
-                if ($kind === 'system_alert') {
-                    $meta = [
-                        'login_at' => now()->subMinutes(rand(1, 500))->toDateTimeString(),
-                    ];
-                }
-
-                $user->notify(new AppAlertNotification(
-                    kind: $kind,
-                    title: $titles[$kind],
-                    message: "إشعار تجريبي: {$titles[$kind]}",
-                    meta: $meta
-                ));
-            }
+        if ($users->isEmpty() || $bookings->isEmpty() || $equipments->isEmpty()) {
+            $this->command->warn('Users or bookings or equipments are missing. Seed them first.');
+            return;
         }
 
+        $fullName = function ($user) {
+            if (!$user) return null;
+            $name = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? ''));
+            return $name !== '' ? $name : null;
+        };
+
         /*
         |--------------------------------------------------------------------------
-        | إشعارات مرتبطة بالحجوزات
+        | إشعارات المستأجرين
         |--------------------------------------------------------------------------
         */
-        foreach ($bookings as $booking) {
-            $equipment = $booking->equipment;
-            if (!$equipment) {
+        foreach ($bookings->take(12) as $booking) {
+            if (!$booking->equipment || !$booking->renter) {
                 continue;
             }
 
-            // للمستأجر: تم إرسال الطلب
-            if ($booking->renter) {
-                $booking->renter->notify(new AppAlertNotification(
-                    kind: 'booking_request',
-                    title: 'تم إرسال طلب الحجز',
-                    message: "تم إرسال طلب الحجز #{$booking->id} للمعدة: {$equipment->name} وهو الآن بانتظار الموافقة.",
-                    meta: [
-                        'booking_id'   => $booking->id,
-                        'equipment_id' => $equipment->id,
-                        'owner_id'     => $booking->owner_id,
-                        'renter_id'    => $booking->renter_id,
-                    ]
-                ));
+            $equipment = $booking->equipment;
+            $ownerName = $fullName($booking->owner ?? $equipment->owner);
+            $renterName = $fullName($booking->renter);
+
+            // 1) تم إرسال الطلب
+            $booking->renter->notify(new AppAlertNotification(
+                kind: 'booking_request',
+                title: 'تم إرسال طلب الحجز',
+                message: "تم إرسال طلب حجز للمعدة: {$equipment->name}" . ($ownerName ? "، بانتظار موافقة {$ownerName}" : ''),
+                url: route('renter.payments.show', $booking->id),
+                meta: [
+                    'booking_id' => $booking->id,
+                    'equipment_name' => $equipment->name,
+                    'owner_name' => $ownerName,
+                    'start_date' => $booking->start_date,
+                    'end_date' => $booking->end_date,
+                ]
+            ));
+
+            // 2) تم تأكيد الحجز
+            $booking->renter->notify(new AppAlertNotification(
+                kind: 'booking_confirmed',
+                title: 'تم تأكيد الحجز',
+                message: "تم تأكيد حجز المعدة: {$equipment->name}",
+                url: route('renter.payments.show', $booking->id),
+                meta: [
+                    'booking_id' => $booking->id,
+                    'equipment_name' => $equipment->name,
+                    'owner_name' => $ownerName,
+                    'amount' => $booking->total_cost,
+                    'start_date' => $booking->start_date,
+                    'end_date' => $booking->end_date,
+                ]
+            ));
+
+            // 3) تم رفع وثيقة دفع
+            $booking->renter->notify(new AppAlertNotification(
+                kind: 'payment_received',
+                title: 'تم إرسال وثيقة الدفع',
+                message: "تم إرسال وثيقة الدفع الخاصة بالمعدة: {$equipment->name} وهي الآن قيد المراجعة.",
+                url: route('renter.payments.show', $booking->id),
+                meta: [
+                    'booking_id' => $booking->id,
+                    'equipment_name' => $equipment->name,
+                    'owner_name' => $ownerName,
+                    'amount' => $booking->total_cost,
+                ]
+            ));
+
+            // 4) قبول الوثيقة
+            $booking->renter->notify(new AppAlertNotification(
+                kind: 'payment_received',
+                title: 'تم قبول وثيقة الدفع',
+                message: "تم قبول وثيقة الدفع الخاصة بالمعدة: {$equipment->name}",
+                url: route('renter.payments.show', $booking->id),
+                meta: [
+                    'booking_id' => $booking->id,
+                    'equipment_name' => $equipment->name,
+                    'owner_name' => $ownerName,
+                    'amount' => $booking->total_cost,
+                ]
+            ));
+
+            // 5) رفض الوثيقة
+            $booking->renter->notify(new AppAlertNotification(
+                kind: 'payment_failed',
+                title: 'تم رفض وثيقة الدفع',
+                message: "تم رفض وثيقة الدفع الخاصة بالمعدة: {$equipment->name}",
+                url: route('renter.payments.show', $booking->id),
+                meta: [
+                    'booking_id' => $booking->id,
+                    'equipment_name' => $equipment->name,
+                    'owner_name' => $ownerName,
+                    'reason' => 'الصورة غير واضحة أو البيانات غير مطابقة.',
+                ]
+            ));
+
+            // 6) إلغاء الحجز
+            $booking->renter->notify(new AppAlertNotification(
+                kind: 'booking_cancelled',
+                title: 'تم إلغاء الحجز',
+                message: "تم إلغاء حجز المعدة: {$equipment->name}",
+                url: route('renter.payments.show', $booking->id),
+                meta: [
+                    'booking_id' => $booking->id,
+                    'equipment_name' => $equipment->name,
+                    'owner_name' => $ownerName,
+                    'reason' => 'تم الإلغاء من طرف المالك.',
+                ]
+            ));
+
+            // 7) رسالة جديدة
+            $booking->renter->notify(new AppAlertNotification(
+                kind: 'new_message',
+                title: 'رسالة جديدة',
+                message: $ownerName
+                    ? "لديك رسالة جديدة من {$ownerName}"
+                    : 'لديك رسالة جديدة بخصوص الحجز.',
+                meta: [
+                    'booking_id' => $booking->id,
+                    'equipment_name' => $equipment->name,
+                    'sender_name' => $ownerName,
+                ]
+            ));
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | إشعارات المؤجرين
+        |--------------------------------------------------------------------------
+        */
+        foreach ($bookings->take(12) as $booking) {
+            if (!$booking->equipment || !$booking->owner) {
+                continue;
             }
 
-            // للمؤجر: طلب حجز جديد
-            if ($booking->owner) {
-                $booking->owner->notify(new AppAlertNotification(
-                    kind: 'booking_request',
-                    title: 'طلب حجز جديد',
-                    message: "وصل طلب حجز جديد على المعدة: {$equipment->name} (حجز #{$booking->id})",
-                    meta: [
-                        'booking_id'   => $booking->id,
-                        'equipment_id' => $equipment->id,
-                        'owner_id'     => $booking->owner_id,
-                        'renter_id'    => $booking->renter_id,
-                    ]
-                ));
-            }
+            $equipment = $booking->equipment;
+            $renterName = $fullName($booking->renter);
 
-            // للمستأجر: تأكيد الحجز
-            if ($booking->renter) {
-                $booking->renter->notify(new AppAlertNotification(
-                    kind: 'booking_confirmed',
-                    title: 'تم تأكيد الحجز',
-                    message: "تم تأكيد الحجز #{$booking->id} للمعدة: {$equipment->name}",
-                    meta: [
-                        'booking_id'   => $booking->id,
-                        'equipment_id' => $equipment->id,
-                    ]
-                ));
-            }
+            // 1) طلب حجز جديد
+            $booking->owner->notify(new AppAlertNotification(
+                kind: 'booking_request',
+                title: 'طلب حجز جديد',
+                message: "وصل طلب حجز جديد على المعدة: {$equipment->name}" . ($renterName ? " من {$renterName}" : ''),
+                url: route('owner.payments.show', $booking->id),
+                meta: [
+                    'booking_id' => $booking->id,
+                    'equipment_name' => $equipment->name,
+                    'renter_name' => $renterName,
+                    'start_date' => $booking->start_date,
+                    'end_date' => $booking->end_date,
+                ]
+            ));
 
-            // للمؤجر: دفعة جديدة
-            if ($booking->owner) {
-                $booking->owner->notify(new AppAlertNotification(
-                    kind: 'payment_received',
-                    title: 'دفعة جديدة',
-                    message: "تم استلام دفعة للحجز #{$booking->id} على معدتك {$equipment->name} بقيمة {$booking->total_cost}",
-                    meta: [
-                        'booking_id'   => $booking->id,
-                        'equipment_id' => $equipment->id,
-                        'amount'       => $booking->total_cost,
-                    ]
-                ));
-            }
+            // 2) تم رفع وثيقة دفع
+            $booking->owner->notify(new AppAlertNotification(
+                kind: 'payment_received',
+                title: 'تم رفع وثيقة الدفع',
+                message: "قام المستأجر برفع وثيقة دفع للمعدة: {$equipment->name}" . ($renterName ? " ({$renterName})" : ''),
+                url: route('owner.payments.show', $booking->id),
+                meta: [
+                    'booking_id' => $booking->id,
+                    'equipment_name' => $equipment->name,
+                    'renter_name' => $renterName,
+                    'amount' => $booking->total_cost,
+                ]
+            ));
 
-            // للمستأجر: رسالة جديدة
-            if ($booking->renter && rand(0, 1)) {
-                $booking->renter->notify(new AppAlertNotification(
-                    kind: 'new_message',
-                    title: 'رسالة جديدة',
-                    message: "لديك رسالة جديدة بخصوص الحجز #{$booking->id}",
-                    meta: [
-                        'booking_id'      => $booking->id,
-                        'conversation_id' => rand(1, 20),
-                        'message_id'      => rand(100, 999),
-                    ]
-                ));
-            }
+            // 3) دفعة جديدة
+            $booking->owner->notify(new AppAlertNotification(
+                kind: 'payment_received',
+                title: 'دفعة جديدة',
+                message: "تم استلام دفعة جديدة على المعدة: {$equipment->name}" . ($renterName ? " من {$renterName}" : ''),
+                url: route('owner.payments.show', $booking->id),
+                meta: [
+                    'booking_id' => $booking->id,
+                    'equipment_name' => $equipment->name,
+                    'renter_name' => $renterName,
+                    'amount' => $booking->total_cost,
+                ]
+            ));
 
-            // إلغاء تجريبي لبعض الحجوزات
-            if ($booking->renter && $booking->owner && rand(0, 1)) {
-                $reason = 'إلغاء تجريبي من السيدر';
-
-                $booking->renter->notify(new AppAlertNotification(
-                    kind: 'booking_cancelled',
-                    title: 'تم إلغاء الحجز',
-                    message: "تم إلغاء الحجز #{$booking->id} للمعدة: {$equipment->name} (السبب: {$reason})",
-                    meta: [
-                        'booking_id'   => $booking->id,
-                        'equipment_id' => $equipment->id,
-                        'reason'       => $reason,
-                    ]
-                ));
-
-                $booking->owner->notify(new AppAlertNotification(
-                    kind: 'booking_cancelled',
-                    title: 'تم إلغاء حجز على معدتك',
-                    message: "تم إلغاء الحجز #{$booking->id} على المعدة: {$equipment->name} (السبب: {$reason})",
-                    meta: [
-                        'booking_id'   => $booking->id,
-                        'equipment_id' => $equipment->id,
-                        'reason'       => $reason,
-                    ]
-                ));
-            }
+            // 4) إلغاء حجز
+            $booking->owner->notify(new AppAlertNotification(
+                kind: 'booking_cancelled',
+                title: 'تم إلغاء حجز على معدتك',
+                message: "تم إلغاء حجز على المعدة: {$equipment->name}" . ($renterName ? " من {$renterName}" : ''),
+                url: route('owner.payments.show', $booking->id),
+                meta: [
+                    'booking_id' => $booking->id,
+                    'equipment_name' => $equipment->name,
+                    'renter_name' => $renterName,
+                    'reason' => 'تم الإلغاء أثناء المراجعة.',
+                ]
+            ));
         }
 
         /*
@@ -195,27 +220,39 @@ class NotificationSeeder extends Seeder
         | إشعارات المعدات
         |--------------------------------------------------------------------------
         */
-        foreach ($equipments->take(5) as $equipment) {
+        foreach ($equipments->take(10) as $equipment) {
+            $ownerName = $fullName($equipment->owner);
+
+            // لصاحب المعدة
             if ($equipment->owner) {
                 $equipment->owner->notify(new AppAlertNotification(
-                    kind: 'system_alert',
+                    kind: 'equipment_created',
                     title: 'تمت إضافة المعدة بنجاح',
                     message: "تمت إضافة المعدة: {$equipment->name} بنجاح وأصبحت ضمن معداتك.",
+                    url: route('equipments.show', $equipment->id),
                     meta: [
-                        'equipment_id' => $equipment->id,
-                        'owner_id'     => $equipment->owner_id,
+                        'equipment_name' => $equipment->name,
+                        'owner_name' => $ownerName,
                     ]
                 ));
+            }
 
-                $equipment->owner->notify(new AppAlertNotification(
-                    kind: 'equipment_moved',
-                    title: 'تحذير حركة',
-                    message: "تحركت المعدة {$equipment->name} لمسافة تقريباً " . number_format(rand(1, 20) / 3, 3) . " كم",
+            // للمستخدمين الآخرين
+            $otherUsers = User::where('role', '!=', 'admin')
+                ->where('id', '!=', $equipment->owner_id)
+                ->inRandomOrder()
+                ->take(8)
+                ->get();
+
+            foreach ($otherUsers as $user) {
+                $user->notify(new AppAlertNotification(
+                    kind: 'equipment_created',
+                    title: 'معدة جديدة متاحة',
+                    message: "تمت إضافة معدة جديدة: {$equipment->name}" . ($ownerName ? " بواسطة {$ownerName}" : ''),
+                    url: route('equipments.show', $equipment->id),
                     meta: [
-                        'equipment_id' => $equipment->id,
-                        'distance_km'  => rand(1, 20) / 3,
-                        'lat'          => 31.95 + (rand(-100, 100) / 1000),
-                        'lng'          => 35.91 + (rand(-100, 100) / 1000),
+                        'equipment_name' => $equipment->name,
+                        'owner_name' => $ownerName,
                     ]
                 ));
             }
@@ -227,47 +264,100 @@ class NotificationSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
         foreach ($admins as $admin) {
-            foreach ($bookings->take(5) as $booking) {
-                $equipment = $booking->equipment;
-                if (!$equipment) {
+            foreach ($bookings->take(12) as $booking) {
+                if (!$booking->equipment) {
                     continue;
                 }
+
+                $equipment = $booking->equipment;
+                $renterName = $fullName($booking->renter);
+                $ownerName = $fullName($booking->owner ?? $equipment->owner);
 
                 $admin->notify(new AppAlertNotification(
                     kind: 'booking_request',
                     title: 'طلب حجز جديد',
-                    message: "تم إنشاء حجز جديد #{$booking->id} على {$equipment->name}",
+                    message: "تم إنشاء طلب حجز جديد على المعدة: {$equipment->name}" . ($renterName ? " بواسطة {$renterName}" : ''),
+                    url: route('admin.bookings.show', $booking->id),
                     meta: [
-                        'booking_id'   => $booking->id,
-                        'equipment_id' => $equipment->id,
+                        'booking_id' => $booking->id,
+                        'equipment_name' => $equipment->name,
+                        'renter_name' => $renterName,
+                        'owner_name' => $ownerName,
+                    ]
+                ));
+
+                $admin->notify(new AppAlertNotification(
+                    kind: 'booking_confirmed',
+                    title: 'تأكيد حجز',
+                    message: "تم تأكيد حجز المعدة: {$equipment->name}",
+                    url: route('admin.bookings.show', $booking->id),
+                    meta: [
+                        'booking_id' => $booking->id,
+                        'equipment_name' => $equipment->name,
+                        'renter_name' => $renterName,
+                        'owner_name' => $ownerName,
+                    ]
+                ));
+
+                $admin->notify(new AppAlertNotification(
+                    kind: 'booking_cancelled',
+                    title: 'إلغاء حجز',
+                    message: "تم إلغاء حجز المعدة: {$equipment->name}",
+                    url: route('admin.bookings.show', $booking->id),
+                    meta: [
+                        'booking_id' => $booking->id,
+                        'equipment_name' => $equipment->name,
+                        'renter_name' => $renterName,
+                        'owner_name' => $ownerName,
+                        'reason' => 'سبب تجريبي',
                     ]
                 ));
 
                 $admin->notify(new AppAlertNotification(
                     kind: 'payment_received',
                     title: 'تم استلام دفعة',
-                    message: "دفعة جديدة للحجز #{$booking->id} بقيمة {$booking->total_cost}",
+                    message: "تم استلام دفعة جديدة خاصة بالمعدة: {$equipment->name}",
+                    url: route('admin.bookings.show', $booking->id),
                     meta: [
-                        'booking_id'   => $booking->id,
-                        'equipment_id' => $equipment->id,
-                        'amount'       => $booking->total_cost,
+                        'booking_id' => $booking->id,
+                        'equipment_name' => $equipment->name,
+                        'renter_name' => $renterName,
+                        'owner_name' => $ownerName,
+                        'amount' => $booking->total_cost,
+                    ]
+                ));
+
+                $admin->notify(new AppAlertNotification(
+                    kind: 'payment_failed',
+                    title: 'تم رفض وثيقة دفع',
+                    message: "تم رفض وثيقة دفع خاصة بالمعدة: {$equipment->name}",
+                    url: route('admin.bookings.show', $booking->id),
+                    meta: [
+                        'booking_id' => $booking->id,
+                        'equipment_name' => $equipment->name,
+                        'renter_name' => $renterName,
+                        'owner_name' => $ownerName,
+                        'reason' => 'الوثيقة غير واضحة',
                     ]
                 ));
             }
 
-            foreach ($equipments->take(3) as $equipment) {
+            foreach ($equipments->take(8) as $equipment) {
+                $ownerName = $fullName($equipment->owner);
+
                 $admin->notify(new AppAlertNotification(
-                    kind: 'system_alert',
+                    kind: 'equipment_created',
                     title: 'تمت إضافة معدة جديدة',
-                    message: "تمت إضافة معدة جديدة: {$equipment->name} (رقم #{$equipment->id})",
+                    message: "تمت إضافة معدة جديدة: {$equipment->name}" . ($ownerName ? " بواسطة {$ownerName}" : ''),
+                    url: route('equipments.show', $equipment->id),
                     meta: [
-                        'equipment_id' => $equipment->id,
-                        'owner_id'     => $equipment->owner_id,
+                        'equipment_name' => $equipment->name,
+                        'owner_name' => $ownerName,
                     ]
                 ));
             }
         }
 
-        $this->command->info('Notifications seeded successfully using AppAlertNotification.');
+        $this->command->info('Notifications seeded successfully with realistic data.');
     }
 }

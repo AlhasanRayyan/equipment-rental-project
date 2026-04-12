@@ -9,10 +9,10 @@ class AdminNotificationController extends Controller
 {
     public function index()
     {
-        $notifications = Auth::user()
+        $notifications = auth()->user()
             ->notifications()
             ->latest()
-            ->paginate(15);
+            ->paginate(10);
 
         return view('dashboard.read_notify', compact('notifications'));
     }

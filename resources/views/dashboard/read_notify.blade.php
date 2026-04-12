@@ -80,6 +80,10 @@
     </style>
 @endsection
 @section('content')
+    @php
+        $notifUI = config('notifications.ui');
+        $titles = config('notifications.titles');
+    @endphp
     <div class="container-fluid">
 
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -87,31 +91,42 @@
                 الإشعارات غير المقروءة ({{ auth()->user()->unreadNotifications->count() }})
             </h5>
 
-            <a class="btn btn-sm btn-outline-primary" href="{{ route('admin.notifications.readall') }}">
-                <i class="fas fa-check-double"></i>
-
-                تعليم الكل كمقروء
-            </a>
+            <form action="{{ route('admin.notifications.readall') }}" method="POST" class="m-0">
+                @csrf
+                @method('PUT')
+                <button class="btn btn-sm btn-outline-primary" type="submit" title="تعليم الكل كمقروء">
+                    <i class="fas fa-check-double"></i>
+                    تعليم الكل كمقروء
+                </button>
+            </form>
         </div>
 
         <div class="card shadow-sm">
             <div class="list-group list-group-flush">
                 {{-- لكل اشعار ايقونة ولو ن مختلفين  --}}
 
-                @forelse(auth()->user()->notifications as $notification)
+                @forelse($notifications as $notification)
                     @php
                         $kind = $notification->data['kind'] ?? 'system_alert';
-                        $ui = $notifUI[$kind] ?? ['icon' => 'fas fa-bell', 'class' => 'text-dark'];
+                        $ui = $notifUI[$kind] ?? [
+                            'icon' => 'fas fa-bell',
+                            'class' => 'text-dark',
+                            'label' => 'تنبيه',
+                        ];
+
                         $meta = [
                             'booking_id' => $notification->data['booking_id'] ?? null,
-                            'equipment_id' => $notification->data['equipment_id'] ?? null,
-                            'conversation_id' => $notification->data['conversation_id'] ?? null,
-                            'message_id' => $notification->data['message_id'] ?? null,
-                            'lat' => $notification->data['lat'] ?? null,
-                            'lng' => $notification->data['lng'] ?? null,
-                            'speed' => $notification->data['speed'] ?? null,
+                            'equipment_name' => $notification->data['equipment_name'] ?? null,
+                            'renter_name' => $notification->data['renter_name'] ?? null,
+                            'owner_name' => $notification->data['owner_name'] ?? null,
+                            'amount' => $notification->data['amount'] ?? null,
+                            'reason' => $notification->data['reason'] ?? null,
+                            'start_date' => $notification->data['start_date'] ?? null,
+                            'end_date' => $notification->data['end_date'] ?? null,
                             'distance_km' => $notification->data['distance_km'] ?? null,
-                            'battery_level' => $notification->data['battery_level'] ?? null,
+                            'location_text' => $notification->data['location_text'] ?? null,
+                            'login_at' => $notification->data['login_at'] ?? null,
+                            'registered_at' => $notification->data['registered_at'] ?? null,
                         ];
                     @endphp
 
@@ -122,13 +137,13 @@
                             data-label="{{ $ui['label'] }}" data-title="{{ $notification->data['title'] ?? $ui['label'] }}"
                             data-message="{{ $notification->data['data'] ?? '' }}"
                             data-time="{{ optional($notification->created_at)->diffForHumans() }}"
-                            data-meta='@json($meta)'> {{-- href="{{ route('read', $notification->id) }}" --}}
+                            data-url="{{ $notification->data['url'] ?? '' }}" data-meta='@json($meta)'>
 
                             <i class="{{ $ui['icon'] }} {{ $ui['class'] }} mt-1"></i>
 
                             <div>
                                 <div class="{{ $notification->read_at ? 'text-muted' : 'fw-bold' }}">
-                                    {{ $titles[$kind] ?? ($notification->data['data'] ?? '') }}
+                                    {{ $notification->data['title'] ?? ($titles[$kind] ?? 'إشعار') }}
                                 </div>
                                 <small class="text-muted d-block">
                                     {{ optional($notification->created_at)->diffForHumans() }}
@@ -137,17 +152,15 @@
                         </a>
 
                         <button type="button" class="btn btn-sm btn-outline-danger ms-3" data-bs-toggle="modal"
-                            data-bs-target="#deleteModal{{ $notification->id }}"> <i class="fas fa-trash"></i>
-
-
+                            data-bs-target="#deleteModal{{ $notification->id }}">
+                            <i class="fas fa-trash"></i>
                         </button>
+
                         <div class="modal fade" id="deleteModal{{ $notification->id }}" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered">
                                 <div class="modal-content text-end" dir="rtl">
                                     <div class="modal-header">
                                         <h5 class="modal-title">تأكيد الحذف</h5>
-                                        {{-- <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button> --}}
                                     </div>
 
                                     <div class="modal-body">
@@ -162,8 +175,10 @@
                                             method="POST" class="m-0">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="btn btn-danger"> <i class="fas fa-trash"></i>
-                                                نعم، احذف</button>
+                                            <button class="btn btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                                نعم، احذف
+                                            </button>
                                         </form>
                                     </div>
                                 </div>
@@ -175,96 +190,13 @@
                 @endforelse
             </div>
 
-
-            {{-- مودال الادمن للاشعارات --}}
-            <div class="modal fade" id="notifModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content text-end notif-modal" dir="rtl">
-
-                        <div class="modal-header border-0 pb-2">
-                            <div class="d-flex align-items-center gap-3 w-100">
-                                <div class="notif-modal__icon-wrap">
-                                    <i id="notifModalIcon" class="fas fa-bell text-dark"></i>
-                                </div>
-
-                                <div class="flex-grow-1">
-                                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                                        <h5 class="modal-title mb-0 fw-bold" id="notifModalTitle">إشعار</h5>
-                                        <span id="notifModalLabel"
-                                            class="badge rounded-pill text-bg-light border px-3 py-2"></span>
-                                    </div>
-                                    <small class="text-muted d-block mt-1" id="notifModalTime"></small>
-                                </div>
-
-                                <button type="button" class="btn-close ms-0" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                        </div>
-
-                        <div class="modal-body pt-2">
-                            <div class="notif-modal__message" id="notifModalMessage"></div>
-
-                            <div class="notif-modal__meta mt-3" id="notifExtraWrap" style="display:none;">
-                                <div class="d-flex align-items-center gap-2 mb-2">
-                                    <i class="fas fa-circle-info text-secondary"></i>
-                                    <strong class="small">تفاصيل إضافية</strong>
-                                </div>
-                                <div class="small text-muted" id="notifModalMeta"></div>
-                            </div>
-{{--
-                            <div class="mt-3">
-                                <span class="small text-muted me-2">النوع:</span>
-                                <code id="notifModalKind" class="notif-modal__kind">system_alert</code>
-                            </div> --}}
-                        </div>
-
-                        <div
-                            class="modal-footer border-0 pt-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                            <div class="d-flex gap-2">
-                                <form id="bookingConfirmForm" method="POST" class="m-0 d-none">
-                                    @csrf
-                                    <button type="submit" class="btn btn-success" title="موافقة">
-                                        <i class="fas fa-check"></i>
-                                        موافقة
-                                    </button>
-                                </form>
-
-                                <form id="bookingCancelForm" method="POST" class="m-0 d-none">
-                                    @csrf
-                                    <input type="hidden" name="reason" value="تم الرفض من الإشعارات">
-                                    <button type="submit" class="btn btn-danger" title="رفض">
-                                        <i class="fas fa-times"></i>
-                                        رفض
-                                    </button>
-                                </form>
-                            </div>
-
-                            <div class="d-flex gap-2">
-                                <form id="markAsReadForm" method="POST" class="m-0">
-                                    @csrf
-                                    @method('PUT')
-                                    <button type="submit" class="btn btn-outline-primary" title="تعليم كمقروء">
-                                        <i class="fas fa-check-double"></i>
-                                    </button>
-                                </form>
-
-                                <form id="deleteNotifForm" method="POST" class="m-0">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-outline-danger" title="حذف الإشعار">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" title="إغلاق">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-
+            @if ($notifications->hasPages())
+                <div class="card-footer bg-white">
+                    <div class="d-flex justify-content-center">
+                        {{ $notifications->links() }}
                     </div>
                 </div>
-            </div>
+            @endif
 
         </div>
 

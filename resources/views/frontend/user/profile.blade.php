@@ -227,7 +227,7 @@
             border-radius: 3px;
         }
 
-       
+
         @media (max-width: 450px) {
             .dropdownNot .dropdown-content {
                 right: -150px;
@@ -520,7 +520,7 @@
                                 '<p style="color:red;text-align:center;">حدث خطأ أثناء تحميل المحتوى.</p>';
                         });
                 }
-            </script> 
+            </script>
 
             <div id="contentArea" style="margin: 70px 0;">
                 <!-- سيتم تحميل الجداول هنا -->

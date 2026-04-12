@@ -25,45 +25,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        .notif-item-btn {
-            cursor: pointer;
-
-        }
-
-        .is-unread {
-            font-weight: 700;
-        }
-
-        .is-read {
-            opacity: .75;
-        }
-
-        #userNotifModalMessage {
-            line-height: 1.8;
-        }
-
-        /* للمودال */
-        .dropdown-content {
-            display: none;
-        }
-
-        .dropdown-content.show {
-            display: block;
-        }
-
-        .notif-item-btn {
-            cursor: pointer;
-        }
-
-        .is-unread {
-            font-weight: 700;
-        }
-
-        .is-read {
-            opacity: .7;
-        }
-
-        /* تنسيقات القوائم المنسدلة الجديدة */
         .user-actions-wrapper {
             display: flex;
             align-items: center;
@@ -74,51 +35,53 @@
         .dropdownNot,
         .dropdown {
             position: relative;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .dropdownNot {
+            margin-top: 0;
+            margin-bottom: 0;
         }
 
         .NotificationsIcon {
-            width: 24px;
-            height: 24px;
+            width: 25px;
+            height: 25px;
+            min-width: 25px;
+            display: block;
             cursor: pointer;
             color: #333;
         }
 
-        /*
         .notif-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: red;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
+            top: -8px;
+            right: -8px;
+            background-color: #dc3545;
+            color: #fff;
+            border-radius: 999px;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 6px;
             font-size: 10px;
-            display: none;
-            /* تظهر عند وجود إشعارات *
+            line-height: 18px;
+            text-align: center;
+            font-weight: 700;
         }
-
-        */
-        /* .user-img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            object-fit: cover;
-            border: 2px solid #eee;
-        } */
 
         .dropdown-content {
             display: none;
             position: absolute;
-            right: -225px;
+            top: 100%;
+            right: -150px;
+            left: auto;
             background-color: #fff;
-            min-width: 250px;
-            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
+            min-width: 300px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
             border-radius: 8px;
             overflow: hidden;
-            margin-top: 10px;
+            margin-top: 12px;
         }
 
         .dropdown-content.show {
@@ -147,7 +110,6 @@
             background-color: #f1f1f1;
         }
 
-        /* تنسيقات خاصة بالإشعارات */
         .notif-header {
             padding: 10px;
             font-weight: bold;
@@ -159,8 +121,25 @@
             list-style: none;
             margin: 0;
             padding: 0;
-            max-height: 300px;
+        }
+
+        .notif-list-scroll {
+            max-height: 250px;
             overflow-y: auto;
+            scrollbar-width: thin;
+        }
+
+        .notif-list-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .notif-list-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .notif-list-scroll::-webkit-scrollbar-track {
+            background: transparent;
         }
 
         .notif-item {
@@ -172,43 +151,31 @@
         }
 
         .notif-item i {
-            color: #007bff;
             margin-top: 3px;
         }
 
-        .notif-footer {
-            padding: 10px;
-            text-align: center;
-            background: #f9f9f9;
+        .notif-item-btn {
+            cursor: pointer;
         }
 
-        /* .notif-item-empty {
-            padding: 20px;
-            text-align: center;
-            color: #888;
-            display: none;
-        } */
-
-        .notif-badge {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background-color: #dc3545;
-            color: #fff;
-            border-radius: 999px;
-            min-width: 18px;
-            height: 18px;
-            padding: 0 6px;
-            font-size: 10px;
-            line-height: 18px;
-            text-align: center;
+        .is-unread {
             font-weight: 700;
+        }
+
+        .is-read {
+            opacity: .75;
         }
 
         .notif-item-empty {
             padding: 20px;
             text-align: center;
             color: #888;
+        }
+
+        .notif-footer {
+            padding: 10px;
+            text-align: center;
+            background: #f9f9f9;
         }
 
         .logout-form {
@@ -235,7 +202,6 @@
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid #eee;
-
         }
 
         .uk-navbar-nav {
@@ -243,63 +209,8 @@
             white-space: nowrap;
         }
 
-        .dropdownNot {
-            margin-top: 0;
-            margin-bottom: 0;
-        }
-
-        .NotificationsIcon {
-            width: 25px;
-            height: 25px;
-            min-width: 25px;
-            display: block;
-        }
-
-
-
-        .page-header-bottom__right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        /* .dropdown-content {
-            display: none;
-            position: absolute;
-            top: 100%;
-            right: -150px;
-            left: auto;
-            background-color: #fff;
-            min-width: 300px;
-            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-            z-index: 9999;
-            border-radius: 8px;
-            margin-top: 12px;
-        }
-     */
-        .dropdownNot {
-            position: relative;
-            /* هذا هو "المرساة" التي ستثبت القائمة */
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            top: 100%;
-            /* لجعلها تبدأ فوراً بعد نهاية الهيدر */
-            right: -150px;
-            /* لمحاذاتها مع طرف الجرس من اليمين */
-            left: auto;
-            background-color: #fff;
-            min-width: 300px;
-            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-            z-index: 9999;
-            /* لضمان ظهورها فوق السلايدر والمحتوى */
-            border-radius: 8px;
-            margin-top: 12px;
-            /* مسافة بسيطة تحت الجرس لتبدو أنيقة */
+        #userNotifModalMessage {
+            line-height: 1.8;
         }
 
         #userNotifModal .modal-content {
@@ -344,10 +255,8 @@
             }
         }
 
-
         .lang-btn {
             color: inherit;
-            /* نفس لون العناصر */
             font-weight: normal;
             text-decoration: none;
             display: flex;
@@ -355,10 +264,8 @@
             gap: 5px;
         }
 
-        /* نفس تأثير الهوفر */
         .lang-btn:hover {
             color: #f0b90b;
-            /* نفس اللون الأصفر تبع الـ active عندك */
         }
     </style>
 
@@ -412,67 +319,9 @@
                             @auth
                                 @php
                                     $unreadCount = auth()->user()->unreadNotifications()->count();
-                                    $latest = auth()->user()->notifications()->latest()->take(5)->get();
-
-                                    $notifUI = [
-                                        'booking_request' => [
-                                            'icon' => 'fas fa-calendar-plus',
-                                            'class' => 'text-primary',
-                                            'label' => 'حجز',
-                                        ],
-                                        'booking_confirmed' => [
-                                            'icon' => 'fas fa-check-circle',
-                                            'class' => 'text-success',
-                                            'label' => 'حجز',
-                                        ],
-                                        'booking_cancelled' => [
-                                            'icon' => 'fas fa-times-circle',
-                                            'class' => 'text-danger',
-                                            'label' => 'حجز',
-                                        ],
-                                        'new_message' => [
-                                            'icon' => 'fas fa-envelope',
-                                            'class' => 'text-info',
-                                            'label' => 'رسائل',
-                                        ],
-                                        'payment_received' => [
-                                            'icon' => 'fas fa-money-bill-wave',
-                                            'class' => 'text-success',
-                                            'label' => 'دفع',
-                                        ],
-                                        'payment_failed' => [
-                                            'icon' => 'fas fa-exclamation-triangle',
-                                            'class' => 'text-warning',
-                                            'label' => 'دفع',
-                                        ],
-                                        'refund_issued' => [
-                                            'icon' => 'fas fa-undo',
-                                            'class' => 'text-secondary',
-                                            'label' => 'دفع',
-                                        ],
-                                        'equipment_moved' => [
-                                            'icon' => 'fas fa-location-arrow',
-                                            'class' => 'text-danger',
-                                            'label' => 'GPS',
-                                        ],
-                                        'system_alert' => [
-                                            'icon' => 'fas fa-bell',
-                                            'class' => 'text-dark',
-                                            'label' => 'تنبيه',
-                                        ],
-                                    ];
-
-                                    $titles = [
-                                        'booking_request' => 'طلب حجز جديد',
-                                        'booking_confirmed' => 'تم تأكيد الحجز',
-                                        'booking_cancelled' => 'تم إلغاء الحجز',
-                                        'new_message' => 'رسالة جديدة',
-                                        'payment_received' => 'تم استلام الدفع',
-                                        'payment_failed' => 'فشل الدفع',
-                                        'refund_issued' => 'تم إصدار استرداد',
-                                        'equipment_moved' => 'تحذير حركة',
-                                        'system_alert' => 'إشعار',
-                                    ];
+                                    $latest = auth()->user()->notifications()->latest()->get();
+                                    $notifUI = config('notifications.ui');
+                                    $titles = config('notifications.titles');
                                 @endphp
 
                                 <div class="dropdownNot">
@@ -500,7 +349,7 @@
                                             </form>
                                         </div>
 
-                                        <ul class="notif-list">
+                                        <ul class="notif-list notif-list-scroll">
                                             @forelse($latest as $n)
                                                 @php
                                                     $kind = $n->data['kind'] ?? 'system_alert';
@@ -509,9 +358,6 @@
                                                         'class' => 'text-dark',
                                                         'label' => 'تنبيه',
                                                     ];
-
-                                                    $title = $n->data['title'] ?? 'إشعار';
-                                                    $msg = $n->data['data'] ?? '';
                                                 @endphp
 
                                                 <li class="notif-item notif-item-btn {{ $n->read_at ? 'is-read' : 'is-unread' }}"
@@ -522,10 +368,13 @@
                                                     data-title="{{ $n->data['title'] ?? ($titles[$kind] ?? 'إشعار') }}"
                                                     data-message="{{ $n->data['data'] ?? '' }}"
                                                     data-time="{{ optional($n->created_at)->diffForHumans() }}"
-                                                    data-meta='@json($n->data)'>
+                                                    data-meta='@json($n->data)'
+                                                    data-url="{{ $n->data['url'] ?? '' }}">
+
                                                     <i class="{{ $ui['icon'] }} {{ $ui['class'] }}"></i>
-                                                    <span
-                                                        class="notif-item-text">{{ $n->data['title'] ?? ($titles[$kind] ?? 'إشعار') }}</span>
+                                                    <span class="notif-item-text">
+                                                        {{ $n->data['title'] ?? ($titles[$kind] ?? 'إشعار') }}
+                                                    </span>
                                                 </li>
                                             @empty
                                                 <li class="notif-item-empty">لا توجد إشعارات</li>
@@ -539,6 +388,7 @@
                                     </div>
                                 </div>
                             @endauth
+
 
                             <div class="lang-switcher">
                                 <a href="{{ route('language.switch', app()->getLocale() === 'ar' ? 'en' : 'ar') }}"
@@ -835,6 +685,11 @@
                     </button>
 
                     <div class="d-flex align-items-center gap-2">
+                        <a id="userNotifDetailsLink" href="#" class="btn px-3 py-2 rounded-pill d-none"
+                            style="border:1px solid #e5e7eb; background:#fff; color:#111827;">
+                            <i class="fas fa-eye"></i>
+                            عرض التفاصيل
+                        </a>
                         {{-- حذف --}}
                         <form id="userDeleteNotifForm" method="POST" class="m-0">
                             @csrf
@@ -863,50 +718,6 @@
     <script src="{{ asset('assets/home/js/libs.js') }}"></script>
     <script src="{{ asset('assets/home/js/main.js') }}"></script>
 
-    {{-- <script>
-        // كود تشغيل القوائم المنسدلة عند النقر
-        document.addEventListener('click', function(event) {
-            const userBtn = document.getElementById('userBtn');
-            const userMenu = document.getElementById('dropdownMenu');
-            const notifBtn = document.getElementById('userBtnNot');
-            const notifMenu = document.getElementById('dropdownMenuNot');
-
-            // فتح/إغلاق قائمة المستخدم
-            if (userBtn && userBtn.contains(event.target)) {
-                userMenu.classList.toggle('show');
-                if (notifMenu) notifMenu.classList.remove('show');
-            }
-            // فتح/إغلاق قائمة الإشعارات
-            else if (notifBtn && notifBtn.contains(event.target)) {
-                notifMenu.classList.toggle('show');
-                userMenu.classList.remove('show');
-            }
-            // إغلاق القوائم عند النقر في أي مكان آخر
-            else {
-                if (userMenu) userMenu.classList.remove('show');
-                if (notifMenu) notifMenu.classList.remove('show');
-            }
-        });
-    </script>
-
-    {{-- لفتح واغلاق المودال --}
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const btn = document.getElementById('userBtnNot');
-            const menu = document.getElementById('dropdownMenuNot');
-
-            if (!btn || !menu) return;
-
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                menu.classList.toggle('show');
-            });
-
-            document.addEventListener('click', () => {
-                menu.classList.remove('show');
-            });
-        });
-    </script> --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const userBtn = document.getElementById('userBtn');
@@ -942,157 +753,6 @@
             });
         });
     </script>
-
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('userNotifModal');
-            if (!modal) return;
-
-            const iconEl = document.getElementById('userNotifModalIcon');
-            const titleEl = document.getElementById('userNotifModalTitle');
-            const labelEl = document.getElementById('userNotifModalLabel');
-            const msgEl = document.getElementById('userNotifModalMessage');
-            const timeEl = document.getElementById('userNotifModalTime');
-            const kindEl = document.getElementById('userNotifModalKind');
-
-            const extraWrap = document.getElementById('userNotifExtraWrap');
-            const metaEl = document.getElementById('userNotifModalMeta');
-
-            const markForm = document.getElementById('userMarkAsReadForm');
-            const delForm = document.getElementById('userDeleteNotifForm');
-
-            modal.addEventListener('show.bs.modal', function(event) {
-                const btn = event.relatedTarget;
-                if (!btn) return;
-
-                const id = btn.getAttribute('data-id');
-                const kind = btn.getAttribute('data-kind') || 'system_alert';
-                const icon = btn.getAttribute('data-icon') || 'fas fa-bell';
-                const color = btn.getAttribute('data-color') || 'text-dark';
-                const label = btn.getAttribute('data-label') || '';
-                const title = btn.getAttribute('data-title') || 'إشعار';
-                const message = btn.getAttribute('data-message') || '';
-                const time = btn.getAttribute('data-time') || '';
-                const meta = JSON.parse(btn.getAttribute('data-meta') || '{}');
-
-                iconEl.className = `${icon} ${color}`;
-                titleEl.textContent = title;
-                labelEl.textContent = label;
-                labelEl.style.display = label ? '' : 'none';
-
-                msgEl.textContent = message;
-                timeEl.textContent = time;
-                kindEl.textContent = kind;
-
-                //  روات القراءة والحذف (نفس اللي عندك بالأدمن)
-                markForm.action = `{{ url('notifications') }}/${id}/read`;
-                delForm.action = `{{ url('notifications') }}/${id}`;
-
-                // تفاصيل إضافية
-                const lines = [];
-                if (meta.booking_id) lines.push(`رقم الحجز: ${meta.booking_id}`);
-                if (meta.equipment_id) lines.push(`رقم المعدة: ${meta.equipment_id}`);
-                if (meta.conversation_id) lines.push(`رقم المحادثة: ${meta.conversation_id}`);
-                if (meta.distance_km) lines.push(`المسافة: ${Number(meta.distance_km).toFixed(3)} كم`);
-                // if (meta.speed) lines.push(`السرعة: ${meta.speed}`);
-                // if (meta.battery_level) lines.push(`البطارية: ${meta.battery_level}%`);
-                if (meta.lat && meta.lng) lines.push(`الموقع: (${meta.lat}, ${meta.lng})`);
-
-                if (lines.length) {
-                    metaEl.innerHTML = '<ul class="mb-0 ps-3">' + lines.map(x => `<li>${x}</li>`).join('') +
-                        '</ul>';
-                    extraWrap.style.display = '';
-                } else {
-                    metaEl.innerHTML = '';
-                    extraWrap.style.display = 'none';
-                }
-            });
-
-            //  إغلاق dropdown custom تبعك قبل فتح المودال
-            document.addEventListener('click', function(e) {
-                const item = e.target.closest('.notif-item-btn');
-                if (!item) return;
-
-                const menu = document.getElementById('dropdownMenuNot');
-                if (menu) menu.classList.remove('show');
-            });
-        });
-    </script> --}}
-
-
-    {{-- مودال اليوزر العادي
- --}}
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('userNotifModal');
-            if (!modal) return;
-
-            const iconEl = document.getElementById('userNotifModalIcon');
-            const titleEl = document.getElementById('userNotifModalTitle');
-            const labelEl = document.getElementById('userNotifModalLabel');
-            const msgEl = document.getElementById('userNotifModalMessage');
-            const timeEl = document.getElementById('userNotifModalTime');
-            // const kindEl = document.getElementById('userNotifModalKind');
-
-            const extraWrap = document.getElementById('userNotifExtraWrap');
-            const metaEl = document.getElementById('userNotifModalMeta');
-
-            const markForm = document.getElementById('userMarkAsReadForm');
-            const delForm = document.getElementById('userDeleteNotifForm');
-
-            modal.addEventListener('show.bs.modal', function(event) {
-                const btn = event.relatedTarget;
-                if (!btn) return;
-
-                const id = btn.getAttribute('data-id');
-                const kind = btn.getAttribute('data-kind') || 'system_alert';
-                const icon = btn.getAttribute('data-icon') || 'fas fa-bell';
-                const color = btn.getAttribute('data-color') || 'text-dark';
-                const label = btn.getAttribute('data-label') || '';
-                const title = btn.getAttribute('data-title') || 'إشعار';
-                const message = btn.getAttribute('data-message') || '';
-                const time = btn.getAttribute('data-time') || '';
-                const meta = JSON.parse(btn.getAttribute('data-meta') || '{}');
-
-                iconEl.className = `${icon} ${color}`;
-                titleEl.textContent = title;
-                labelEl.textContent = label;
-                labelEl.style.display = label ? '' : 'none';
-
-                msgEl.textContent = message;
-                timeEl.textContent = time;
-                // kindEl.textContent = kind;
-
-                markForm.action = `{{ url('my-notifications') }}/${id}/read`;
-                delForm.action = `{{ url('my-notifications') }}/${id}`;
-
-                const lines = [];
-
-                if (meta.booking_id) lines.push(`رقم الحجز: ${meta.booking_id}`);
-                if (meta.equipment_id) lines.push(`رقم المعدة: ${meta.equipment_id}`);
-                if (meta.conversation_id) lines.push(`رقم المحادثة: ${meta.conversation_id}`);
-                if (meta.amount) lines.push(`المبلغ: ${meta.amount}`);
-                if (meta.reason) lines.push(`السبب: ${meta.reason}`);
-                if (meta.distance_km) lines.push(`المسافة: ${Number(meta.distance_km).toFixed(3)} كم`);
-                if (meta.lat && meta.lng) lines.push(`الموقع: (${meta.lat}, ${meta.lng})`);
-                if (meta.login_at) lines.push(`وقت تسجيل الدخول: ${meta.login_at}`);
-                if (meta.registered_at) lines.push(`وقت إنشاء الحساب: ${meta.registered_at}`);
-                if (meta.start_date) lines.push(`موعد البداية: ${meta.start_date}`);
-
-                if (lines.length) {
-                    metaEl.innerHTML = '<ul class="mb-0 ps-3">' + lines.map(x => `<li>${x}</li>`).join('') +
-                        '</ul>';
-                    extraWrap.style.display = '';
-                } else {
-                    metaEl.innerHTML = '';
-                    extraWrap.style.display = 'none';
-                }
-
-                const notifMenu = document.getElementById('dropdownMenuNot');
-                if (notifMenu) notifMenu.classList.remove('show');
-            });
-        });
-    </script> --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('userNotifModal');
@@ -1109,6 +769,7 @@
 
             const markForm = document.getElementById('userMarkAsReadForm');
             const delForm = document.getElementById('userDeleteNotifForm');
+            const detailsLink = document.getElementById('userNotifDetailsLink');
 
             modal.addEventListener('show.bs.modal', function(event) {
                 const btn = event.relatedTarget;
@@ -1121,6 +782,7 @@
                 const title = btn.getAttribute('data-title') || 'إشعار';
                 const message = btn.getAttribute('data-message') || '';
                 const time = btn.getAttribute('data-time') || '';
+                const url = btn.getAttribute('data-url') || '';
                 const meta = JSON.parse(btn.getAttribute('data-meta') || '{}');
 
                 iconEl.className = `${icon} ${color}`;
@@ -1133,6 +795,17 @@
 
                 markForm.action = `{{ url('my-notifications') }}/${id}/read`;
                 delForm.action = `{{ url('my-notifications') }}/${id}`;
+
+                if (detailsLink) {
+
+                    if (url) {
+                        detailsLink.href = url;
+                        detailsLink.classList.remove('d-none');
+                    } else {
+                        detailsLink.href = '#';
+                        detailsLink.classList.add('d-none');
+                    }
+                }
 
                 const lines = [];
                 if (meta.equipment_name) lines.push(`المعدة: ${meta.equipment_name}`);
@@ -1149,7 +822,8 @@
                 if (meta.registered_at) lines.push(`وقت إنشاء الحساب: ${meta.registered_at}`);
 
                 if (lines.length) {
-                    metaEl.innerHTML = '<ul class="mb-0 ps-3">' + lines.map(x => `<li>${x}</li>`).join('') +
+                    metaEl.innerHTML = '<ul class="mb-0 ps-3">' + lines.map(x => `<li>${x}</li>`).join(
+                            '') +
                         '</ul>';
                     extraWrap.style.display = '';
                 } else {
@@ -1162,71 +836,7 @@
             });
         });
     </script>
-    {{-- <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const modal = document.getElementById('userNotifModal');
-            if (!modal) return;
 
-            const iconEl = document.getElementById('userNotifModalIcon');
-            const titleEl = document.getElementById('userNotifModalTitle');
-            const labelEl = document.getElementById('userNotifModalLabel');
-            const msgEl = document.getElementById('userNotifModalMessage');
-            const timeEl = document.getElementById('userNotifModalTime');
-            const kindEl = document.getElementById('userNotifModalKind');
-
-            const extraWrap = document.getElementById('userNotifExtraWrap');
-            const metaEl = document.getElementById('userNotifModalMeta');
-
-            const markForm = document.getElementById('userMarkAsReadForm');
-            const delForm = document.getElementById('userDeleteNotifForm');
-
-            modal.addEventListener('show.bs.modal', function(event) {
-                const btn = event.relatedTarget;
-                if (!btn) return;
-
-                const id = btn.getAttribute('data-id');
-                const kind = btn.getAttribute('data-kind') || 'system_alert';
-                const icon = btn.getAttribute('data-icon') || 'fas fa-bell';
-                const color = btn.getAttribute('data-color') || 'text-dark';
-                const label = btn.getAttribute('data-label') || '';
-                const title = btn.getAttribute('data-title') || 'إشعار';
-                const message = btn.getAttribute('data-message') || '';
-                const time = btn.getAttribute('data-time') || '';
-                const meta = JSON.parse(btn.getAttribute('data-meta') || '{}');
-
-                iconEl.className = `${icon} ${color}`;
-                titleEl.textContent = title;
-                labelEl.textContent = label;
-                labelEl.style.display = label ? '' : 'none';
-
-                msgEl.textContent = message;
-                timeEl.textContent = time;
-                kindEl.textContent = kind;
-
-                //  روات Front
-                markForm.action = `{{ url('my-notifications') }}/${id}/read`;
-                delForm.action = `{{ url('my-notifications') }}/${id}`;
-
-                const lines = [];
-                if (meta.booking_id) lines.push(`رقم الحجز: ${meta.booking_id}`);
-                if (meta.equipment_id) lines.push(`رقم المعدة: ${meta.equipment_id}`);
-                if (meta.conversation_id) lines.push(`رقم المحادثة: ${meta.conversation_id}`);
-                if (meta.distance_km) lines.push(`المسافة: ${Number(meta.distance_km).toFixed(3)} كم`);
-                // if (meta.speed) lines.push(`السرعة: ${meta.speed}`);
-                // if (meta.battery_level) lines.push(`البطارية: ${meta.battery_level}%`);
-                if (meta.lat && meta.lng) lines.push(`الموقع: (${meta.lat}, ${meta.lng})`);
-
-                if (lines.length) {
-                    metaEl.innerHTML = '<ul class="mb-0 ps-3">' + lines.map(x => `<li>${x}</li>`).join('') +
-                        '</ul>';
-                    extraWrap.style.display = '';
-                } else {
-                    metaEl.innerHTML = '';
-                    extraWrap.style.display = 'none';
-                }
-            });
-        });
-    </script> --}}
 
     @stack('scripts')
 </body>
