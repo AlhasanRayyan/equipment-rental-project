@@ -110,7 +110,7 @@ class HomeController extends Controller
             ->with('owner', 'category', 'images')
             ->paginate(12);
 
-        // ✅ قسم الاهتمامات
+        //  قسم الاهتمامات
         $hasInterests = false;
         $recommendedEquipments = collect();
 
@@ -146,8 +146,8 @@ class HomeController extends Controller
             'location',
             'minDailyRate',
             'maxDailyRate',
-            'recommendedEquipments', // ✅ أضفناه
-            'hasInterests', // ✅
+            'recommendedEquipments', //  أضفناه
+            'hasInterests', //
 
         ));
     }
